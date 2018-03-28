@@ -208,7 +208,6 @@ public class Impresion {
         List<Cocina> cocinasExistentesEnLaOrden = new ArrayList<>();
         for (ProductovOrden x : o.getProductovOrdenList()) {
             if(!cocinasExistentesEnLaOrden.contains(x.getProductoVenta().getCocinacodCocina()) && 
-                    !x.getProductoVenta().getCocinacodCocina().getNombreCocina().equals("Barra") &&
                     x.getEnviadosacocina()<x.getCantidad()){
                 cocinasExistentesEnLaOrden.add(x.getProductoVenta().getCocinacodCocina());
             }
@@ -280,7 +279,6 @@ public class Impresion {
         int total = 0;
         for (ProductovOrden x : o.getProductovOrdenList()) {
             if(x.getEnviadosacocina()<x.getCantidad() &&
-              !x.getProductoVenta().getCocinacodCocina().getNombreCocina().equals("Barra") && 
                     x.getProductoVenta().getCocinacodCocina().equals(c)){
             p.setText(x.getCantidad()-x.getEnviadosacocina() + " " + x.getProductoVenta().getNombre());
             p.newLine();
