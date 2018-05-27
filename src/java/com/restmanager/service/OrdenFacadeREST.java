@@ -139,8 +139,8 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         List<Orden> ord = super.findAll();
         Venta v = getEntityManager().find(Venta.class, today);
         for (int i = ord.size() - 1; i >= 0; i--) {
-            if (ord.get(i).getMesacodMesa().getCodMesa().equals(codMesa) && ord.get(i).getHoraTerminada() == null && 
-                   ord.get(i).getVentafecha().getFecha().compareTo(v.getFecha()) >= 0 ) {
+            if (ord.get(i).getMesacodMesa().getCodMesa().equals(codMesa) &&
+                    ord.get(i).getHoraTerminada() == null) {
                 return ord.get(i).getCodOrden();
             }
         }
@@ -260,8 +260,9 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
             p = getEntityManager().find(ProductovOrden.class, p.getProductovOrdenPK());
             getEntityManager().remove(p);
         }
-        getEntityManager().getTransaction().commit();
         o.setProductovOrdenList(po);
+        getEntityManager().getTransaction().commit();
+        
         super.edit(o);
         return "1";
     }//TODO: METODoS ARCAICOS
