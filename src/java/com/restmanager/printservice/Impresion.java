@@ -35,8 +35,7 @@ public class Impresion {
     private String nombreRest = null;
     private boolean monedaCUC = false;
     private float cambio = 24;
-    private String 
-            CABECERA = "Restaurante",
+    private String CABECERA = "Restaurante",
             COCINA = "Cocina: ",
             DELACASA = "(Pedido por la casa)",
             ORDEN = "Orden No: ",
@@ -50,45 +49,38 @@ public class Impresion {
             CUC = " CUC",
             MN = " MN",
             SYNC = "Sale con: ";
-            
-    
+
     SimpleDateFormat Format = new SimpleDateFormat("dd'/'MM'/'yy ' ' ");
     SimpleDateFormat TimaFormat = new SimpleDateFormat(" hh ':' mm ' ' a ");
-    
-   
- 
-    
+
     private static void feedPrinter(byte[] b) throws PrintException {
-        
+
         //DocPrintJob job = PrintServiceLookup.lookupPrintServices(null, attrSet)[0].createPrintJob();       
-        DocPrintJob job = PrintServiceLookup.lookupDefaultPrintService().createPrintJob();  
+        DocPrintJob job = PrintServiceLookup.lookupDefaultPrintService().createPrintJob();
         DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
         Doc doc = new SimpleDoc(b, flavor, null);
 
         job.print(doc, null);
-        
-        
-    
-   
-}
+
+    }
 
     public Impresion(Carta m) {
-        this.nombreRest = m.getNombreCarta();
-        
+        this(m, m.getMonedaPrincipal().equals("CUC"), 25);
     }
 
-    public Impresion(Carta m , boolean monedaCUC, float cambio) {
+    public Impresion(Carta m, boolean monedaCUC, float cambio) {
         nombreRest = m.getNombreCarta();
         this.cambio = cambio;
-        if(this.monedaCUC = monedaCUC)
+        if (this.monedaCUC = monedaCUC) {
             MONEDA = CUC;
-        else
+        } else {
             MONEDA = MN;
-        
+        }
+
     }
-    
+
     public Impresion(Carta m, String footer) {
-        this.nombreRest = m.getNombreCarta();
+        this(m, m.getMonedaPrincipal().equals("CUC"), 25);
         PIE = footer;
     }
 
@@ -96,16 +88,17 @@ public class Impresion {
         this.nombreRest = m.getNombreCarta();
         this.cambio = cambio;
         PIE = footer;
-        if(this.monedaCUC = monedaCUC)
+        if (this.monedaCUC = monedaCUC) {
             MONEDA = CUC;
-        else
+        } else {
             MONEDA = MN;
+        }
     }
 
-    public void print(Orden o) throws PrintException {
+   public void print(Orden o, boolean preview) throws PrintException {
 
         float total = 0;
-        
+
         Ticket p = new Ticket();
         p.resetAll();
         p.initialize();
@@ -115,7 +108,8 @@ public class Impresion {
         p.newLine();
         p.setText(this.nombreRest);
         p.newLine();
-        if(o.getDeLaCasa()){
+        
+        if (o.getDeLaCasa()) {
             p.doubleStrik(true);
             p.setText(DELACASA);
             p.doubleStrik(false);
@@ -135,56 +129,59 @@ public class Impresion {
         p.newLine();
         p.alignRight();
         p.setText(o.getPersonalusuario().getDatosPersonales().getNombre());
-        
+
         p.newLine();
         p.addLineSeperator();
         p.newLine();
-        
+
         for (ProductovOrden x : o.getProductovOrdenList()) {
             p.alignLeft();
             p.setText(x.getCantidad() + " " + x.getProductoVenta().getNombre());
             p.newLine();
             p.alignRight();
-            p.setText(x.getCantidad()*x.getProductoVenta().getPrecioVenta()+ MONEDA);
+            p.setText(x.getCantidad() * x.getProductoVenta().getPrecioVenta() + MONEDA);
             p.newLine();
-            total+=x.getCantidad()*x.getProductoVenta().getPrecioVenta();
+            total += x.getCantidad() * x.getProductoVenta().getPrecioVenta();
         }
-        
-         String totalPrint = redondeoDeMonedaMN_CUC((int) (total*100));
-        
+
+        String subTotalPrint = redondeoDeMonedaMN_CUC((int) (total * 100));
+        String sumaPorciento = setDosLugaresDecimales((int) ((total / o.getPorciento()) * 100));
+        String totalPrint = subTotalPrint;
         p.alignRight();
         p.newLine();
-        p.setText(SUBTOTAL + totalPrint + MONEDA);
+        p.setText(SUBTOTAL + subTotalPrint + MONEDA);
+        if (o.getPorciento() != 0) {
+            p.newLine();
+            p.setText("+ " + o.getPorciento() + "% : " + sumaPorciento + MONEDA);
+            totalPrint = setDosLugaresDecimales((int) ((total * 100) + ((total / o.getPorciento()) * 100)));
+
+        }
         p.newLine();
         p.addLineSeperator();
         p.setText(TOTAL + totalPrint + MONEDA);
         p.newLine();
-        
-        if(monedaCUC){
-        p.setText(TOTAL + redondeoDeMonedaMN_CUC((int) (total*cambio*100)) + MN); 
+
+        if (monedaCUC) {
+            p.setText(TOTAL + redondeoDeMonedaMN_CUC((int) (Float.valueOf(totalPrint) * cambio * 100)) + MN);
+        } else {
+            p.setText(TOTAL + redondeoDeMonedaMN_CUC((int) (100 * Float.valueOf(totalPrint) / cambio)) + CUC);
         }
-        else{
-        p.setText(TOTAL + redondeoDeMonedaMN_CUC((int) (100*total/cambio)) + CUC);
-        }
-        
+
         p.newLine();
         p.newLine();
-        
+
         p.alignCenter();
         p.setText(this.PIE);
         p.newLine();
-        p.feed((byte)3);
+        p.feed((byte) 3);
         p.finit();
-        
-     
-            feedPrinter(p.finalCommandSet().getBytes());
-      
+
+        feedPrinter(p.finalCommandSet().getBytes());
+
     }
 
     public Orden printKitchen(Orden o) throws PrintException {
-        
-        
-        
+
         Ticket p = new Ticket();
         p.resetAll();
         p.initialize();
@@ -195,8 +192,8 @@ public class Impresion {
         p.addLineSeperator();
         p.newLine();
         p.alignRight();
-        p.setText(FECHA + this.Format.format(o.getVentafecha().getFecha()) + 
-                TimaFormat.format(new Date()));
+        p.setText(FECHA + this.Format.format(o.getVentafecha().getFecha())
+                + TimaFormat.format(new Date()));
         p.newLine();
         p.setText(ORDEN + o.getCodOrden());
         p.newLine();
@@ -205,52 +202,48 @@ public class Impresion {
         p.addLineSeperator();
         p.newLine();
         p.alignLeft();
-        
+
         List<Cocina> cocinasExistentesEnLaOrden = new ArrayList<>();
         for (ProductovOrden x : o.getProductovOrdenList()) {
-            if(!cocinasExistentesEnLaOrden.contains(x.getProductoVenta().getCocinacodCocina()) && 
-                    x.getEnviadosacocina()<x.getCantidad()){
+            if (!cocinasExistentesEnLaOrden.contains(x.getProductoVenta().getCocinacodCocina())
+                    && x.getEnviadosacocina() < x.getCantidad()) {
                 cocinasExistentesEnLaOrden.add(x.getProductoVenta().getCocinacodCocina());
             }
         }
-        if(cocinasExistentesEnLaOrden.size()>1){
-           for (int i = 0; i < cocinasExistentesEnLaOrden.size(); i++) {
-            String sync = SYNC;
-            for (int j = 0; j < cocinasExistentesEnLaOrden.size(); j++) {
-                if(i == j){
-                    continue;
+        if (cocinasExistentesEnLaOrden.size() > 1) {
+            for (int i = 0; i < cocinasExistentesEnLaOrden.size(); i++) {
+                String sync = SYNC;
+                for (int j = 0; j < cocinasExistentesEnLaOrden.size(); j++) {
+                    if (i == j) {
+                        continue;
+                    }
+                    sync += cocinasExistentesEnLaOrden.get(j).getNombreCocina() + " ";
                 }
-                sync += cocinasExistentesEnLaOrden.get(j).getNombreCocina()+" ";
+                printKitchen(o, cocinasExistentesEnLaOrden.get(i), sync);
             }
-               printKitchen(o, cocinasExistentesEnLaOrden.get(i), sync);
-        } 
-        }else{
-            if(cocinasExistentesEnLaOrden.size() > 0){
+        } else {
+            if (cocinasExistentesEnLaOrden.size() > 0) {
                 printKitchen(o, cocinasExistentesEnLaOrden.get(0), p.newLine());
             }
-            
+
         }
-        
-   
-      
-    
-    return o;
+
+        return o;
     }
-    
-    
+
     /**
      * imprime una orden por la impresora predeterminada
+     *
      * @param o la orden que se va a imprimir
      * @param c la cocina hacia donde se va a imprimir
-     * @param sync es string de sincronizacion. ej: si los productos 
-     * van a salir con los de otra cocina
+     * @param sync es string de sincronizacion. ej: si los productos van a salir
+     * con los de otra cocina
      * @return
-     * @throws PrintException 
+     * @throws PrintException
      */
-    public Orden printKitchen(Orden o,Cocina c,String sync) throws PrintException {
+    public Orden printKitchen(Orden o, Cocina c, String sync) throws PrintException {
         boolean ordenSinPlatos = true;
-        
-        
+
         Ticket p = new Ticket();
         p.resetAll();
         p.initialize();
@@ -279,21 +272,21 @@ public class Impresion {
         p.alignLeft();
         int total = 0;
         for (ProductovOrden x : o.getProductovOrdenList()) {
-            if(x.getEnviadosacocina()<x.getCantidad() &&
-                    x.getProductoVenta().getCocinacodCocina().equals(c)){
-            p.setText(x.getCantidad()-x.getEnviadosacocina() + " " + x.getProductoVenta().getNombre());
-            p.newLine();
-            
-            p.alignRight();
-            total += (x.getCantidad()-x.getEnviadosacocina())*x.getProductoVenta().getPrecioVenta();
-            p.setText((x.getCantidad()-x.getEnviadosacocina())*x.getProductoVenta().getPrecioVenta() + " " + MONEDA);
-            p.newLine();
-            p.alignLeft();
-            x.setEnviadosacocina(x.getCantidad());
-            ordenSinPlatos = false;
+            if (x.getEnviadosacocina() < x.getCantidad()
+                    && x.getProductoVenta().getCocinacodCocina().equals(c)) {
+                p.setText(x.getCantidad() - x.getEnviadosacocina() + " " + x.getProductoVenta().getNombre());
+                p.newLine();
+
+                p.alignRight();
+                total += (x.getCantidad() - x.getEnviadosacocina()) * x.getProductoVenta().getPrecioVenta();
+                p.setText((x.getCantidad() - x.getEnviadosacocina()) * x.getProductoVenta().getPrecioVenta() + " " + MONEDA);
+                p.newLine();
+                p.alignLeft();
+                x.setEnviadosacocina(x.getCantidad());
+                ordenSinPlatos = false;
             }
         }
-        
+
         p.addLineSeperator();
         p.newLine();
         p.setText(total + " " + MONEDA);
@@ -302,56 +295,67 @@ public class Impresion {
         p.newLine();
         p.setText(sync);
         p.newLine();
-        p.feed((byte)3);
+        p.feed((byte) 3);
         p.finit();
-        
-            if(!ordenSinPlatos){
+
+        if (!ordenSinPlatos) {
             feedPrinter(p.finalCommandSet().getBytes());
-            }
-            else{
-                System.out.println("No existen platos de la cocina "
-                        +c.getNombreCocina()+" de la orden"+ o.getCodOrden()+" para imprimir");
-            }
-    
-    return o;
+        } else {
+            System.out.println("No existen platos de la cocina "
+                    + c.getNombreCocina() + " de la orden" + o.getCodOrden() + " para imprimir");
+        }
+
+        return o;
     }
 
-    
-
-    
     /**
      * redondea por exceso las cuentas en moneda nacional a CUC
-     * @param valorARedondear el valor a redondear en entero (multiplicando el float por 100)
+     *
+     * @param valorARedondear el valor a redondear en entero (multiplicando el
+     * float por 100)
      * @return un string con el valor a imprimir o usar
      */
-    public static String redondeoDeMonedaMN_CUC (int valorARedondear){
-        int ref = valorARedondear%5;
-        
-        if(ref != 0){
-            valorARedondear+= 5-ref ;
+    public static String redondeoDeMonedaMN_CUC(int valorARedondear) {
+        int ref = valorARedondear % 5;
+
+        if (ref != 0) {
+            valorARedondear += 5 - ref;
         }
-        float valorConvertido = (float)valorARedondear/100;
+        float valorConvertido = (float) valorARedondear / 100;
         String ret = String.valueOf(valorConvertido);
-        
+
         int decimales = 0;
-        for (int i = 0; decimales == 0 ; i++) {
-        if(ret.charAt(i) == 46){
-            decimales = ret.length()-1-i;
-        }    
+        for (int i = 0; decimales == 0; i++) {
+            if (ret.charAt(i) == 46) {
+                decimales = ret.length() - 1 - i;
+            }
         }
-        if(decimales != 2){
+        if (decimales != 2) {
             ret += "0";
         }
         return ret;
     }
     
-   
-   
+    public static String setDosLugaresDecimales(int valorARedondear) {
+        
+
+        
+        int decimales = 0;
+        
+        float valorConvertido = (float) valorARedondear / 100;
+        String ret = String.valueOf(valorConvertido);
+        
+        for (int i = 0; decimales == 0 && i < ret.length(); i++) {
+            if (ret.charAt(i) == 46) {
+                decimales = ret.length() - 1 - i;
+            }
+        }
+
+        while (decimales != 2) {
+            ret += "0";
+            decimales++;
+        }
+        return ret;
+    }
+
 }
-    
-    
-
-
-    
-    
-

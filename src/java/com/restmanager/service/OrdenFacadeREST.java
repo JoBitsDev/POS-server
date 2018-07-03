@@ -98,6 +98,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         o.setVentafecha(v);
         o.setDeLaCasa(false);
         o.setHoraComenzada(new Date());
+        o.setPorciento(Float.valueOf("10"));
        
         
         super.create(o);
@@ -285,13 +286,17 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
             ordenGastosEnInsumos += x.getProductoVenta().getGasto()*x.getCantidad();
         }
         
+        if(o.getPorciento() != 0){
+            ordenValorMonetario += o.getPorciento()*ordenValorMonetario;
+        }
+        
         o.setOrdengastoEninsumos(ordenGastosEnInsumos);
         o.setOrdenvalorMonetario(ordenValorMonetario);
         
         
         Impresion i = new Impresion(getEntityManager().find(Carta.class, "Mnu-1"), false, 24);
         try {
-            i.print(o);
+            i.print(o,false);
         } catch (PrintException | NullPointerException ex) {
             Logger.getLogger(OrdenFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -335,7 +340,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         Impresion i = new Impresion(getEntityManager().find(Carta.class, "Mnu-1"), false, 24);
         try {
             
-            i.print(o);
+            i.print(o,false);
 
         } catch (PrintException | NullPointerException ex) {
             Logger.getLogger(OrdenFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
