@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.restmanager;
 
 import java.io.Serializable;
@@ -13,6 +14,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -24,8 +27,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
- *
+ * FirstDream
  * @author Jorge
+ * 
  */
 @Entity
 @Table(name = "producto_venta")
@@ -51,17 +55,27 @@ public class ProductoVenta implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 100)
+    @Column(name = "nombre")
     private String nombre;
     @Basic(optional = false)
     @NotNull
     @Column(name = "precio_venta")
     private float precioVenta;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "ganancia")
     private Float ganancia;
+    @Column(name = "gasto")
     private Float gasto;
     @Size(max = 255)
+    @Column(name = "descripcion")
     private String descripcion;
+    @Column(name = "visible")
     private Boolean visible;
+    @JoinTable(name = "producto_venta_sector", joinColumns = {
+        @JoinColumn(name = "producto_ventap_cod", referencedColumnName = "p_cod")}, inverseJoinColumns = {
+        @JoinColumn(name = "sectorcod_sector", referencedColumnName = "cod_sector")})
+    @ManyToMany
+    private List<Sector> sectorList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "productoVenta")
     private List<ProductoInsumo> productoInsumoList;
     @JoinColumn(name = "cocinacod_cocina", referencedColumnName = "cod_cocina")
@@ -71,7 +85,11 @@ public class ProductoVenta implements Serializable {
     @ManyToOne
     private Seccion seccionnombreSeccion;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "productoVenta")
+    private List<Agrego> agregoList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "productoVenta")
     private List<ProductovOrden> productovOrdenList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "productoVenta")
+    private List<ProductovOrdenArchivado> productovOrdenArchivadoList;
 
     public ProductoVenta() {
     }
@@ -143,6 +161,15 @@ public class ProductoVenta implements Serializable {
     }
 
     @XmlTransient
+    public List<Sector> getSectorList() {
+        return sectorList;
+    }
+
+    public void setSectorList(List<Sector> sectorList) {
+        this.sectorList = sectorList;
+    }
+
+    @XmlTransient
     public List<ProductoInsumo> getProductoInsumoList() {
         return productoInsumoList;
     }
@@ -168,12 +195,30 @@ public class ProductoVenta implements Serializable {
     }
 
     @XmlTransient
+    public List<Agrego> getAgregoList() {
+        return agregoList;
+    }
+
+    public void setAgregoList(List<Agrego> agregoList) {
+        this.agregoList = agregoList;
+    }
+
+    @XmlTransient
     public List<ProductovOrden> getProductovOrdenList() {
         return productovOrdenList;
     }
 
     public void setProductovOrdenList(List<ProductovOrden> productovOrdenList) {
         this.productovOrdenList = productovOrdenList;
+    }
+
+    @XmlTransient
+    public List<ProductovOrdenArchivado> getProductovOrdenArchivadoList() {
+        return productovOrdenArchivadoList;
+    }
+
+    public void setProductovOrdenArchivadoList(List<ProductovOrdenArchivado> productovOrdenArchivadoList) {
+        this.productovOrdenArchivadoList = productovOrdenArchivadoList;
     }
 
     @Override
@@ -200,5 +245,5 @@ public class ProductoVenta implements Serializable {
     public String toString() {
         return "com.restmanager.ProductoVenta[ pCod=" + pCod + " ]";
     }
-    
+
 }

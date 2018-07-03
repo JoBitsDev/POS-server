@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.restmanager;
 
 import java.io.Serializable;
@@ -23,8 +24,9 @@ import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- *
+ * FirstDream
  * @author Jorge
+ * 
  */
 @Entity
 @Table(name = "datos_personales")
@@ -49,29 +51,37 @@ public class DatosPersonales implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 20)
+    @Column(name = "personalusuario")
     private String personalusuario;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 20)
+    @Column(name = "nombre")
     private String nombre;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 30)
+    @Column(name = "apellidos")
     private String apellidos;
     @Size(max = 11)
+    @Column(name = "carnet")
     private String carnet;
     @Column(name = "telefono_movil")
     private Integer telefonoMovil;
     @Column(name = "telefono_fijo")
     private Integer telefonoFijo;
     @Size(max = 100)
+    @Column(name = "direccion")
     private String direccion;
     @Size(max = 255)
+    @Column(name = "descripcion")
     private String descripcion;
     @Column(name = "fecha_nacimineto")
     @Temporal(TemporalType.DATE)
     private Date fechaNacimineto;
+    @Column(name = "edad")
     private Integer edad;
+    @Column(name = "sexo")
     private Character sexo;
     @JoinColumn(name = "personalusuario", referencedColumnName = "usuario", insertable = false, updatable = false)
     @OneToOne(optional = false)
@@ -210,5 +220,5 @@ public class DatosPersonales implements Serializable {
     public String toString() {
         return "com.restmanager.DatosPersonales[ personalusuario=" + personalusuario + " ]";
     }
-    
+
 }

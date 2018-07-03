@@ -19,7 +19,7 @@ import javax.validation.constraints.Size;
  * 
  */
 @Embeddable
-public class ProductovOrdenPK implements Serializable {
+public class ProductovOrdenArchivadoPK implements Serializable {
 
     @Basic(optional = false)
     @NotNull
@@ -32,10 +32,10 @@ public class ProductovOrdenPK implements Serializable {
     @Column(name = "ordencod_orden")
     private String ordencodOrden;
 
-    public ProductovOrdenPK() {
+    public ProductovOrdenArchivadoPK() {
     }
 
-    public ProductovOrdenPK(String productoVentapCod, String ordencodOrden) {
+    public ProductovOrdenArchivadoPK(String productoVentapCod, String ordencodOrden) {
         this.productoVentapCod = productoVentapCod;
         this.ordencodOrden = ordencodOrden;
     }
@@ -67,10 +67,10 @@ public class ProductovOrdenPK implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ProductovOrdenPK)) {
+        if (!(object instanceof ProductovOrdenArchivadoPK)) {
             return false;
         }
-        ProductovOrdenPK other = (ProductovOrdenPK) object;
+        ProductovOrdenArchivadoPK other = (ProductovOrdenArchivadoPK) object;
         if ((this.productoVentapCod == null && other.productoVentapCod != null) || (this.productoVentapCod != null && !this.productoVentapCod.equals(other.productoVentapCod))) {
             return false;
         }
@@ -82,7 +82,7 @@ public class ProductovOrdenPK implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.ProductovOrdenPK[ productoVentapCod=" + productoVentapCod + ", ordencodOrden=" + ordencodOrden + " ]";
+        return "com.restmanager.ProductovOrdenArchivadoPK[ productoVentapCod=" + productoVentapCod + ", ordencodOrden=" + ordencodOrden + " ]";
     }
 
 }

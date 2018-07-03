@@ -3,18 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.restmanager;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
@@ -23,10 +26,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
- *
+ * FirstDream
  * @author Jorge
+ * 
  */
 @Entity
+@Table(name = "cliente")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Cliente.findAll", query = "SELECT c FROM Cliente c")
@@ -73,6 +78,8 @@ public class Cliente implements Serializable {
     private String observacionesCliente;
     @OneToMany(mappedBy = "clientecodCliente")
     private List<Orden> ordenList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "clientecodCliente")
+    private List<OrdenArchivada> ordenArchivadaList;
 
     public Cliente() {
     }
@@ -160,6 +167,15 @@ public class Cliente implements Serializable {
         this.ordenList = ordenList;
     }
 
+    @XmlTransient
+    public List<OrdenArchivada> getOrdenArchivadaList() {
+        return ordenArchivadaList;
+    }
+
+    public void setOrdenArchivadaList(List<OrdenArchivada> ordenArchivadaList) {
+        this.ordenArchivadaList = ordenArchivadaList;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -184,5 +200,5 @@ public class Cliente implements Serializable {
     public String toString() {
         return "com.restmanager.Cliente[ codCliente=" + codCliente + " ]";
     }
-    
+
 }

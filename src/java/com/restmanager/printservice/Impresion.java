@@ -274,7 +274,16 @@ public class Impresion {
         for (ProductovOrden x : o.getProductovOrdenList()) {
             if (x.getEnviadosacocina() < x.getCantidad()
                     && x.getProductoVenta().getCocinacodCocina().equals(c)) {
-                p.setText(x.getCantidad() - x.getEnviadosacocina() + " " + x.getProductoVenta().getNombre());
+                if (x.getNota() != null) {
+                    p.alignCenter();
+                    p.emphasized(true);
+                    p.setText(x.getNota().getDescripcion());
+                    p.newLine();
+                    p.alignLeft();
+                    p.setText("*NOTA* " + (x.getCantidad() - x.getEnviadosacocina()) + " " + x.getProductoVenta().getNombre());
+                } else {
+                    p.setText(x.getCantidad() - x.getEnviadosacocina() + " " + x.getProductoVenta().getNombre());
+                }
                 p.newLine();
 
                 p.alignRight();

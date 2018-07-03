@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.restmanager;
 
 import java.io.Serializable;
@@ -17,16 +18,19 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
- *
+ * FirstDream
  * @author Jorge
+ * 
  */
 @Entity
+@Table(name = "insumo")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Insumo.findAll", query = "SELECT i FROM Insumo i")
@@ -48,9 +52,12 @@ public class Insumo implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 60)
+    @Column(name = "nombre")
     private String nombre;
     @Size(max = 3)
+    @Column(name = "um")
     private String um;
+    @Column(name = "elaborado")
     private Boolean elaborado;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "costo_por_unidad")
@@ -62,6 +69,8 @@ public class Insumo implements Serializable {
     @JoinColumn(name = "almacencod_almacen", referencedColumnName = "cod_almacen")
     @ManyToOne
     private Almacen almacencodAlmacen;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
+    private List<Ipv> ipvList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
     private List<InsumoElaborado> insumoElaboradoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo1")
@@ -145,6 +154,15 @@ public class Insumo implements Serializable {
     }
 
     @XmlTransient
+    public List<Ipv> getIpvList() {
+        return ipvList;
+    }
+
+    public void setIpvList(List<Ipv> ipvList) {
+        this.ipvList = ipvList;
+    }
+
+    @XmlTransient
     public List<InsumoElaborado> getInsumoElaboradoList() {
         return insumoElaboradoList;
     }
@@ -186,5 +204,5 @@ public class Insumo implements Serializable {
     public String toString() {
         return "com.restmanager.Insumo[ codInsumo=" + codInsumo + " ]";
     }
-    
+
 }

@@ -3,11 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.restmanager;
 
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -16,16 +18,19 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
- *
+ * FirstDream
  * @author Jorge
+ * 
  */
 @Entity
+@Table(name = "mesa")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Mesa.findAll", query = "SELECT m FROM Mesa m")
@@ -46,17 +51,22 @@ public class Mesa implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 15)
+    @Column(name = "estado")
     private String estado;
+    @Column(name = "estallena")
     private Boolean estallena;
     @Column(name = "capacidad_max")
     private Integer capacidadMax;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "ubicacion")
     private Double ubicacion;
     @JoinColumn(name = "areacod_area", referencedColumnName = "cod_area")
     @ManyToOne
     private Area areacodArea;
     @OneToMany(mappedBy = "mesacodMesa")
     private List<Orden> ordenList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "mesacodMesa")
+    private List<OrdenArchivada> ordenArchivadaList;
 
     public Mesa() {
     }
@@ -127,6 +137,15 @@ public class Mesa implements Serializable {
         this.ordenList = ordenList;
     }
 
+    @XmlTransient
+    public List<OrdenArchivada> getOrdenArchivadaList() {
+        return ordenArchivadaList;
+    }
+
+    public void setOrdenArchivadaList(List<OrdenArchivada> ordenArchivadaList) {
+        this.ordenArchivadaList = ordenArchivadaList;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -151,5 +170,5 @@ public class Mesa implements Serializable {
     public String toString() {
         return "com.restmanager.Mesa[ codMesa=" + codMesa + " ]";
     }
-    
+
 }

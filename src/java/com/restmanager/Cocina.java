@@ -3,27 +3,32 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.restmanager;
 
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
- *
+ * FirstDream
  * @author Jorge
+ * 
  */
 @Entity
+@Table(name = "cocina")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Cocina.findAll", query = "SELECT c FROM Cocina c")
@@ -45,6 +50,10 @@ public class Cocina implements Serializable {
     private String nombreCocina;
     @OneToMany(mappedBy = "cocinacodCocina")
     private List<ProductoVenta> productoVentaList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cocina")
+    private List<Ipv> ipvList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cocinacodCocina")
+    private List<Impresora> impresoraList;
 
     public Cocina() {
     }
@@ -83,6 +92,24 @@ public class Cocina implements Serializable {
         this.productoVentaList = productoVentaList;
     }
 
+    @XmlTransient
+    public List<Ipv> getIpvList() {
+        return ipvList;
+    }
+
+    public void setIpvList(List<Ipv> ipvList) {
+        this.ipvList = ipvList;
+    }
+
+    @XmlTransient
+    public List<Impresora> getImpresoraList() {
+        return impresoraList;
+    }
+
+    public void setImpresoraList(List<Impresora> impresoraList) {
+        this.impresoraList = impresoraList;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -107,5 +134,5 @@ public class Cocina implements Serializable {
     public String toString() {
         return "com.restmanager.Cocina[ codCocina=" + codCocina + " ]";
     }
-    
+
 }

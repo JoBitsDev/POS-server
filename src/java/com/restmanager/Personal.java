@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.restmanager;
 
 import java.io.Serializable;
@@ -13,11 +14,13 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
@@ -26,10 +29,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
- *
+ * FirstDream
  * @author Jorge
+ * 
  */
 @Entity
+@Table(name = "personal")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Personal.findAll", query = "SELECT p FROM Personal p")
@@ -45,24 +50,33 @@ public class Personal implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 20)
+    @Column(name = "usuario")
     private String usuario;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 20)
+    @Column(name = "contrasenna")
     private String contrasenna;
     @Basic(optional = false)
     @NotNull
+    @Column(name = "online")
     private boolean online;
+    @Column(name = "frecuencia")
     private Short frecuencia;
     @Column(name = "ultimodia_trabajo")
     @Temporal(TemporalType.DATE)
     private Date ultimodiaTrabajo;
+    @Lob
+    @Column(name = "foto")
+    private byte[] foto;
     @ManyToMany(mappedBy = "personalList")
     private List<PuestoTrabajo> puestoTrabajoList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "personalusuario")
+    private List<Orden> ordenList;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "personal")
     private DatosPersonales datosPersonales;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "personalusuario")
-    private List<Orden> ordenList;
+    private List<OrdenArchivada> ordenArchivadaList;
 
     public Personal() {
     }
@@ -117,6 +131,14 @@ public class Personal implements Serializable {
         this.ultimodiaTrabajo = ultimodiaTrabajo;
     }
 
+    public byte[] getFoto() {
+        return foto;
+    }
+
+    public void setFoto(byte[] foto) {
+        this.foto = foto;
+    }
+
     @XmlTransient
     public List<PuestoTrabajo> getPuestoTrabajoList() {
         return puestoTrabajoList;
@@ -124,6 +146,15 @@ public class Personal implements Serializable {
 
     public void setPuestoTrabajoList(List<PuestoTrabajo> puestoTrabajoList) {
         this.puestoTrabajoList = puestoTrabajoList;
+    }
+
+    @XmlTransient
+    public List<Orden> getOrdenList() {
+        return ordenList;
+    }
+
+    public void setOrdenList(List<Orden> ordenList) {
+        this.ordenList = ordenList;
     }
 
     public DatosPersonales getDatosPersonales() {
@@ -135,12 +166,12 @@ public class Personal implements Serializable {
     }
 
     @XmlTransient
-    public List<Orden> getOrdenList() {
-        return ordenList;
+    public List<OrdenArchivada> getOrdenArchivadaList() {
+        return ordenArchivadaList;
     }
 
-    public void setOrdenList(List<Orden> ordenList) {
-        this.ordenList = ordenList;
+    public void setOrdenArchivadaList(List<OrdenArchivada> ordenArchivadaList) {
+        this.ordenArchivadaList = ordenArchivadaList;
     }
 
     @Override
@@ -167,5 +198,5 @@ public class Personal implements Serializable {
     public String toString() {
         return "com.restmanager.Personal[ usuario=" + usuario + " ]";
     }
-    
+
 }

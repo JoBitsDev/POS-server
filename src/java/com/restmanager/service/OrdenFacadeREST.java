@@ -196,12 +196,14 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         } else {
             aux.setCantidad(1);
             aux.setEnviadosacocina(0);
+            aux.setNumeroComensal(-1);
 
             //em.persist(aux);
             po.add(aux);
 
         }
         o.setProductovOrdenList(po);
+        o.setOrdenvalorMonetario(calcularValorTotal(o));
 
         super.edit(o);
         return "1";
@@ -230,6 +232,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
             if (cant > 1) {
                 p.setCantidad(cant - 1);
                 o.setProductovOrdenList(po);
+                o.setOrdenvalorMonetario(calcularValorTotal(o));
                 super.edit(o);
 
             } else {
@@ -239,6 +242,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                 getEntityManager().remove(p);
                 getEntityManager().getTransaction().commit();
                 o.setProductovOrdenList(po);
+                o.setOrdenvalorMonetario(calcularValorTotal(o));
                 super.edit(o);
             }
 
@@ -262,6 +266,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
             getEntityManager().remove(p);
         }
         o.setProductovOrdenList(po);
+        o.setOrdenvalorMonetario(calcularValorTotal(o));
         getEntityManager().getTransaction().commit();
         
         super.edit(o);
@@ -272,8 +277,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     @Path("FINISH_{codOrden}")
     @Produces(MediaType.TEXT_PLAIN)
     public String finish(@PathParam("codOrden") String codOrden) {
-        float ordenGastosEnInsumos = 0,
-                ordenValorMonetario = 0;
+      
         
         Orden o = super.find(codOrden);
         Mesa m = getEntityManager().find(Mesa.class, o.getMesacodMesa().getCodMesa());
@@ -281,20 +285,11 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         m.setEstado("vacia");
         o.setHoraTerminada(new Date());
         
-        for (ProductovOrden x : o.getProductovOrdenList()) {
-            ordenValorMonetario += x.getProductoVenta().getPrecioVenta()*x.getCantidad();
-            ordenGastosEnInsumos += x.getProductoVenta().getGasto()*x.getCantidad();
-        }
-        
-        if(o.getPorciento() != 0){
-            ordenValorMonetario += o.getPorciento()*ordenValorMonetario;
-        }
-        
-        o.setOrdengastoEninsumos(ordenGastosEnInsumos);
-        o.setOrdenvalorMonetario(ordenValorMonetario);
+        o.setOrdengastoEninsumos(calcularGastoTotal(o));
+        o.setOrdenvalorMonetario(calcularValorTotal(o));
         
         
-        Impresion i = new Impresion(getEntityManager().find(Carta.class, "Mnu-1"), false, 24);
+        Impresion i = new Impresion(getEntityManager().find(Carta.class, "Mnu-1"));
         try {
             i.print(o,false);
         } catch (PrintException | NullPointerException ex) {
@@ -316,7 +311,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
         Orden o = super.find(codOrden);
         Mesa m = getEntityManager().find(Mesa.class, o.getMesacodMesa().getCodMesa());
-        Impresion i = new Impresion(getEntityManager().find(Carta.class, "Mnu-1"), false, 24);
+        Impresion i = new Impresion(getEntityManager().find(Carta.class, "Mnu-1"));
         try {
 
             i.printKitchen(o);
@@ -324,10 +319,125 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         } catch (PrintException | NullPointerException ex) {
             Logger.getLogger(OrdenFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
         super.edit(o);
 
         return "1";
     }//TODO: METODoS ARCAICOS
+    
+    @GET
+    @Path("ADDNOTA_{codOrden}_{pcod}_{nota}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String addNota(
+            @PathParam("codOrden") String codOrden,
+            @PathParam("pcod") String pCod,
+            @PathParam("nota") String nota) {
+
+        Orden o = super.find(codOrden);
+        ProductovOrden pv = null;
+        nota = nota.replace('%', ' ');
+        
+        for (ProductovOrden x : o.getProductovOrdenList()) {
+            if(x.getProductoVenta().getPCod().equals(pCod)){
+                if(x.getNota() == null){
+                    NotaPK notaPk = new NotaPK(pCod, codOrden);
+                    Nota newNota = new Nota(notaPk);
+                    newNota.setDescripcion(nota);
+                    x.setNota(newNota);
+                    pv = x;
+                }
+                else {
+                    x.getNota().setDescripcion(nota);
+                    pv = x;}
+            }
+            
+        }
+        em1.getTransaction().begin();
+        em1.merge(pv.getNota());
+        em1.merge(pv);
+        em1.getTransaction().commit();
+        super.edit(o);
+
+        return "1";
+    }//TODO: METODoS ARCAICOS
+    
+     @GET
+    @Path("GETNOTA_{codOrden}_{pcod}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getNota(
+            @PathParam("codOrden") String codOrden,
+            @PathParam("pcod") String pCod){
+
+        Orden o = super.find(codOrden);
+        
+        for (ProductovOrden x : o.getProductovOrdenList()) {
+            if(x.getProductoVenta().getPCod().equals(pCod)){
+                if(x.getNota() == null){
+                    return "0";
+                }
+               return x.getNota().getDescripcion();
+            }
+            
+        }
+        return "0";
+                
+                
+
+    }//TODO: METODoS ARCAICOS
+    
+     @GET
+    @Path("GETCOMENSAL_{codOrden}_{pcod}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getComensal(
+            @PathParam("codOrden") String codOrden,
+            @PathParam("pcod") String pCod){
+
+        Orden o = super.find(codOrden);
+        
+        for (ProductovOrden x : o.getProductovOrdenList()) {
+            if(x.getProductoVenta().getPCod().equals(pCod)){
+                if(x.getNumeroComensal() == null){
+                    return "0";
+                }
+               return ""+x.getNumeroComensal();
+            }
+            
+        }
+        return "0";
+                
+                
+
+    }//TODO: METODoS ARCAICOS
+    
+     @GET
+    @Path("ADDCOMENSAL_{codOrden}_{pcod}_{numeroComensal}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String addComensal(
+            @PathParam("codOrden") String codOrden,
+            @PathParam("pcod") String pCod,
+            @PathParam("numeroComensal") String numero){
+
+        Orden o = super.find(codOrden);
+        ProductovOrden pv = null;
+        for (ProductovOrden x : o.getProductovOrdenList()) {
+            if(x.getProductoVenta().getPCod().equals(pCod)){
+                x.setNumeroComensal(Integer.parseInt(numero));
+                pv = x;
+                
+            }
+            
+        }
+        
+        em1.getTransaction().begin();
+        em1.merge(pv);
+        em1.getTransaction().commit();
+        super.edit(o);
+        return "1";
+                
+                
+
+    }//TODO: METODoS ARCAICOS
+    
     
     
     @GET
@@ -421,6 +531,29 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         }
         return numeroOrdenNuevo;
         
+    }
+    private float calcularValorTotal(Orden o){
+        float ordenValorMonetario = 0;
+        
+         for (ProductovOrden x : o.getProductovOrdenList()) {
+            ordenValorMonetario += x.getProductoVenta().getPrecioVenta()*x.getCantidad();
+        }
+        
+        if(o.getPorciento() != 0){
+            ordenValorMonetario += (o.getPorciento()/100)*ordenValorMonetario;
+        }
+        
+        return ordenValorMonetario;
+        
+    }
+    
+    private float calcularGastoTotal(Orden o){
+        float ordenGastosEnInsumos = 0;
+        
+         for (ProductovOrden x : o.getProductovOrdenList()) {
+            ordenGastosEnInsumos += x.getProductoVenta().getGasto()*x.getCantidad();
+        }
+         return ordenGastosEnInsumos;
     }
 
 }

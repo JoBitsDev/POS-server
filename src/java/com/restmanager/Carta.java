@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.restmanager;
 
 import java.io.Serializable;
@@ -16,16 +17,19 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
- *
+ * FirstDream
  * @author Jorge
+ * 
  */
 @Entity
+@Table(name = "carta")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Carta.findAll", query = "SELECT c FROM Carta c")
@@ -124,5 +128,5 @@ public class Carta implements Serializable {
     public String toString() {
         return "com.restmanager.Carta[ codCarta=" + codCarta + " ]";
     }
-    
+
 }

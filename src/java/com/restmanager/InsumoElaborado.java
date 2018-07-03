@@ -3,10 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.restmanager;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -18,8 +20,9 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- *
+ * FirstDream
  * @author Jorge
+ * 
  */
 @Entity
 @Table(name = "insumo_elaborado")
@@ -37,9 +40,11 @@ public class InsumoElaborado implements Serializable {
     protected InsumoElaboradoPK insumoElaboradoPK;
     @Basic(optional = false)
     @NotNull
+    @Column(name = "cantidad")
     private float cantidad;
     @Basic(optional = false)
     @NotNull
+    @Column(name = "costo")
     private float costo;
     @JoinColumn(name = "insumocod_nombre", referencedColumnName = "cod_insumo", insertable = false, updatable = false)
     @ManyToOne(optional = false)
@@ -129,5 +134,5 @@ public class InsumoElaborado implements Serializable {
     public String toString() {
         return "com.restmanager.InsumoElaborado[ insumoElaboradoPK=" + insumoElaboradoPK + " ]";
     }
-    
+
 }

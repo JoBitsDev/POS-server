@@ -33,19 +33,19 @@ import javax.xml.bind.annotation.XmlTransient;
  * 
  */
 @Entity
-@Table(name = "orden")
+@Table(name = "orden_archivada")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Orden.findAll", query = "SELECT o FROM Orden o")
-    , @NamedQuery(name = "Orden.findByCodOrden", query = "SELECT o FROM Orden o WHERE o.codOrden = :codOrden")
-    , @NamedQuery(name = "Orden.findByHoraComenzada", query = "SELECT o FROM Orden o WHERE o.horaComenzada = :horaComenzada")
-    , @NamedQuery(name = "Orden.findByHoraTerminada", query = "SELECT o FROM Orden o WHERE o.horaTerminada = :horaTerminada")
-    , @NamedQuery(name = "Orden.findByDeLaCasa", query = "SELECT o FROM Orden o WHERE o.deLaCasa = :deLaCasa")
-    , @NamedQuery(name = "Orden.findByPorciento", query = "SELECT o FROM Orden o WHERE o.porciento = :porciento")
-    , @NamedQuery(name = "Orden.findByGananciaXporciento", query = "SELECT o FROM Orden o WHERE o.gananciaXporciento = :gananciaXporciento")
-    , @NamedQuery(name = "Orden.findByOrdenvalorMonetario", query = "SELECT o FROM Orden o WHERE o.ordenvalorMonetario = :ordenvalorMonetario")
-    , @NamedQuery(name = "Orden.findByOrdengastoEninsumos", query = "SELECT o FROM Orden o WHERE o.ordengastoEninsumos = :ordengastoEninsumos")})
-public class Orden implements Serializable {
+    @NamedQuery(name = "OrdenArchivada.findAll", query = "SELECT o FROM OrdenArchivada o")
+    , @NamedQuery(name = "OrdenArchivada.findByCodOrden", query = "SELECT o FROM OrdenArchivada o WHERE o.codOrden = :codOrden")
+    , @NamedQuery(name = "OrdenArchivada.findByHoraComenzada", query = "SELECT o FROM OrdenArchivada o WHERE o.horaComenzada = :horaComenzada")
+    , @NamedQuery(name = "OrdenArchivada.findByHoraTerminada", query = "SELECT o FROM OrdenArchivada o WHERE o.horaTerminada = :horaTerminada")
+    , @NamedQuery(name = "OrdenArchivada.findByDeLaCasa", query = "SELECT o FROM OrdenArchivada o WHERE o.deLaCasa = :deLaCasa")
+    , @NamedQuery(name = "OrdenArchivada.findByPorciento", query = "SELECT o FROM OrdenArchivada o WHERE o.porciento = :porciento")
+    , @NamedQuery(name = "OrdenArchivada.findByGananciaXporciento", query = "SELECT o FROM OrdenArchivada o WHERE o.gananciaXporciento = :gananciaXporciento")
+    , @NamedQuery(name = "OrdenArchivada.findByOrdenvalorMonetario", query = "SELECT o FROM OrdenArchivada o WHERE o.ordenvalorMonetario = :ordenvalorMonetario")
+    , @NamedQuery(name = "OrdenArchivada.findByOrdengastoEninsumos", query = "SELECT o FROM OrdenArchivada o WHERE o.ordengastoEninsumos = :ordengastoEninsumos")})
+public class OrdenArchivada implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -74,28 +74,28 @@ public class Orden implements Serializable {
     @Column(name = "ordengasto_eninsumos")
     private Float ordengastoEninsumos;
     @JoinColumn(name = "clientecod_cliente", referencedColumnName = "cod_cliente")
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Cliente clientecodCliente;
     @JoinColumn(name = "mesacod_mesa", referencedColumnName = "cod_mesa")
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Mesa mesacodMesa;
     @JoinColumn(name = "personalusuario", referencedColumnName = "usuario")
     @ManyToOne(optional = false)
     private Personal personalusuario;
     @JoinColumn(name = "ventafecha", referencedColumnName = "fecha")
     @ManyToOne(optional = false)
-    private Venta ventafecha;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "orden")
-    private List<ProductovOrden> productovOrdenList;
+    private VentaArchivada ventafecha;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "ordenArchivada")
+    private List<ProductovOrdenArchivado> productovOrdenArchivadoList;
 
-    public Orden() {
+    public OrdenArchivada() {
     }
 
-    public Orden(String codOrden) {
+    public OrdenArchivada(String codOrden) {
         this.codOrden = codOrden;
     }
 
-    public Orden(String codOrden, boolean deLaCasa) {
+    public OrdenArchivada(String codOrden, boolean deLaCasa) {
         this.codOrden = codOrden;
         this.deLaCasa = deLaCasa;
     }
@@ -188,21 +188,21 @@ public class Orden implements Serializable {
         this.personalusuario = personalusuario;
     }
 
-    public Venta getVentafecha() {
+    public VentaArchivada getVentafecha() {
         return ventafecha;
     }
 
-    public void setVentafecha(Venta ventafecha) {
+    public void setVentafecha(VentaArchivada ventafecha) {
         this.ventafecha = ventafecha;
     }
 
     @XmlTransient
-    public List<ProductovOrden> getProductovOrdenList() {
-        return productovOrdenList;
+    public List<ProductovOrdenArchivado> getProductovOrdenArchivadoList() {
+        return productovOrdenArchivadoList;
     }
 
-    public void setProductovOrdenList(List<ProductovOrden> productovOrdenList) {
-        this.productovOrdenList = productovOrdenList;
+    public void setProductovOrdenArchivadoList(List<ProductovOrdenArchivado> productovOrdenArchivadoList) {
+        this.productovOrdenArchivadoList = productovOrdenArchivadoList;
     }
 
     @Override
@@ -215,10 +215,10 @@ public class Orden implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Orden)) {
+        if (!(object instanceof OrdenArchivada)) {
             return false;
         }
-        Orden other = (Orden) object;
+        OrdenArchivada other = (OrdenArchivada) object;
         if ((this.codOrden == null && other.codOrden != null) || (this.codOrden != null && !this.codOrden.equals(other.codOrden))) {
             return false;
         }
@@ -227,7 +227,7 @@ public class Orden implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.Orden[ codOrden=" + codOrden + " ]";
+        return "com.restmanager.OrdenArchivada[ codOrden=" + codOrden + " ]";
     }
 
 }

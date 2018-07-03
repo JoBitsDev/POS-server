@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.restmanager;
 
 import java.io.Serializable;
@@ -13,8 +14,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
- *
+ * FirstDream
  * @author Jorge
+ * 
  */
 @Embeddable
 public class ProductoInsumoPK implements Serializable {
@@ -82,5 +84,5 @@ public class ProductoInsumoPK implements Serializable {
     public String toString() {
         return "com.restmanager.ProductoInsumoPK[ productoVentapCod=" + productoVentapCod + ", insumocodInsumo=" + insumocodInsumo + " ]";
     }
-    
+
 }

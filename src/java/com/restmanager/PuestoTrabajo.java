@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.restmanager;
 
 import java.io.Serializable;
@@ -23,8 +24,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
- *
+ * FirstDream
  * @author Jorge
+ * 
  */
 @Entity
 @Table(name = "puesto_trabajo")
@@ -173,5 +175,5 @@ public class PuestoTrabajo implements Serializable {
     public String toString() {
         return "com.restmanager.PuestoTrabajo[ nombrePuesto=" + nombrePuesto + " ]";
     }
-    
+
 }
