@@ -17,6 +17,6 @@
         <servlet-name>Restaurant Manager</servlet-name>
         <url-pattern>/rest/*</url-pattern>
      </servlet-mapping>
-     
-   
+    
+          
 </web-app>

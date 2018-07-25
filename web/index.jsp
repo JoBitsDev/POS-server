@@ -9,9 +9,17 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Restaurant Manager </title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <%! int a = 5; %>
+        <h1>
+            <% 
+            out.println("El numero es "+ a);
+            %>
+        </h1>
+        
+        
+        
     </body>
 </html>

@@ -20,45 +20,6 @@
     <class>com.restmanager.DatosPersonales</class>
     <class>com.restmanager.PuestoTrabajo</class>
     <class>com.restmanager.Configuracion</class>
-    <class>com.restmanager.Seccion_1</class>
-    <class>com.restmanager.Nota</class>
-    <class>com.restmanager.Area_1</class>
-    <class>com.restmanager.Orden_1</class>
-    <class>com.restmanager.Cocina_1</class>
-    <class>com.restmanager.Cliente_1</class>
-    <class>com.restmanager.Mesa_1</class>
-    <class>com.restmanager.Personal_1</class>
-    <class>com.restmanager.Venta_1</class>
-    <class>com.restmanager.XMLservice.InsumoElaborado</class>
-    <class>com.restmanager.XMLservice.Carta</class>
-    <class>com.restmanager.XMLservice.ProductovOrdenArchivado</class>
-    <class>com.restmanager.XMLservice.ProductoInsumo</class>
-    <class>com.restmanager.XMLservice.Cliente</class>
-    <class>com.restmanager.XMLservice.OrdenArchivada</class>
-    <class>com.restmanager.XMLservice.Venta</class>
-    <class>com.restmanager.XMLservice.ProductovOrden</class>
-    <class>com.restmanager.XMLservice.Seccion</class>
-    <class>com.restmanager.XMLservice.Area</class>
-    <class>com.restmanager.XMLservice.Sector</class>
-    <class>com.restmanager.XMLservice.Cocina</class>
-    <class>com.restmanager.XMLservice.DatosPersonales</class>
-    <class>com.restmanager.XMLservice.Ipv</class>
-    <class>com.restmanager.XMLservice.MenuEspecial</class>
-    <class>com.restmanager.XMLservice.Configuracion</class>
-    <class>com.restmanager.XMLservice.Orden</class>
-    <class>com.restmanager.XMLservice.PuestoTrabajo</class>
-    <class>com.restmanager.XMLservice.Personal</class>
-    <class>com.restmanager.XMLservice.Insumo</class>
-    <class>com.restmanager.XMLservice.NotaArchivada</class>
-    <class>com.restmanager.XMLservice.Log</class>
-    <class>com.restmanager.XMLservice.Mesa</class>
-    <class>com.restmanager.XMLservice.Impresora</class>
-    <class>com.restmanager.XMLservice.IpvRegistro</class>
-    <class>com.restmanager.XMLservice.Almacen</class>
-    <class>com.restmanager.XMLservice.Nota</class>
-    <class>com.restmanager.XMLservice.VentaArchivada</class>
-    <class>com.restmanager.XMLservice.ProductoVenta</class>
-    <class>com.restmanager.XMLservice.Agrego</class>
     <class>com.restmanager.OrdenArchivada</class>
     <class>com.restmanager.ProductovOrdenArchivado</class>
     <class>com.restmanager.Ipv</class>
@@ -72,7 +33,7 @@
     <class>com.restmanager.NotaArchivada</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
-      <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://192.168.173.1:5432/Restaurant_Manager_DB"/>
+      <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/Restaurant_Manager_DB"/>
       <property name="javax.persistence.jdbc.user" value="Rest_Admin"/>
       <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
       <property name="javax.persistence.jdbc.password" value="admin"/>
