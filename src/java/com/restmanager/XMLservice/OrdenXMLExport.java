@@ -3,13 +3,14 @@ package com.restmanager.XMLservice;
 import com.restmanager.Mesa;
 import com.restmanager.Orden;
 import com.restmanager.Venta;
+import java.util.ArrayList;
 
 /**
  * FirstDream
  * @author Jorge
  * 
  */
-class OrdenXMLExport {
+public class OrdenXMLExport {
     
     private static final Tag
             ENTITY =Tag.getInstance("orden"),
@@ -28,7 +29,7 @@ class OrdenXMLExport {
             ESTADO = Tag.getInstance("estado");
     
     
-    static String exportSingleEntity (Orden o){
+    public static String exportSingleEntity (Orden o){
         String ret = "";
         ret += ENTITY.getStartTag();
         
@@ -45,6 +46,19 @@ class OrdenXMLExport {
          
         ret += ENTITY.getEndTag();
         
+        return ret;
+    }
+    
+     public static String exportEntities (ArrayList<Orden> ordenes){
+        String ret = "";
+        ret += ENTITIES.getStartTag();
+        
+        for (Orden x : ordenes) {
+           ret += exportSingleEntity(x);
+        }
+        
+        ret += ENTITIES.getEndTag();
+                
         return ret;
     }
     

@@ -5,7 +5,11 @@
  */
 package com.restmanager.service;
 
+import com.restmanager.Orden;
 import com.restmanager.Personal;
+import com.restmanager.Venta;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -80,6 +84,30 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
             }
         }
         return "0";
+    }
+    
+    @GET
+    @Path("MOSTRAR_PERSONAL_TRABAJANDO")
+    @Produces({MediaType.TEXT_PLAIN})
+    public String findActiveUsers() {
+        ArrayList<String> aux = new ArrayList<>();
+        
+        
+        
+        for (Orden x : super.em1.find(Venta.class, new Date()).getOrdenList()) {
+            String nombre = x.getPersonalusuario().getUsuario();
+            if(!aux.contains(nombre)){
+                aux.add(nombre);
+            }
+        }
+        
+        String ret = "";
+        
+        
+        for (int i = 0; i < aux.size(); i++) {
+            ret += aux.get(i)+ ",";
+        }
+        return ret;
     }
     
     @GET
