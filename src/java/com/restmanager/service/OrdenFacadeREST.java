@@ -33,6 +33,10 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     SimpleDateFormat FormatTime = new SimpleDateFormat(" hh ':' mm ' ' a ");
     private Date today = new Date();
     private static LinkedList<Orden> ordenesActivas = new LinkedList<>();
+    
+    public static final String
+            ESTADO_MESA_VACIA = "vacia",
+            ESTADO_MESA_ESPERANDO_CONFIRMACION = "esperando confirmacion";
 
     public OrdenFacadeREST() {
         super(Orden.class);
@@ -91,7 +95,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
         Venta v = getEntityManager().find(Venta.class, today);
        
-        m.setEstado("ocupada");
+        m.setEstado(usuarioTrabajador);
         o.setMesacodMesa(m);
         o.setPersonalusuario(p);
         o.setVentafecha(v);
@@ -114,7 +118,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public String get(@PathParam("codMesa") String codMesa) {
         Mesa m = getEntityManager().find(Mesa.class, codMesa);
-        if (m.getEstado().equals("vacia")) {
+        if (m.getEstado().equals(ESTADO_MESA_VACIA)) {
             return null;
         }
         if(ordenesActivas.isEmpty()){
@@ -133,13 +137,13 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
             }
         }
        
-        m.setEstado("vacia");
+        m.setEstado(ESTADO_MESA_VACIA);
         
         em1.getTransaction().begin();
         em1.merge(m);
         em1.flush();
-        if(em1.getTransaction().isActive())
-        em1.getTransaction().commit();
+        if(em1.getTransaction().isActive()){
+        em1.getTransaction().commit();}
         
         return null;
     }
@@ -149,7 +153,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     @Produces(MediaType.TEXT_PLAIN)
     public String getNoOrden(@PathParam("codMesa") String codMesa) {
         Mesa m = getEntityManager().find(Mesa.class, codMesa);
-        if (m.getEstado().equals("vacia")) {
+        if (m.getEstado().equals(ESTADO_MESA_VACIA)) {
             return null;
         }
 
@@ -162,7 +166,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
             }
         }
 
-        m.setEstado("vacia");
+        m.setEstado(ESTADO_MESA_VACIA);
         
         em1.getTransaction().begin();
         em1.merge(m);
@@ -178,7 +182,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     @Produces(MediaType.TEXT_PLAIN)
     public String getAll(@PathParam("codMesa") String codMesa) {
         Mesa m = getEntityManager().find(Mesa.class, codMesa);
-        if (m.getEstado().equals("vacia")) {
+        if (m.getEstado().equals(ESTADO_MESA_VACIA)) {
             return null;
         }
 
@@ -337,7 +341,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         }
         
        
-        
+        //o.setHoraTerminada(new Date());
         
         Impresion i = new Impresion(getEntityManager().find(Carta.class, "Mnu-1"));
         try {
@@ -346,8 +350,8 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
             Logger.getLogger(OrdenFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        m.setEstado("vacia");
-        o.setHoraTerminada(new Date());
+        m.setEstado(ESTADO_MESA_ESPERANDO_CONFIRMACION);
+        
         
         o.setOrdengastoEninsumos(calcularGastoTotal(o));
         o.setOrdenvalorMonetario(calcularValorTotal(o));
@@ -552,7 +556,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         mesaDestino.setEstado("ocupada");
         getEntityManager().merge(mesaDestino);
         o.setMesacodMesa(mesaDestino);
-        mesaOrigen.setEstado("vacia");
+        mesaOrigen.setEstado(ESTADO_MESA_VACIA);
         getEntityManager().merge(mesaOrigen);
         super.edit(o);
         getEntityManager().getTransaction().commit();
@@ -580,7 +584,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     @Produces(MediaType.TEXT_PLAIN)
     public String isMine(@PathParam("codMesa") String codMesa, @PathParam("user") String user) {
         
-        String noOrden = getNoOrden(codMesa);
+        String noOrden = get(codMesa);
         
         Orden o = super.find(noOrden);
         
