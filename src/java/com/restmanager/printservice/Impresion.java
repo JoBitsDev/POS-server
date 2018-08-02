@@ -122,7 +122,7 @@ public class Impresion {
         p.addLineSeperator();
         p.newLine();
         p.alignRight();
-        p.setText(FECHA + this.Format.format(o.getVentafecha().getFecha()) + TimeFormat.format(o.getHoraComenzada()));
+        p.setText(FECHA + this.Format.format(o.getVentafecha().getFecha()) + TimeFormat.format(o.getHoraTerminada()));
         p.newLine();
         p.setText(ORDEN + o.getCodOrden());
         p.newLine();
@@ -157,7 +157,7 @@ public class Impresion {
         if (o.getPorciento() != 0) {
             p.newLine();
             p.setText("+ " + o.getPorciento() + "% : " + sumaPorciento + MONEDA);
-            totalPrint = setDosLugaresDecimales((int) ((Float.valueOf(subTotalPrint) + Float.valueOf(sumaPorciento)) * 100));
+            totalPrint = redondeoDeMonedaMN_CUC((int) ((Float.valueOf(subTotalPrint) + Float.valueOf(sumaPorciento)) * 100));
 
         }
         p.newLine();
