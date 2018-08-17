@@ -55,12 +55,23 @@ public class Impresion {
     SimpleDateFormat Format = new SimpleDateFormat("dd'/'MM'/'yy ' ' ");
     SimpleDateFormat TimeFormat = new SimpleDateFormat(" hh ':' mm ' ' a ");
     
-    ArrayList<byte []> RAM = new ArrayList<>();
+    private final String NOMBRE_COCINA_PRINCIPAL = "Cocina";
+    private final String DEFAULT_PRINT_LOCATION = null;
+    private int cantidadCopias = 1;
+    
+    ArrayList<CopiaTicket> RAM = new ArrayList<>();
+       
+    private static void feedPrinter(byte[] b,String printerName) throws PrintException {
 
-    private static void feedPrinter(byte[] b) throws PrintException {
-
-        //DocPrintJob job = PrintServiceLookup.lookupPrintServices(null, attrSet)[0].createPrintJob();       
+        PrintService [] prints = PrintServiceLookup.lookupPrintServices(null, null);
         DocPrintJob job = PrintServiceLookup.lookupDefaultPrintService().createPrintJob();
+
+        for (int i = 0; i < prints.length; i++) {
+            if(prints[i].getName().equals(printerName)){
+            job = prints[i].createPrintJob();
+        }
+        }
+        
         DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
         Doc doc = new SimpleDoc(b, flavor, null);
 
@@ -68,30 +79,45 @@ public class Impresion {
 
     }
 
+      
+    /**
+     * Constructor por defecto
+     *
+     * @param m una instancia de una carta especifica
+     */
     public Impresion(Carta m) {
         this(m, m.getMonedaPrincipal().equals("CUC"), 25);
+
     }
 
+    /**
+     *
+     * @param m
+     * @param monedaCUC
+     * @param cambio
+     */
     public Impresion(Carta m, boolean monedaCUC, float cambio) {
-        nombreRest = m.getNombreCarta();
-        this.cambio = cambio;
-        if (this.monedaCUC = monedaCUC) {
-            MONEDA = CUC;
-        } else {
-            MONEDA = MN;
-        }
+       this(m,null,monedaCUC,cambio,1);
 
     }
 
+    /**
+     *
+     * @param m
+     * @param footer
+     */
     public Impresion(Carta m, String footer) {
         this(m, m.getMonedaPrincipal().equals("CUC"), 25);
         PIE = footer;
     }
 
-    public Impresion(Carta m, String footer, boolean monedaCUC, float cambio) {
+    public Impresion(Carta m, String footer, boolean monedaCUC, float cambio,int cantidadCopias) {
         this.nombreRest = m.getNombreCarta();
         this.cambio = cambio;
-        PIE = footer;
+        this.cantidadCopias = cantidadCopias;
+        if(footer != null){
+            PIE = footer;            
+        }
         if (this.monedaCUC = monedaCUC) {
             MONEDA = CUC;
         } else {
@@ -183,7 +209,7 @@ public class Impresion {
         else{
         p.finitAndDrawerKick();}
 
-        feedPrinter(p.finalCommandSet().getBytes());
+        feedPrinter(p.finalCommandSet().getBytes(),DEFAULT_PRINT_LOCATION);
 
     }
 
@@ -322,8 +348,12 @@ public class Impresion {
         p.finit();
 
         if (!ordenSinPlatos) {
-            RAM.add(p.finalCommandSet().getBytes());
-            feedPrinter(p.finalCommandSet().getBytes());
+            for (int i = 0; i < cantidadCopias; i++) {
+               RAM.add(new CopiaTicket(c.getNombreCocina(), p.finalCommandSet().getBytes())); 
+            }
+            
+            feedPrinter(p.finalCommandSet().getBytes(),c.getNombreCocina());
+            
         } else {
             System.out.println("No existen platos de la cocina "
                     + c.getNombreCocina() + " de la orden" + o.getCodOrden() + " para imprimir");
@@ -461,8 +491,8 @@ public class Impresion {
         p.finit();
         
         try {
-            feedPrinter(p.finalCommandSet().getBytes());
-            feedPrinter(p.finalCommandSet().getBytes());
+            feedPrinter(p.finalCommandSet().getBytes(),NOMBRE_COCINA_PRINCIPAL);
+            feedPrinter(p.finalCommandSet().getBytes(),NOMBRE_COCINA_PRINCIPAL);
         } catch (PrintException ex) {
             Logger.getLogger(Impresion.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -472,13 +502,11 @@ public class Impresion {
        
     }
 
-    public void printKitchenDouble(Orden o) {
-    }
 
-    private void cleanAndPrintRAM() {
+ private void cleanAndPrintRAM() {
         while(!RAM.isEmpty()){
             try {
-                feedPrinter(RAM.get(0));
+                feedPrinter(RAM.get(0).getImpresionData(),RAM.get(0).getNombreImpresora());
                 RAM.remove(0);
             } catch (PrintException ex) {
                 Logger.getLogger(Impresion.class.getName()).log(Level.SEVERE, null, ex);
@@ -486,6 +514,24 @@ public class Impresion {
         }
     }
 
+    private class CopiaTicket {
+         private final String nombreImpresora;
+         private final byte [] impresionData;
+
+        public CopiaTicket(String nombreImpresora, byte[] impresionData) {
+            this.nombreImpresora = nombreImpresora;
+            this.impresionData = impresionData;
+        }
+
+        public String getNombreImpresora() {
+            return nombreImpresora;
+        }
+
+        public byte[] getImpresionData() {
+            return impresionData;
+        }
+        
+     }
     
 
 }
