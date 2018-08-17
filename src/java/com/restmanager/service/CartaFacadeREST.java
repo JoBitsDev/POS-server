@@ -61,6 +61,13 @@ public class CartaFacadeREST extends AbstractFacade<Carta> {
     public Carta find(@PathParam("id") String id) {
         return super.find(id);
     }
+    
+      @GET
+    @Path("NOMBRE_REST")
+    @Produces({MediaType.TEXT_PLAIN})
+    public String getNombreRest() {
+        return super.find("Mnu-1").getNombreCarta();
+    }
 
     @GET
     @Override
