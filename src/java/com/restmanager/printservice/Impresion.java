@@ -36,8 +36,9 @@ public class Impresion {
      */
     private String nombreRest = null;
     private boolean monedaCUC = false;
-    private float cambio = 24;
-    private String CABECERA = "Restaurante",
+    private static float cambio = 24;
+    private String 
+            CABECERA = "Restaurante",
             COCINA = "",
             DELACASA = "(Pedido por la casa)",
             ORDEN = "Orden No: ",
@@ -57,7 +58,7 @@ public class Impresion {
     
     private final String NOMBRE_COCINA_PRINCIPAL = "Cocina";
     private final String DEFAULT_PRINT_LOCATION = null;
-    private int cantidadCopias = 1;
+    private static int cantidadCopias = 0;
     
     ArrayList<CopiaTicket> RAM = new ArrayList<>();
        
@@ -86,7 +87,7 @@ public class Impresion {
      * @param m una instancia de una carta especifica
      */
     public Impresion(Carta m) {
-        this(m, m.getMonedaPrincipal().equals("CUC"), 25);
+        this(m, m.getMonedaPrincipal().equals("CUC"), cambio);
 
     }
 
@@ -97,7 +98,7 @@ public class Impresion {
      * @param cambio
      */
     public Impresion(Carta m, boolean monedaCUC, float cambio) {
-       this(m,null,monedaCUC,cambio,1);
+       this(m,null,monedaCUC,cambio,cantidadCopias);
 
     }
 
@@ -107,14 +108,14 @@ public class Impresion {
      * @param footer
      */
     public Impresion(Carta m, String footer) {
-        this(m, m.getMonedaPrincipal().equals("CUC"), 25);
+        this(m, m.getMonedaPrincipal().equals("CUC"), cambio);
         PIE = footer;
     }
 
     public Impresion(Carta m, String footer, boolean monedaCUC, float cambio,int cantidadCopias) {
         this.nombreRest = m.getNombreCarta();
-        this.cambio = cambio;
-        this.cantidadCopias = cantidadCopias;
+        Impresion.cambio = cambio;
+        Impresion.cantidadCopias = cantidadCopias;
         if(footer != null){
             PIE = footer;            
         }
@@ -132,7 +133,7 @@ public class Impresion {
         Ticket p = new Ticket();
         p.resetAll();
         p.initialize();
-//p.feedBack((byte)2);
+        //p.feedBack((byte)2);
         p.alignCenter();
         p.setText(CABECERA);
         p.newLine();
@@ -175,7 +176,7 @@ public class Impresion {
         }
 
         String subTotalPrint = redondeoDeMonedaMN_CUC((int) (total * 100));
-        String sumaPorciento = redondeoDeMonedaMN_CUC((int) ((Float.valueOf(subTotalPrint) / 10) * 100));
+        String sumaPorciento = redondeoDeMonedaMN_CUC((int) ((Float.valueOf(subTotalPrint) / o.getPorciento()) * 100));
         String totalPrint = subTotalPrint;
         p.alignRight();
         p.newLine();
