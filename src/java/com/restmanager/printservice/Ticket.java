@@ -9,6 +9,14 @@ public class Ticket {
 
     String commandSet = "";
 
+    /**
+     * the paper lenght is 32 for 58mm and 48 for 80mm
+     */
+    final static int PAPER_LENGHT = 32;
+    final static char LINE_CHAR = '*';
+
+    private AlignmentState posState = AlignmentState.LEFT;
+
     public Ticket() {
     }
 
@@ -64,6 +72,7 @@ public class Ticket {
     }
 
     public String alignLeft() {
+        posState = AlignmentState.LEFT;
         final byte[] AlignLeft = {27, 97, 48};
         String s = new String(AlignLeft);
         commandSet += s;
@@ -71,17 +80,19 @@ public class Ticket {
     }
 
     public String alignCenter() {
-        final byte[] AlignCenter = {27, 97, 49};
-        String s = new String(AlignCenter);
-        commandSet += s;
-        return s;
+        posState = AlignmentState.CENTER;
+//        final byte[] AlignCenter = {27, 97, 49};
+//        String s = new String(AlignCenter);
+//        commandSet += s;
+        return "";
     }
 
     public String alignRight() {
-        final byte[] AlignRight = {27, 97, 50};
-        String s = new String(AlignRight);
-        commandSet += s;
-        return s;
+        posState = AlignmentState.RIGHT;
+//        final byte[] AlignRight = {27, 97, 50};
+//        String s = new String(AlignRight);
+//        commandSet += s;
+        return "";
     }
 
     public String newLine() {
@@ -89,39 +100,6 @@ public class Ticket {
         String s = new String(LF);
         commandSet += s;
         return s;
-    }
-
-    /**
-     * set the texto size based on the following options 0- Small size 1- Medium
-     * size 2- Large size 3- Huge size
-     *
-     * @param option the option to set the text size
-     * @return the comand for setting the text size
-     */
-    public String setTextSize(int option) {
-        String s = "";
-        byte[] SMALL_SIZE = {29, 33, 17},
-                MEDIUM_SIZE = {29, 33, 51},
-                LARGE_SIZE = {29, 33, 85},
-                HUGE_SIZE = {29, 33, 119};
-
-        switch (option) {
-            case 0:
-                s = new String(SMALL_SIZE);
-                break;
-            case 1:
-                s = new String(MEDIUM_SIZE);
-                break;
-            case 2:
-                s = new String(LARGE_SIZE);
-                break;
-            case 3:
-                s = new String(HUGE_SIZE);
-                break;
-        }
-        commandSet += s;
-        return s;
-
     }
 
     public String reverseColorMode(boolean enabled) {
@@ -155,7 +133,7 @@ public class Ticket {
     }
 
     public String doubleHeight(boolean enabled) {
-        final byte[] DoubleHeight = {27, 33, 49};
+        final byte[] DoubleHeight = {27, 33, 17};
         final byte[] UnDoubleHeight = {27, 33, 0};
 
         String s = "";
@@ -232,48 +210,58 @@ public class Ticket {
 
         String s = new String(FeedAndCut);
 
-        final byte[] DrawerKick={27,70,0,60,120};   
+        final byte[] DrawerKick = {27, 70, 0, 60, 120};
         s += new String(DrawerKick);
-        commandSet += s;
-        
-        return s;
-    }
-    
-    public String finitAndDrawerKick() {
-        final byte[] FeedAndCut = {29, 'V', 66, 0};
 
-        String s = new String(FeedAndCut);
-
-        final byte[] DrawerKick={27,70,0,60,120};   
-        s += new String(DrawerKick);
         commandSet += s;
-        
         return s;
     }
 
     public String addLineSeperator() {
-        String lineSpace = "********************************";
+        alignLeft();
+        String lineSpace = "";
+        while (lineSpace.length() < PAPER_LENGHT) {
+            lineSpace += LINE_CHAR;
+        }
         commandSet += lineSpace;
         return lineSpace;
     }
-    
-    public String addLargeLineSeparator(){
-        String lineSpace = "*********************";
-        commandSet += lineSpace;
-        return lineSpace;
-    
-    }
-        
-    
+
     public void resetAll() {
         commandSet = "";
     }
 
     public void setText(String s) {
-        commandSet += s;
+        int sLenght = s.length();
+        switch (posState) {
+            case LEFT:
+                commandSet += s;
+                break;
+            case CENTER:
+                commandSet += (addBlankSpaces((PAPER_LENGHT - s.length()) / 2)
+                        + s
+                        + addBlankSpaces((PAPER_LENGHT-s.length()) / 2));
+                break;
+            case RIGHT:
+                commandSet += (addBlankSpaces(PAPER_LENGHT-s.length()) + s);
+                break;
+        }
+        //commandSet += s;
     }
 
     public String finalCommandSet() {
         return commandSet;
+    }
+
+    private String addBlankSpaces(int amount) {
+        String ret = "";
+        for (int i = 0; i < amount; i++) {
+           ret += " "; 
+        }
+        return ret;
+    }
+
+    private enum AlignmentState {
+        LEFT, RIGHT, CENTER
     }
 }
