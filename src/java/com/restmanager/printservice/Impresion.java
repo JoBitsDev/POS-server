@@ -136,7 +136,7 @@ public class Impresion {
         }
     }
 
-    public void print(Orden o, boolean preview) throws PrintException {
+    public void print(Orden o, boolean preview) {
 
         float total = 0;
 
@@ -230,7 +230,7 @@ public class Impresion {
 
     public Orden printKitchen(Orden o) throws PrintException {
 
-        return printKitchenForced(printKitchen(o, new CocinaJpaController(e).findCocina("C-2"), ""));
+        return printKitchenForced(printKitchen(printCancelationTicket(o), new CocinaJpaController(e).findCocina("C-2"), ""));
 //
 //        Ticket p = new Ticket();
 //        p.resetAll();
@@ -582,7 +582,6 @@ public class Impresion {
                 t.alignLeft();
                 x.setEnviadosacocina(x.getCantidad());
                 ordenSinPlatos = false;
-                x.setEnviadosacocina(x.getCantidad());
             }
         }
 
@@ -603,7 +602,7 @@ public class Impresion {
 
     public Orden printCancelationTicket(Orden o) {
 
-        return printCancelationKitchenForced(printCancelationKitchen(o,"Cocina"));
+        return printCancelationKitchenForced(printCancelationKitchen(o,new CocinaJpaController(e).findCocina("C-2")));
 //        Ticket t = new Ticket();
 //
 //        addHeader(t);
@@ -744,8 +743,9 @@ public class Impresion {
      *
      * @param o the value of o
      * @param c the value of c
+     * @return 
      */
-    public Orden printCancelationKitchen(Orden o, String c) {
+    public Orden printCancelationKitchen(Orden o, Cocina c) {
         boolean ordenSinPlatos = true;
 
         Ticket t = new Ticket();
@@ -753,7 +753,7 @@ public class Impresion {
         addHeader(t);
 
         t.emphasized(true);
-        t.setText(COCINA + c);
+        t.setText(COCINA + c.getNombreCocina());
         t.emphasized(false);
         t.newLine();
 
@@ -766,7 +766,7 @@ public class Impresion {
         for (ProductovOrden x : o.getProductovOrdenList()) {
 
             if (x.getEnviadosacocina() > x.getCantidad()
-                    && x.getProductoVenta().getNombre().equals(c)) {
+                    && x.getProductoVenta().getCocinacodCocina().equals(c)) {
                 t.setText(x.getCantidad() - x.getEnviadosacocina() + " " + x.getProductoVenta().getNombre());
                 t.newLine();
                 t.alignRight();
@@ -786,14 +786,14 @@ public class Impresion {
 
         if (!ordenSinPlatos) {
             for (int i = 0; i < cantidadCopias; i++) {
-                RAM.add(new CopiaTicket(c, t.finalCommandSet().getBytes()));
+                RAM.add(new CopiaTicket(c.getNombreCocina(), t.finalCommandSet().getBytes()));
             }
 
-            feedPrinter(t.finalCommandSet().getBytes(), c);
+            feedPrinter(t.finalCommandSet().getBytes(), c.getNombreCocina());
 
         } else {
             System.out.println("No existen platos de la cocina "
-                    + c + " de la orden " + o.getCodOrden() + " para cancelar");
+                    + c.getNombreCocina() + " de la orden " + o.getCodOrden() + " para cancelar");
             t.resetAll();
         }
 

@@ -87,7 +87,6 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
         super.create(o);
 
-
         return "1";
     }
 
@@ -186,6 +185,9 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                 p.setCantidad(cant - 1);
 
             } else {
+                po.get(contains).setCantidad(0);
+                Impresion i = new Impresion(getEntityManager().find(Carta.class, "Mnu-1"));
+                i.printCancelationTicket(o);
                 po.remove(contains);
                 getEntityManager().getTransaction().begin();
                 p = getEntityManager().find(ProductovOrden.class, p.getProductovOrdenPK());
@@ -239,11 +241,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
         o.setHoraTerminada(new Date());
         Impresion i = new Impresion(getEntityManager().find(Carta.class, "Mnu-1"));
-        try {
-            i.print(o, false);
-        } catch (PrintException | NullPointerException ex) {
-            Logger.getLogger(OrdenFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        i.print(o, false);
 
         m.setEstado(ESTADO_MESA_VACIA);
 
@@ -398,13 +396,8 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         Orden o = super.find(codOrden);
         Mesa m = getEntityManager().find(Mesa.class, o.getMesacodMesa().getCodMesa());
         Impresion i = new Impresion(getEntityManager().find(Carta.class, "Mnu-1"), false, 24);
-        try {
+        i.print(o, false);
 
-            i.print(o, false);
-
-        } catch (PrintException | NullPointerException ex) {
-            Logger.getLogger(OrdenFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
-        }
         super.edit(o);
 
         return "1";
@@ -442,7 +435,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         getEntityManager().merge(mesaOrigen);
         super.edit(o);
         getEntityManager().getTransaction().commit();
-     
+
         return "1";
     }//TODO: METODoS ARCAICOS
 
