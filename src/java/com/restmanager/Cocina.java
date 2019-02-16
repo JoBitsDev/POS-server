@@ -13,6 +13,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -48,8 +49,12 @@ public class Cocina implements Serializable {
     @Size(min = 1, max = 30)
     @Column(name = "nombre_cocina")
     private String nombreCocina;
+    @ManyToMany(mappedBy = "cocinaList")
+    private List<Transaccion> transaccionList;
     @OneToMany(mappedBy = "cocinacodCocina")
     private List<ProductoVenta> productoVentaList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cocina")
+    private List<NotificacionEnvioCocina> notificacionEnvioCocinaList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cocina")
     private List<Ipv> ipvList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cocinacodCocina")
@@ -84,12 +89,30 @@ public class Cocina implements Serializable {
     }
 
     @XmlTransient
+    public List<Transaccion> getTransaccionList() {
+        return transaccionList;
+    }
+
+    public void setTransaccionList(List<Transaccion> transaccionList) {
+        this.transaccionList = transaccionList;
+    }
+
+    @XmlTransient
     public List<ProductoVenta> getProductoVentaList() {
         return productoVentaList;
     }
 
     public void setProductoVentaList(List<ProductoVenta> productoVentaList) {
         this.productoVentaList = productoVentaList;
+    }
+
+    @XmlTransient
+    public List<NotificacionEnvioCocina> getNotificacionEnvioCocinaList() {
+        return notificacionEnvioCocinaList;
+    }
+
+    public void setNotificacionEnvioCocinaList(List<NotificacionEnvioCocina> notificacionEnvioCocinaList) {
+        this.notificacionEnvioCocinaList = notificacionEnvioCocinaList;
     }
 
     @XmlTransient

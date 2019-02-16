@@ -9,6 +9,7 @@ package com.restmanager;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -32,7 +33,9 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "Almacen.findAll", query = "SELECT a FROM Almacen a")
     , @NamedQuery(name = "Almacen.findByCodAlmacen", query = "SELECT a FROM Almacen a WHERE a.codAlmacen = :codAlmacen")
-    , @NamedQuery(name = "Almacen.findByNombre", query = "SELECT a FROM Almacen a WHERE a.nombre = :nombre")})
+    , @NamedQuery(name = "Almacen.findByNombre", query = "SELECT a FROM Almacen a WHERE a.nombre = :nombre")
+    , @NamedQuery(name = "Almacen.findByCantidadInsumos", query = "SELECT a FROM Almacen a WHERE a.cantidadInsumos = :cantidadInsumos")
+    , @NamedQuery(name = "Almacen.findByValorMonetario", query = "SELECT a FROM Almacen a WHERE a.valorMonetario = :valorMonetario")})
 public class Almacen implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -45,8 +48,15 @@ public class Almacen implements Serializable {
     @Size(max = 30)
     @Column(name = "nombre")
     private String nombre;
-    @OneToMany(mappedBy = "almacencodAlmacen")
-    private List<Insumo> insumoList;
+    @Column(name = "cantidad_insumos")
+    private Integer cantidadInsumos;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "valor_monetario")
+    private Float valorMonetario;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "almacen")
+    private List<Transaccion> transaccionList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "almacen")
+    private List<InsumoAlmacen> insumoAlmacenList;
 
     public Almacen() {
     }
@@ -71,13 +81,38 @@ public class Almacen implements Serializable {
         this.nombre = nombre;
     }
 
-    @XmlTransient
-    public List<Insumo> getInsumoList() {
-        return insumoList;
+    public Integer getCantidadInsumos() {
+        return cantidadInsumos;
     }
 
-    public void setInsumoList(List<Insumo> insumoList) {
-        this.insumoList = insumoList;
+    public void setCantidadInsumos(Integer cantidadInsumos) {
+        this.cantidadInsumos = cantidadInsumos;
+    }
+
+    public Float getValorMonetario() {
+        return valorMonetario;
+    }
+
+    public void setValorMonetario(Float valorMonetario) {
+        this.valorMonetario = valorMonetario;
+    }
+
+    @XmlTransient
+    public List<Transaccion> getTransaccionList() {
+        return transaccionList;
+    }
+
+    public void setTransaccionList(List<Transaccion> transaccionList) {
+        this.transaccionList = transaccionList;
+    }
+
+    @XmlTransient
+    public List<InsumoAlmacen> getInsumoAlmacenList() {
+        return insumoAlmacenList;
+    }
+
+    public void setInsumoAlmacenList(List<InsumoAlmacen> insumoAlmacenList) {
+        this.insumoAlmacenList = insumoAlmacenList;
     }
 
     @Override

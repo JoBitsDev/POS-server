@@ -2,35 +2,36 @@
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
   <persistence-unit name="Restaurant_Manager_Web_ServicePU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>com.restmanager.InsumoElaborado</class>
-    <class>com.restmanager.Cliente</class>
-    <class>com.restmanager.Carta</class>
-    <class>com.restmanager.Mesa</class>
-    <class>com.restmanager.Insumo</class>
-    <class>com.restmanager.ProductovOrden</class>
-    <class>com.restmanager.ProductoInsumo</class>
-    <class>com.restmanager.Seccion</class>
     <class>com.restmanager.Almacen</class>
-    <class>com.restmanager.Cocina</class>
-    <class>com.restmanager.ProductoVenta</class>
-    <class>com.restmanager.Personal</class>
     <class>com.restmanager.Area</class>
-    <class>com.restmanager.Orden</class>
-    <class>com.restmanager.Venta</class>
-    <class>com.restmanager.DatosPersonales</class>
-    <class>com.restmanager.PuestoTrabajo</class>
+    <class>com.restmanager.Carta</class>
+    <class>com.restmanager.Cliente</class>
+    <class>com.restmanager.Cocina</class>
     <class>com.restmanager.Configuracion</class>
-    <class>com.restmanager.OrdenArchivada</class>
-    <class>com.restmanager.ProductovOrdenArchivado</class>
-    <class>com.restmanager.Ipv</class>
+    <class>com.restmanager.DatosPersonales</class>
+    <class>com.restmanager.Extraccion</class>
     <class>com.restmanager.Impresora</class>
+    <class>com.restmanager.Insumo</class>
+    <class>com.restmanager.InsumoAlmacen</class>
+    <class>com.restmanager.InsumoElaborado</class>
+    <class>com.restmanager.Ipv</class>
     <class>com.restmanager.IpvRegistro</class>
     <class>com.restmanager.Log</class>
-    <class>com.restmanager.MenuEspecial</class>
-    <class>com.restmanager.Sector</class>
-    <class>com.restmanager.VentaArchivada</class>
-    <class>com.restmanager.Agrego</class>
-    <class>com.restmanager.NotaArchivada</class>
+    <class>com.restmanager.Mesa</class>
+    <class>com.restmanager.Negocio</class>
+    <class>com.restmanager.Nota</class>
+    <class>com.restmanager.NotificacionEnvioCocina</class>
+    <class>com.restmanager.Orden</class>
+    <class>com.restmanager.Personal</class>
+    <class>com.restmanager.ProductoInsumo</class>
+    <class>com.restmanager.ProductoVenta</class>
+    <class>com.restmanager.ProductovOrden</class>
+    <class>com.restmanager.PuestoTrabajo</class>
+    <class>com.restmanager.Seccion</class>
+    <class>com.restmanager.Transaccion</class>
+    <class>com.restmanager.TransaccionEntrada</class>
+    <class>com.restmanager.TransaccionMerma</class>
+    <class>com.restmanager.Venta</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/Restaurant_Manager_DB"/>

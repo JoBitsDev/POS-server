@@ -6,12 +6,11 @@
 package com.restmanager.service;
 
 import com.restmanager.Venta;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -21,26 +20,22 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.xml.ws.handler.MessageContext;
 
 /**
+ * FirstDream
  *
  * @author Jorge
+ *
  */
-
 @Path("com.restmanager.venta")
 public class VentaFacadeREST extends AbstractFacade<Venta> {
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")
     private EntityManager em;
-    private Date d;
-    SimpleDateFormat 
-            Format = new SimpleDateFormat("dd'/'MM'/'yy"),
-            hour = new SimpleDateFormat(" hh ':' mm ' ' a ");
-    
 
     public VentaFacadeREST() {
         super(Venta.class);
-        d = new Date();
     }
 
     @POST
@@ -48,6 +43,17 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public void create(Venta entity) {
         super.create(entity);
+    }
+
+    @GET
+    @Path("ip")
+    @Consumes(MediaType.TEXT_PLAIN)
+    public String ip() {
+        MessageContext messageContext = webServiceContext.getMessageContext();
+        HttpServletRequest request = (HttpServletRequest) messageContext.get(MessageContext.SERVLET_REQUEST);
+        String callerIpAddress = request.getRemoteAddr();
+
+        return ("Caller IP = " + callerIpAddress);
     }
 
     @PUT
@@ -61,28 +67,6 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
     @Path("{id}")
     public void remove(@PathParam("id") Date id) {
         super.remove(super.find(id));
-    }
-    
-    @GET
-    @Path("START")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String addVenta() {
-        super.create(new Venta(d));
-        return "1";
-    }
-    
-    @GET
-    @Path("date")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getToday() {
-        return Format.format(new Date());
-    }
-    
-    @GET
-    @Path("hour")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getHour() {
-        return hour.format(new Date());
     }
 
     @GET
@@ -117,5 +101,5 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
     protected EntityManager getEntityManager() {
         return em;
     }
-    
+
 }

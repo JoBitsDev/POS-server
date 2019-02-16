@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.restmanager.service;
 
 import com.restmanager.Orden;
@@ -11,7 +12,6 @@ import com.restmanager.Venta;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.Consumes;
@@ -25,10 +25,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
- *
+ * FirstDream
  * @author Jorge
+ * 
  */
-
+ 
 @Path("com.restmanager.personal")
 public class PersonalFacadeREST extends AbstractFacade<Personal> {
 
@@ -135,5 +136,5 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
     protected EntityManager getEntityManager() {
         return em;
     }
-    
+
 }

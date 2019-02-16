@@ -36,14 +36,14 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "DatosPersonales.findByPersonalusuario", query = "SELECT d FROM DatosPersonales d WHERE d.personalusuario = :personalusuario")
     , @NamedQuery(name = "DatosPersonales.findByNombre", query = "SELECT d FROM DatosPersonales d WHERE d.nombre = :nombre")
     , @NamedQuery(name = "DatosPersonales.findByApellidos", query = "SELECT d FROM DatosPersonales d WHERE d.apellidos = :apellidos")
-    , @NamedQuery(name = "DatosPersonales.findByCarnet", query = "SELECT d FROM DatosPersonales d WHERE d.carnet = :carnet")
     , @NamedQuery(name = "DatosPersonales.findByTelefonoMovil", query = "SELECT d FROM DatosPersonales d WHERE d.telefonoMovil = :telefonoMovil")
     , @NamedQuery(name = "DatosPersonales.findByTelefonoFijo", query = "SELECT d FROM DatosPersonales d WHERE d.telefonoFijo = :telefonoFijo")
-    , @NamedQuery(name = "DatosPersonales.findByDireccion", query = "SELECT d FROM DatosPersonales d WHERE d.direccion = :direccion")
-    , @NamedQuery(name = "DatosPersonales.findByDescripcion", query = "SELECT d FROM DatosPersonales d WHERE d.descripcion = :descripcion")
     , @NamedQuery(name = "DatosPersonales.findByFechaNacimineto", query = "SELECT d FROM DatosPersonales d WHERE d.fechaNacimineto = :fechaNacimineto")
     , @NamedQuery(name = "DatosPersonales.findByEdad", query = "SELECT d FROM DatosPersonales d WHERE d.edad = :edad")
-    , @NamedQuery(name = "DatosPersonales.findBySexo", query = "SELECT d FROM DatosPersonales d WHERE d.sexo = :sexo")})
+    , @NamedQuery(name = "DatosPersonales.findBySexo", query = "SELECT d FROM DatosPersonales d WHERE d.sexo = :sexo")
+    , @NamedQuery(name = "DatosPersonales.findByCarnet", query = "SELECT d FROM DatosPersonales d WHERE d.carnet = :carnet")
+    , @NamedQuery(name = "DatosPersonales.findByDireccion", query = "SELECT d FROM DatosPersonales d WHERE d.direccion = :direccion")
+    , @NamedQuery(name = "DatosPersonales.findByDescripcion", query = "SELECT d FROM DatosPersonales d WHERE d.descripcion = :descripcion")})
 public class DatosPersonales implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -63,19 +63,10 @@ public class DatosPersonales implements Serializable {
     @Size(min = 1, max = 30)
     @Column(name = "apellidos")
     private String apellidos;
-    @Size(max = 11)
-    @Column(name = "carnet")
-    private String carnet;
     @Column(name = "telefono_movil")
     private Integer telefonoMovil;
     @Column(name = "telefono_fijo")
     private Integer telefonoFijo;
-    @Size(max = 100)
-    @Column(name = "direccion")
-    private String direccion;
-    @Size(max = 255)
-    @Column(name = "descripcion")
-    private String descripcion;
     @Column(name = "fecha_nacimineto")
     @Temporal(TemporalType.DATE)
     private Date fechaNacimineto;
@@ -83,6 +74,15 @@ public class DatosPersonales implements Serializable {
     private Integer edad;
     @Column(name = "sexo")
     private Character sexo;
+    @Size(max = 11)
+    @Column(name = "carnet")
+    private String carnet;
+    @Size(max = 100)
+    @Column(name = "direccion")
+    private String direccion;
+    @Size(max = 255)
+    @Column(name = "descripcion")
+    private String descripcion;
     @JoinColumn(name = "personalusuario", referencedColumnName = "usuario", insertable = false, updatable = false)
     @OneToOne(optional = false)
     private Personal personal;
@@ -124,14 +124,6 @@ public class DatosPersonales implements Serializable {
         this.apellidos = apellidos;
     }
 
-    public String getCarnet() {
-        return carnet;
-    }
-
-    public void setCarnet(String carnet) {
-        this.carnet = carnet;
-    }
-
     public Integer getTelefonoMovil() {
         return telefonoMovil;
     }
@@ -146,22 +138,6 @@ public class DatosPersonales implements Serializable {
 
     public void setTelefonoFijo(Integer telefonoFijo) {
         this.telefonoFijo = telefonoFijo;
-    }
-
-    public String getDireccion() {
-        return direccion;
-    }
-
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
     }
 
     public Date getFechaNacimineto() {
@@ -186,6 +162,30 @@ public class DatosPersonales implements Serializable {
 
     public void setSexo(Character sexo) {
         this.sexo = sexo;
+    }
+
+    public String getCarnet() {
+        return carnet;
+    }
+
+    public void setCarnet(String carnet) {
+        this.carnet = carnet;
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     public Personal getPersonal() {

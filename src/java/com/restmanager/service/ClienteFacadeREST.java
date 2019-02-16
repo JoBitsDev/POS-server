@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.restmanager.service;
 
 import com.restmanager.Cliente;
 import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.Consumes;
@@ -21,10 +21,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
- *
+ * FirstDream
  * @author Jorge
+ * 
  */
-
+ 
 @Path("com.restmanager.cliente")
 public class ClienteFacadeREST extends AbstractFacade<Cliente> {
 
@@ -87,5 +88,5 @@ public class ClienteFacadeREST extends AbstractFacade<Cliente> {
     protected EntityManager getEntityManager() {
         return em;
     }
-    
+
 }

@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.restmanager.service;
 
 import com.restmanager.Carta;
 import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.Consumes;
@@ -21,15 +21,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
- *
+ * FirstDream
  * @author Jorge
+ * 
  */
-
 @Path("com.restmanager.carta")
 public class CartaFacadeREST extends AbstractFacade<Carta> {
 
-    @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")
-    private EntityManager em;
+
 
     public CartaFacadeREST() {
         super(Carta.class);
@@ -61,17 +60,10 @@ public class CartaFacadeREST extends AbstractFacade<Carta> {
     public Carta find(@PathParam("id") String id) {
         return super.find(id);
     }
-    
-      @GET
-    @Path("NOMBRE_REST")
-    @Produces({MediaType.TEXT_PLAIN})
-    public String getNombreRest() {
-        return super.find("Mnu-1").getNombreCarta();
-    }
 
     @GET
     @Override
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML})
     public List<Carta> findAll() {
         return super.findAll();
     }
@@ -92,7 +84,7 @@ public class CartaFacadeREST extends AbstractFacade<Carta> {
 
     @Override
     protected EntityManager getEntityManager() {
-        return em;
+        return em1;
     }
-    
+
 }

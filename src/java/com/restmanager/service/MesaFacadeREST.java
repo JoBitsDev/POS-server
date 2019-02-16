@@ -3,12 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.restmanager.service;
 
 import com.restmanager.Mesa;
-import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.Consumes;
@@ -22,10 +21,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
- *
+ * FirstDream
  * @author Jorge
+ * 
  */
-
+ 
 @Path("com.restmanager.mesa")
 public class MesaFacadeREST extends AbstractFacade<Mesa> {
 
@@ -50,13 +50,6 @@ public class MesaFacadeREST extends AbstractFacade<Mesa> {
         super.edit(entity);
     }
 
-    
-    @POST
-    @Path("{id}_{estado}")
-    public void create(@PathParam("id") String id, @PathParam("estado") String estado) {
-        super.create(new Mesa(id, estado));
-    }
-    
     @DELETE
     @Path("{id}")
     public void remove(@PathParam("id") String id) {
@@ -67,34 +60,16 @@ public class MesaFacadeREST extends AbstractFacade<Mesa> {
     @Path("{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Mesa find(@PathParam("id") String id) {
-        em1.getEntityManagerFactory().getCache().evict(Mesa.class);
         return super.find(id);
     }
 
     @GET
     @Override
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Mesa> findAll() {
         return super.findAll();
     }
-    
-    @GET
-    @Path("MOSTRARVACIAS")
-    @Produces(MediaType.APPLICATION_XML)
-    public List<Mesa> findEmptyTables() {
-       // em1.getEntityManagerFactory().getCache().evict(Mesa.class);
-        List<Mesa> mesas = findAll();
-        List<Mesa> ret = new ArrayList<>();
-        
-        for (Mesa m : mesas) {
-            if(m.getEstado().equals("vacia")){
-                ret.add(m);
-            }
-        }
-        return ret;
-    }
-    
-    
+
     @GET
     @Path("{from}/{to}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -109,15 +84,9 @@ public class MesaFacadeREST extends AbstractFacade<Mesa> {
         return String.valueOf(super.count());
     }
 
-     @GET
-    @Path("pincha")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String def() {
-        return "pincha";
-    }
     @Override
     protected EntityManager getEntityManager() {
         return em;
     }
-    
+
 }

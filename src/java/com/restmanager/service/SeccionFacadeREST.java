@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.restmanager.service;
 
 import com.restmanager.Seccion;
 import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.Consumes;
@@ -21,10 +21,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
- *
+ * FirstDream
  * @author Jorge
+ * 
  */
-
+ 
 @Path("com.restmanager.seccion")
 public class SeccionFacadeREST extends AbstractFacade<Seccion> {
 
@@ -64,7 +65,7 @@ public class SeccionFacadeREST extends AbstractFacade<Seccion> {
 
     @GET
     @Override
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Seccion> findAll() {
         return super.findAll();
     }
@@ -87,5 +88,5 @@ public class SeccionFacadeREST extends AbstractFacade<Seccion> {
     protected EntityManager getEntityManager() {
         return em;
     }
-    
+
 }

@@ -51,6 +51,8 @@ public class ApplicationConfig extends Application {
         resources.add(com.restmanager.service.PuestoTrabajoFacadeREST.class);
         resources.add(com.restmanager.service.SeccionFacadeREST.class);
         resources.add(com.restmanager.service.VentaFacadeREST.class);
+        resources.add(com.restmanager.service.NotificacionEnvioCocinaFacadeREST.class);
+        
     }
     
 }

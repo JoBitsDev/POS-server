@@ -3,14 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.restmanager.service;
 
 import com.restmanager.ProductoVenta;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.Consumes;
@@ -24,10 +21,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
- *
+ * FirstDream
  * @author Jorge
+ * 
  */
-
+ 
 @Path("com.restmanager.productoventa")
 public class ProductoVentaFacadeREST extends AbstractFacade<ProductoVenta> {
 
@@ -69,18 +67,7 @@ public class ProductoVentaFacadeREST extends AbstractFacade<ProductoVenta> {
     @Override
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<ProductoVenta> findAll() {
-        List<ProductoVenta> aux = super.findAll();
-        Collections.sort(aux,(o1, o2) -> {
-            return o1.getNombre().compareTo(o2.getNombre()); //To change body of generated lambdas, choose Tools | Templates.
-        });
-        List<ProductoVenta> ret = new ArrayList<>();
-        for (ProductoVenta x : aux) {
-            
-            if(x.getVisible()){
-                ret.add(x);
-            }
-        }
-        return ret;
+        return super.findAll();
     }
 
     @GET
@@ -101,5 +88,5 @@ public class ProductoVentaFacadeREST extends AbstractFacade<ProductoVenta> {
     protected EntityManager getEntityManager() {
         return em;
     }
-    
+
 }

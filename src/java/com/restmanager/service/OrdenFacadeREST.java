@@ -282,10 +282,10 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                     notPK.setCocinacodCocina(x.getProductoVenta().getCocinacodCocina().getCodCocina());
                     notPK.setProductovOrdenordencodOrden(o.getCodOrden());
                     notPK.setProductovOrdenproductoVentapCod(x.getProductoVenta().getPCod());
-                    NotificacionEnvioCocina not  = super.find(notPK);
+                    NotificacionEnvioCocina not  = super.em1.find(NotificacionEnvioCocina.class,notPK);
                     boolean exist= true;
                     if (not == null) {
-                        not == new NotificacionEnvioCocina(notPK);
+                        not = new NotificacionEnvioCocina(notPK);
                         exist = false;
                     } 
                     not.setCocina(x.getProductoVenta().getCocinacodCocina());
@@ -293,10 +293,14 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                     not.setProductovOrden(x);
                     not.setCantidad(x.getCantidad()-x.getEnviadosacocina());
                     super.em1.getTransaction().begin();
-                    exist ? super.em1.merge(not) : super.em1.persist(not);
+                    if (exist) {
+                        super.em1.merge(not);
+                    } else {
+                        super.em1.persist(not);
+                    }
                     super.em1.getTransaction().commit();
                     x.setEnviadosacocina(x.getCantidad());
-                    
+                   
                 }
             }
         }

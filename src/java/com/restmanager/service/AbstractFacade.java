@@ -6,9 +6,11 @@
 package com.restmanager.service;
 
 import java.util.List;
+import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.xml.ws.WebServiceContext;
 
 /**
  *
@@ -16,6 +18,9 @@ import javax.persistence.Persistence;
  */
 public abstract class AbstractFacade<T> {
 
+    @Resource
+    WebServiceContext webServiceContext;
+    
     private Class<T> entityClass;
     
     protected EntityManagerFactory e = Persistence.createEntityManagerFactory("Restaurant_Manager_Web_ServicePU");

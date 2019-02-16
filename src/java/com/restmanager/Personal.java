@@ -14,8 +14,10 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -57,10 +59,8 @@ public class Personal implements Serializable {
     @Size(min = 1, max = 20)
     @Column(name = "contrasenna")
     private String contrasenna;
-    @Basic(optional = false)
-    @NotNull
     @Column(name = "online")
-    private boolean online;
+    private Boolean online;
     @Column(name = "frecuencia")
     private Short frecuencia;
     @Column(name = "ultimodia_trabajo")
@@ -75,8 +75,9 @@ public class Personal implements Serializable {
     private List<Orden> ordenList;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "personal")
     private DatosPersonales datosPersonales;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "personalusuario")
-    private List<OrdenArchivada> ordenArchivadaList;
+    @JoinColumn(name = "puesto_trabajonombre_puesto", referencedColumnName = "nombre_puesto")
+    @ManyToOne(optional = false)
+    private PuestoTrabajo puestoTrabajonombrePuesto;
 
     public Personal() {
     }
@@ -85,10 +86,9 @@ public class Personal implements Serializable {
         this.usuario = usuario;
     }
 
-    public Personal(String usuario, String contrasenna, boolean online) {
+    public Personal(String usuario, String contrasenna) {
         this.usuario = usuario;
         this.contrasenna = contrasenna;
-        this.online = online;
     }
 
     public String getUsuario() {
@@ -107,11 +107,11 @@ public class Personal implements Serializable {
         this.contrasenna = contrasenna;
     }
 
-    public boolean getOnline() {
+    public Boolean getOnline() {
         return online;
     }
 
-    public void setOnline(boolean online) {
+    public void setOnline(Boolean online) {
         this.online = online;
     }
 
@@ -165,13 +165,12 @@ public class Personal implements Serializable {
         this.datosPersonales = datosPersonales;
     }
 
-    @XmlTransient
-    public List<OrdenArchivada> getOrdenArchivadaList() {
-        return ordenArchivadaList;
+    public PuestoTrabajo getPuestoTrabajonombrePuesto() {
+        return puestoTrabajonombrePuesto;
     }
 
-    public void setOrdenArchivadaList(List<OrdenArchivada> ordenArchivadaList) {
-        this.ordenArchivadaList = ordenArchivadaList;
+    public void setPuestoTrabajonombrePuesto(PuestoTrabajo puestoTrabajonombrePuesto) {
+        this.puestoTrabajonombrePuesto = puestoTrabajonombrePuesto;
     }
 
     @Override

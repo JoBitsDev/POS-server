@@ -7,6 +7,7 @@
 package com.restmanager;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -16,10 +17,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
@@ -35,7 +38,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "ProductovOrden.findByOrdencodOrden", query = "SELECT p FROM ProductovOrden p WHERE p.productovOrdenPK.ordencodOrden = :ordencodOrden")
     , @NamedQuery(name = "ProductovOrden.findByCantidad", query = "SELECT p FROM ProductovOrden p WHERE p.cantidad = :cantidad")
     , @NamedQuery(name = "ProductovOrden.findByEnviadosacocina", query = "SELECT p FROM ProductovOrden p WHERE p.enviadosacocina = :enviadosacocina")
-    , @NamedQuery(name = "ProductovOrden.findByNumeroComensal", query = "SELECT p FROM ProductovOrden p WHERE p.numeroComensal = :numeroComensal")})
+    , @NamedQuery(name = "ProductovOrden.findByNumeroComensal", query = "SELECT p FROM ProductovOrden p WHERE p.numeroComensal = :numeroComensal")
+    , @NamedQuery(name = "ProductovOrden.findByListoParaRecoger", query = "SELECT p FROM ProductovOrden p WHERE p.listoParaRecoger = :listoParaRecoger")})
 public class ProductovOrden implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -44,11 +48,16 @@ public class ProductovOrden implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "cantidad")
-    private int cantidad;
+    private float cantidad;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "enviadosacocina")
-    private Integer enviadosacocina;
+    private Float enviadosacocina;
     @Column(name = "numero_comensal")
     private Integer numeroComensal;
+    @Column(name = "listo_para_recoger")
+    private Boolean listoParaRecoger;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "productovOrden")
+    private List<NotificacionEnvioCocina> notificacionEnvioCocinaList;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "productovOrden")
     private Nota nota;
     @JoinColumn(name = "ordencod_orden", referencedColumnName = "cod_orden", insertable = false, updatable = false)
@@ -65,7 +74,7 @@ public class ProductovOrden implements Serializable {
         this.productovOrdenPK = productovOrdenPK;
     }
 
-    public ProductovOrden(ProductovOrdenPK productovOrdenPK, int cantidad) {
+    public ProductovOrden(ProductovOrdenPK productovOrdenPK, float cantidad) {
         this.productovOrdenPK = productovOrdenPK;
         this.cantidad = cantidad;
     }
@@ -82,19 +91,19 @@ public class ProductovOrden implements Serializable {
         this.productovOrdenPK = productovOrdenPK;
     }
 
-    public int getCantidad() {
+    public float getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(int cantidad) {
+    public void setCantidad(float cantidad) {
         this.cantidad = cantidad;
     }
 
-    public Integer getEnviadosacocina() {
+    public Float getEnviadosacocina() {
         return enviadosacocina;
     }
 
-    public void setEnviadosacocina(Integer enviadosacocina) {
+    public void setEnviadosacocina(Float enviadosacocina) {
         this.enviadosacocina = enviadosacocina;
     }
 
@@ -104,6 +113,23 @@ public class ProductovOrden implements Serializable {
 
     public void setNumeroComensal(Integer numeroComensal) {
         this.numeroComensal = numeroComensal;
+    }
+
+    public Boolean getListoParaRecoger() {
+        return listoParaRecoger;
+    }
+
+    public void setListoParaRecoger(Boolean listoParaRecoger) {
+        this.listoParaRecoger = listoParaRecoger;
+    }
+
+    @XmlTransient
+    public List<NotificacionEnvioCocina> getNotificacionEnvioCocinaList() {
+        return notificacionEnvioCocinaList;
+    }
+
+    public void setNotificacionEnvioCocinaList(List<NotificacionEnvioCocina> notificacionEnvioCocinaList) {
+        this.notificacionEnvioCocinaList = notificacionEnvioCocinaList;
     }
 
     public Nota getNota() {

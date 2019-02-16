@@ -7,7 +7,6 @@ package com.restmanager.printservice;
 
 import com.restmanager.Carta;
 import com.restmanager.Cocina;
-import com.restmanager.CocinaJpaController;
 import com.restmanager.Orden;
 import com.restmanager.ProductovOrden;
 import java.text.SimpleDateFormat;
@@ -230,7 +229,7 @@ public class Impresion {
 
     public Orden printKitchen(Orden o) throws PrintException {
 
-        return printKitchenForced(printKitchen(printCancelationTicket(o), new CocinaJpaController(e).findCocina("C-2"), ""));
+        return printKitchenForced(printKitchen(printCancelationTicket(o), e.createEntityManager().find(Cocina.class,"C-2"), ""));
 //
 //        Ticket p = new Ticket();
 //        p.resetAll();
@@ -602,7 +601,7 @@ public class Impresion {
 
     public Orden printCancelationTicket(Orden o) {
 
-        return printCancelationKitchenForced(printCancelationKitchen(o,new CocinaJpaController(e).findCocina("C-2")));
+        return printCancelationKitchenForced(printCancelationKitchen(o,e.createEntityManager().find(Cocina.class,"C-2")));
 //        Ticket t = new Ticket();
 //
 //        addHeader(t);

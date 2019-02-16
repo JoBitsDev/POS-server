@@ -9,7 +9,6 @@ package com.restmanager;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -50,7 +49,7 @@ public class Mesa implements Serializable {
     private String codMesa;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 15)
+    @Size(min = 1, max = 30)
     @Column(name = "estado")
     private String estado;
     @Column(name = "estallena")
@@ -65,8 +64,6 @@ public class Mesa implements Serializable {
     private Area areacodArea;
     @OneToMany(mappedBy = "mesacodMesa")
     private List<Orden> ordenList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "mesacodMesa")
-    private List<OrdenArchivada> ordenArchivadaList;
 
     public Mesa() {
     }
@@ -135,15 +132,6 @@ public class Mesa implements Serializable {
 
     public void setOrdenList(List<Orden> ordenList) {
         this.ordenList = ordenList;
-    }
-
-    @XmlTransient
-    public List<OrdenArchivada> getOrdenArchivadaList() {
-        return ordenArchivadaList;
-    }
-
-    public void setOrdenArchivadaList(List<OrdenArchivada> ordenArchivadaList) {
-        this.ordenArchivadaList = ordenArchivadaList;
     }
 
     @Override
