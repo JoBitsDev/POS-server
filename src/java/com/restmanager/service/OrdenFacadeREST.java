@@ -20,6 +20,7 @@ import javax.persistence.EntityManager;
 import javax.print.PrintException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import restmanager.resources.Res;
 
 /**
  *
@@ -140,7 +141,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
         if (contains != -1) {
             ProductovOrden p = po.get(contains);
-            int cant = p.getCantidad();
+            float cant = p.getCantidad();
             p.setCantidad(++cant);
 
         } else {
@@ -148,7 +149,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
             aux.setOrden(o);
             aux.setProductoVenta(producto);
             aux.setCantidad(1);
-            aux.setEnviadosacocina(0);
+            aux.setEnviadosacocina((float) 0);
             aux.setNumeroComensal(0);
 
             //em.persist(aux);
@@ -180,7 +181,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
         if (contains != -1) {
             ProductovOrden p = po.get(contains);
-            int cant = p.getCantidad();
+            float cant = p.getCantidad();
             if (cant > 1) {
                 p.setCantidad(cant - 1);
 
@@ -267,15 +268,39 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
         Orden o = super.find(codOrden);
         Mesa m = getEntityManager().find(Mesa.class, o.getMesacodMesa().getCodMesa());
-        Impresion i = new Impresion(getEntityManager().find(Carta.class, "Mnu-1"));
-        try {
-
-            i.printKitchen(o);
-
-        } catch (PrintException | NullPointerException ex) {
-            Logger.getLogger(OrdenFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        if (!Res.TABLETS_EN_COCINA) {
+            Impresion i = new Impresion(getEntityManager().find(Carta.class, "Mnu-1"));
+            try {
+                i.printKitchen(o);
+            } catch (PrintException | NullPointerException ex) {
+                Logger.getLogger(OrdenFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            for (ProductovOrden x : o.getProductovOrdenList()) {
+                if (x.getEnviadosacocina() < x.getCantidad()) {
+                    NotificacionEnvioCocinaPK notPK = new NotificacionEnvioCocinaPK();
+                    notPK.setCocinacodCocina(x.getProductoVenta().getCocinacodCocina().getCodCocina());
+                    notPK.setProductovOrdenordencodOrden(o.getCodOrden());
+                    notPK.setProductovOrdenproductoVentapCod(x.getProductoVenta().getPCod());
+                    NotificacionEnvioCocina not  = super.find(notPK);
+                    boolean exist= true;
+                    if (not == null) {
+                        not == new NotificacionEnvioCocina(notPK);
+                        exist = false;
+                    } 
+                    not.setCocina(x.getProductoVenta().getCocinacodCocina());
+                    not.setHoraNotificacion(new Date());
+                    not.setProductovOrden(x);
+                    not.setCantidad(x.getCantidad()-x.getEnviadosacocina());
+                    super.em1.getTransaction().begin();
+                    exist ? super.em1.merge(not) : super.em1.persist(not);
+                    super.em1.getTransaction().commit();
+                    x.setEnviadosacocina(x.getCantidad());
+                    
+                }
+            }
         }
-
+        
         super.edit(o);
 
         return "1";
