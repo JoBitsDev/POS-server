@@ -5,22 +5,26 @@
  */
 package com.restmanager.service;
 
+import com.restmanager.Cocina;
+import com.restmanager.Impresora;
 import com.restmanager.NotificacionEnvioCocina;
 import com.restmanager.NotificacionEnvioCocinaPK;
 import com.restmanager.ProductovOrden;
 import com.restmanager.XMLservice.ProductovOrdenXMLexport;
+import com.restmanager.notificationdelivery.Notificable;
+import com.restmanager.notificationdelivery.Notificador;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.ws.rs.Consumes;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
 
@@ -70,9 +74,15 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
     @GET
     @Path("PENDING_{codCocina}")
     @Produces({MediaType.TEXT_PLAIN})
-    public String showPending(@PathParam("codCocina") String codCocina) {
+    public String showPending(@PathParam("codCocina") String codCocina, @Context HttpServletRequest inRequest) {
+        registerDevice(inRequest, codCocina);
         List<ProductovOrden> ret = new ArrayList<>();
-        for (NotificacionEnvioCocina x : findAll()) {
+        List<NotificacionEnvioCocina> all = findAll();
+        for (NotificacionEnvioCocina x : all) {
+            if (x.getProductovOrden().getOrden().getHoraTerminada() != null) {
+                super.remove(x);
+                continue;
+            }
             if (x.getCocina().getCodCocina().equals(codCocina)) {
                 x.getProductovOrden().setCantidad(x.getCantidad());
                 ret.add(x.getProductovOrden());
@@ -93,11 +103,35 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
                 super.em1.merge(x.getProductovOrden());
                 super.em1.getTransaction().commit();
                 super.remove(x);
+                new Notificador(x.getIp_dependiente(), new Notificable() {
+                    @Override
+                    public String getMensajeNotificacion() {
+                        return "Productos a recoger en " + x.getProductovOrden().getProductoVenta().getCocinacodCocina().getNombreCocina();
+                    }
+
+                    @Override
+                    public String getTituloNotificacion() {
+                        return "Restaurant Manager";
+                    }
+
+                    @Override
+                    public String getDescripcionNotificacion() {
+                        return x.getCantidad() + " de " + x.getProductovOrden().getProductoVenta().getNombre();
+                    }
+                }).notificar();
                 return "Notificacion Exitosa";
 
             }
         }
-        return "Los parámetros no son válidos o la notificación ya fue enviada";
+        return "Los parámetros no son válidos o la notificación ya fue enviada \n "
+                + "o el receptor no esta conectado";
+    }
+
+    @GET
+    @Path("ip")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String ip(@Context HttpServletRequest inRequest) {
+        return inRequest.getRemoteHost();
     }
 
     @DELETE
@@ -139,6 +173,35 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
     @Override
     protected EntityManager getEntityManager() {
         return em;
+    }
+
+    private void registerDevice(HttpServletRequest inRequest, String cod_cocina) {
+        boolean founded = false;
+        Cocina c = em1.find(Cocina.class, cod_cocina);
+        Impresora imp = null;
+        String host = inRequest.getRemoteHost();
+        for (Impresora i : c.getImpresoraList()) {
+            if (!i.getIpImpresora().equals(host)) {
+                i.setIpImpresora(host);
+            }
+            imp = i;
+            founded = true;
+        }
+        if (!founded) {
+            Impresora i = new Impresora();
+            i.setCocinacodCocina(c);
+            i.setEstaactiva(true);
+            i.setIpImpresora(host);
+            i.setNombreImpresora("Device");
+            i.setCodImpresora("D-" + c.getCodCocina());
+            em1.getTransaction().begin();
+            em1.persist(i);
+            em1.getTransaction().commit();
+        } else {
+            em1.getTransaction().begin();
+            em1.merge(imp);
+            em1.getTransaction().commit();
+        }
     }
 
 }

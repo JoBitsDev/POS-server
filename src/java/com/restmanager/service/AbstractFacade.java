@@ -20,9 +20,9 @@ public abstract class AbstractFacade<T> {
 
     @Resource
     WebServiceContext webServiceContext;
-    
+
     private Class<T> entityClass;
-    
+
     protected EntityManagerFactory e = Persistence.createEntityManagerFactory("Restaurant_Manager_Web_ServicePU");
     protected EntityManager em1 = e.createEntityManager();
 
@@ -33,51 +33,60 @@ public abstract class AbstractFacade<T> {
     protected abstract EntityManager getEntityManager();
 
     public void create(T entity) {
-        if(em1.getTransaction().isActive()){
+        if (em1.getTransaction().isActive()) {
             em1.persist(entity);
-        }
-        else{
-        em1.getTransaction().begin();
-        em1.persist(entity);
-        em1.getTransaction().commit();
+        } else {
+            em1.getTransaction().begin();
+            em1.persist(entity);
+            em1.getTransaction().commit();
         }
 
     }
 
     public void edit(T entity) {
-        if(em1.getTransaction().isActive()){
+        if (em1.getTransaction().isActive()) {
             em1.merge(entity);
-        }
-        else{
-        em1.getTransaction().begin();
-        em1.merge(entity);
-        em1.getTransaction().commit();
+        } else {
+            em1.getTransaction().begin();
+            em1.merge(entity);
+            em1.getTransaction().commit();
         }
     }
 
     public void remove(T entity) {
-        if(em1.getTransaction().isActive()){
+        if (em1.getTransaction().isActive()) {
             em1.remove(em1.merge(entity));
+        } else {
+            em1.getTransaction().begin();
+            em1.remove(em1.merge(entity));
+            em1.getTransaction().commit();
         }
-        else{
-        em1.getTransaction().begin();
-        em1.remove(em1.merge(entity));
-        em1.getTransaction().commit();}
     }
 
     public T find(Object id) {
         e.getCache().evictAll();
-        EntityManager aux =  e.createEntityManager();
+        EntityManager aux = e.createEntityManager();
         return aux.find(entityClass, id);
     }
 
     public List<T> findAll() {
-         e.getCache().evictAll();
-         em1.close();
+        e.getCache().evictAll();
+        em1.close();
         em1 = e.createEntityManager();
-        
+
         javax.persistence.criteria.CriteriaQuery cq = em1.getCriteriaBuilder().createQuery();
         cq.select(cq.from(entityClass));
+        return em1.createQuery(cq).getResultList();
+
+    }
+
+    public List findAll(Class entity) {
+        e.getCache().evictAll();
+        em1.close();
+        em1 = e.createEntityManager();
+
+        javax.persistence.criteria.CriteriaQuery cq = em1.getCriteriaBuilder().createQuery();
+        cq.select(cq.from(entity));
         return em1.createQuery(cq).getResultList();
 
     }

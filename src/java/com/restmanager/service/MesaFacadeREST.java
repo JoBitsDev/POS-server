@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.restmanager.service;
 
+import com.restmanager.Area;
 import com.restmanager.Mesa;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -22,10 +23,10 @@ import javax.ws.rs.core.MediaType;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
- 
 @Path("com.restmanager.mesa")
 public class MesaFacadeREST extends AbstractFacade<Mesa> {
 
@@ -61,6 +62,30 @@ public class MesaFacadeREST extends AbstractFacade<Mesa> {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Mesa find(@PathParam("id") String id) {
         return super.find(id);
+    }
+
+    @GET
+    @Path("AREA_{id}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<Mesa> getAreaMesas(@PathParam("id") String id) {
+        List<Mesa> ret = new ArrayList<>();
+        for (Mesa mesa : super.findAll()) {
+            if (mesa.getAreacodArea().getCodArea().equals(id)) {
+             ret.add(mesa);
+            }
+        }
+        return ret;
+    }
+
+    @GET
+    @Path("AREAS")
+    @Produces({MediaType.TEXT_PLAIN})
+    public String getAreas() {
+        String ret = "";
+        for (Area cocina : (List<Area>) super.findAll(Area.class)) {
+            ret += cocina.getCodArea() + ",";
+        }
+        return ret.substring(0, ret.length() - 1);
     }
 
     @GET

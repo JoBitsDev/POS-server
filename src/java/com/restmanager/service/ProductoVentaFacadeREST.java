@@ -3,10 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.restmanager.service;
 
+import com.restmanager.Carta;
+import com.restmanager.Mesa;
 import com.restmanager.ProductoVenta;
+import com.restmanager.Seccion;
+import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -22,10 +26,10 @@ import javax.ws.rs.core.MediaType;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
- 
 @Path("com.restmanager.productoventa")
 public class ProductoVentaFacadeREST extends AbstractFacade<ProductoVenta> {
 
@@ -64,28 +68,46 @@ public class ProductoVentaFacadeREST extends AbstractFacade<ProductoVenta> {
     }
 
     @GET
-    @Override
+    @Path("PRODUCTS_{cod_mesa}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<ProductoVenta> findAll() {
+    public List<ProductoVenta> getProductsFromArea(@PathParam("cod_mesa") String id) {
+        Mesa m = em1.find(Mesa.class, id);
+        List<ProductoVenta> ret = new ArrayList<>();
+        for (Carta carta : new ArrayList<>(m.getAreacodArea().getCartaList())) {
+            for (Seccion seccion : new ArrayList<>(carta.getSeccionList())) {
+                for (ProductoVenta p : seccion.getProductoVentaList()) {
+                    if (p.getVisible()) {
+                        ret.add(p);
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+
+@GET
+        @Override
+        @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+        public List<ProductoVenta> findAll() {
         return super.findAll();
     }
 
     @GET
-    @Path("{from}/{to}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<ProductoVenta> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
+        @Path("{from}/{to}")
+        @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+        public List<ProductoVenta> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
         return super.findRange(new int[]{from, to});
     }
 
     @GET
-    @Path("count")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String countREST() {
+        @Path("count")
+        @Produces(MediaType.TEXT_PLAIN)
+        public String countREST() {
         return String.valueOf(super.count());
     }
 
     @Override
-    protected EntityManager getEntityManager() {
+        protected EntityManager getEntityManager() {
         return em;
     }
 

@@ -7,6 +7,8 @@ package com.restmanager.service;
 
 import com.restmanager.*;
 import com.restmanager.XMLservice.ProductovOrdenXMLexport;
+import com.restmanager.notificationdelivery.Notificable;
+import com.restmanager.notificationdelivery.Notificador;
 import com.restmanager.printservice.Impresion;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,7 +20,9 @@ import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
 import javax.print.PrintException;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import restmanager.resources.Res;
 
@@ -84,7 +88,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         o.setDeLaCasa(false);
         o.setHoraComenzada(new Date());
         o.setOrdenvalorMonetario(Float.valueOf("0"));
-        o.setPorciento(Float.valueOf("10"));
+        o.setPorciento(Float.valueOf("0"));
 
         super.create(o);
 
@@ -163,6 +167,48 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         return "1";
     }//TODO: METODoS ARCAICOS
 
+      @GET
+    @Path("ADD_{codOrden}_{codProductoVenta}_{cantidad}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String addProducto(@PathParam("codOrden") String codOrden,
+            @PathParam("codProductoVenta") String codProducto,@PathParam("cantidad") Float cantidad) {
+
+        Orden o = super.find(codOrden);
+        ProductoVenta producto = getEntityManager().find(ProductoVenta.class, codProducto);
+        ArrayList<ProductovOrden> po = new ArrayList<>(o.getProductovOrdenList());
+        int contains = -1;
+        if (!po.isEmpty()) {
+            for (int i = 0; contains == -1 && i < po.size(); i++) {
+                if (po.get(i).getProductoVenta().getPCod().equals(codProducto)) {
+                    contains = i;
+                }
+            }
+        }
+
+        if (contains != -1) {
+            ProductovOrden p = po.get(contains);
+            float cant = p.getCantidad();
+            p.setCantidad(cant + cantidad);
+
+        } else {
+            ProductovOrden aux = new ProductovOrden(codProducto, codOrden);
+            aux.setOrden(o);
+            aux.setProductoVenta(producto);
+            aux.setCantidad(cantidad);
+            aux.setEnviadosacocina((float) 0);
+            aux.setNumeroComensal(0);
+
+            //em.persist(aux);
+            po.add(aux);
+
+        }
+        o.setProductovOrdenList(po);
+        o.setOrdenvalorMonetario(calcularValorTotal(o));
+
+        super.edit(o);
+        return "1";
+    }//TODO: METODoS ARCAICOS
+    
     @GET
     @Path("REMOVE_{codOrden}_{codProductoVenta}")
     @Produces(MediaType.TEXT_PLAIN)
@@ -235,8 +281,16 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         Mesa m = getEntityManager().find(Mesa.class, o.getMesacodMesa().getCodMesa());
 
         for (ProductovOrden x : o.getProductovOrdenList()) {
-            if (x.getCantidad() > x.getEnviadosacocina()) {
-                return "2";
+
+            if (Res.TABLETS_EN_COCINA) {
+                if (!x.getNotificacionEnvioCocinaList().isEmpty()) {
+                    return "2";
+                }
+            } else {
+                if (x.getCantidad() > x.getEnviadosacocina()) {
+                    return "2";
+                }
+
             }
         }
 
@@ -264,7 +318,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     @GET
     @Path("ENVIARCOCINA_{codOrden}")
     @Produces(MediaType.TEXT_PLAIN)
-    public String enviarACocina(@PathParam("codOrden") String codOrden) {
+    public String enviarACocina(@PathParam("codOrden") String codOrden, @Context HttpServletRequest inRequest) {
 
         Orden o = super.find(codOrden);
         Mesa m = getEntityManager().find(Mesa.class, o.getMesacodMesa().getCodMesa());
@@ -282,29 +336,32 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                     notPK.setCocinacodCocina(x.getProductoVenta().getCocinacodCocina().getCodCocina());
                     notPK.setProductovOrdenordencodOrden(o.getCodOrden());
                     notPK.setProductovOrdenproductoVentapCod(x.getProductoVenta().getPCod());
-                    NotificacionEnvioCocina not  = super.em1.find(NotificacionEnvioCocina.class,notPK);
-                    boolean exist= true;
+                    NotificacionEnvioCocina not = super.em1.find(NotificacionEnvioCocina.class, notPK);
+                    boolean exist = true;
                     if (not == null) {
                         not = new NotificacionEnvioCocina(notPK);
                         exist = false;
-                    } 
+                    }
                     not.setCocina(x.getProductoVenta().getCocinacodCocina());
                     not.setHoraNotificacion(new Date());
                     not.setProductovOrden(x);
-                    not.setCantidad(x.getCantidad()-x.getEnviadosacocina());
+                    not.setIp_dependiente(inRequest.getRemoteHost());
+                    not.setCantidad(x.getCantidad() - x.getEnviadosacocina());
                     super.em1.getTransaction().begin();
                     if (exist) {
                         super.em1.merge(not);
                     } else {
                         super.em1.persist(not);
                     }
+
+                    enviarNotificacion(not);
                     super.em1.getTransaction().commit();
                     x.setEnviadosacocina(x.getCantidad());
-                   
+                    x.setListoParaRecoger(false);
                 }
             }
         }
-        
+
         super.edit(o);
 
         return "1";
@@ -621,6 +678,31 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
             ordenGastosEnInsumos += x.getProductoVenta().getGasto() * x.getCantidad();
         }
         return ordenGastosEnInsumos;
+    }
+
+    private String enviarNotificacion(NotificacionEnvioCocina c) {
+        for (Impresora i : c.getCocina().getImpresoraList()) {
+            if (i.getIpImpresora() != null) {
+                new Notificador(i.getIpImpresora(), new Notificable() {
+                    @Override
+                    public String getMensajeNotificacion() {
+                        return "Productos a elaborar " + c.getProductovOrden().getProductoVenta().getNombre();
+                    }
+
+                    @Override
+                    public String getTituloNotificacion() {
+                        return "Restaurant Manager";
+                    }
+
+                    @Override
+                    public String getDescripcionNotificacion() {
+                        return c.getCantidad() + " de " + c.getProductovOrden().getProductoVenta().getNombre();
+                    }
+                }).notificar();
+            }
+        }
+        return "Notificacion Exitosa";
+
     }
 
 }

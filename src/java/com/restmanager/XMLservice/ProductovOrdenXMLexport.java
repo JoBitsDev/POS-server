@@ -25,6 +25,7 @@ public class ProductovOrdenXMLexport extends abstractXMLExport{
             TAGENVIADOSACOCINA = Tag.getInstance("enviadosacocina"),
             TAGPRODUCTOVENTA = Tag.getInstance("productoVenta"),
             TAGNUMEROCOMENSAL = Tag.getInstance("numeroComensal"),
+            TAGNOTA = Tag.getInstance("nota"),
             TAGORDEN = Tag.getInstance("orden");
 
     public static String exportToXML(List<ProductovOrden> po) {
@@ -54,6 +55,12 @@ public class ProductovOrdenXMLexport extends abstractXMLExport{
         ret += TAGNUMEROCOMENSAL.getStartTag();
         ret += p.getNumeroComensal();
         ret += TAGNUMEROCOMENSAL.getEndTag();
+        
+        if(p.getNota() != null){
+            ret += TAGNOTA.getStartTag();
+            ret += p.getNota().getDescripcion();
+            ret += TAGNOTA.getEndTag();
+        }
         
         ret += ProductoVentaXMLExport.exportSingleEntity(p.getProductoVenta());
         ret += OrdenXMLExport.exportSingleEntity(p.getOrden());

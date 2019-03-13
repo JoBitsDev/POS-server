@@ -57,6 +57,8 @@ public class NotificacionEnvioCocina implements Serializable {
         , @JoinColumn(name = "productov_ordenordencod_orden", referencedColumnName = "ordencod_orden", insertable = false, updatable = false)})
     @ManyToOne(optional = false)
     private ProductovOrden productovOrden;
+    @Column(name = "ip_dependiente")
+    private String ip_dependiente;
 
     public NotificacionEnvioCocina() {
     }
@@ -111,6 +113,14 @@ public class NotificacionEnvioCocina implements Serializable {
 
     public void setProductovOrden(ProductovOrden productovOrden) {
         this.productovOrden = productovOrden;
+    }
+
+    public String getIp_dependiente() {
+        return ip_dependiente;
+    }
+
+    public void setIp_dependiente(String ip_dependiente) {
+        this.ip_dependiente = ip_dependiente;
     }
 
     @Override

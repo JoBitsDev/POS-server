@@ -7,6 +7,7 @@ package com.restmanager.printservice;
 
 import com.restmanager.Carta;
 import com.restmanager.Cocina;
+import com.restmanager.Negocio;
 import com.restmanager.Orden;
 import com.restmanager.ProductovOrden;
 import java.text.SimpleDateFormat;
@@ -122,7 +123,7 @@ public class Impresion {
     }
 
     public Impresion(Carta m, String footer, boolean monedaCUC, float cambio, int cantidadCopias) {
-        this.nombreRest = m.getNombreCarta();
+        this.nombreRest = em1.find(Negocio.class, 1).getNombre();
         Impresion.cambio = cambio;
         Impresion.cantidadCopias = cantidadCopias;
         if (footer != null) {
@@ -179,9 +180,21 @@ public class Impresion {
             p.setText(x.getCantidad() + " " + x.getProductoVenta().getNombre());
             p.newLine();
             p.alignRight();
-            p.setText(redondeoDeMonedaMN_CUC((int) (x.getCantidad() * x.getProductoVenta().getPrecioVenta() * 100)) + MONEDA);
+            if (!x.getOrden().getDeLaCasa()) {
+                p.setText(redondeoDeMonedaMN_CUC((int) (x.getCantidad() * x.getProductoVenta().getPrecioVenta() * 100)) + MONEDA);
+
+            } else {
+                p.setText(redondeoDeMonedaMN_CUC((int) (x.getCantidad() * x.getProductoVenta().getGasto() * 100)) + MONEDA);
+
+            }
             p.newLine();
-            total += x.getCantidad() * x.getProductoVenta().getPrecioVenta();
+            if (!x.getOrden().getDeLaCasa()) {
+                total += x.getCantidad() * x.getProductoVenta().getPrecioVenta();
+
+            } else {
+                total += x.getCantidad() * x.getProductoVenta().getGasto();
+
+            }
         }
 
         String subTotalPrint = redondeoDeMonedaMN_CUC((int) (total * 100));
@@ -229,7 +242,7 @@ public class Impresion {
 
     public Orden printKitchen(Orden o) throws PrintException {
 
-        return printKitchenForced(printKitchen(printCancelationTicket(o), e.createEntityManager().find(Cocina.class,"C-2"), ""));
+        return printKitchenForced(printKitchen(printCancelationTicket(o), e.createEntityManager().find(Cocina.class, "C-2"), ""));
 //
 //        Ticket p = new Ticket();
 //        p.resetAll();
@@ -592,16 +605,16 @@ public class Impresion {
         t.finit();
 
         if (!ordenSinPlatos) {
-            feedPrinter(t.finalCommandSet().getBytes(), DEFAULT_KITCHEN_PRINTER_LOCATION);
+//            feedPrinter(t.finalCommandSet().getBytes(), DEFAULT_KITCHEN_PRINTER_LOCATION);
         }
-        cleanAndPrintRAM();
+//        cleanAndPrintRAM();
 
         return o;
     }
 
     public Orden printCancelationTicket(Orden o) {
 
-        return printCancelationKitchenForced(printCancelationKitchen(o,e.createEntityManager().find(Cocina.class,"C-2")));
+        return printCancelationKitchenForced(printCancelationKitchen(o, e.createEntityManager().find(Cocina.class, "C-2")));
 //        Ticket t = new Ticket();
 //
 //        addHeader(t);
@@ -742,7 +755,7 @@ public class Impresion {
      *
      * @param o the value of o
      * @param c the value of c
-     * @return 
+     * @return
      */
     public Orden printCancelationKitchen(Orden o, Cocina c) {
         boolean ordenSinPlatos = true;
@@ -784,11 +797,11 @@ public class Impresion {
         t.finit();
 
         if (!ordenSinPlatos) {
-            for (int i = 0; i < cantidadCopias; i++) {
-                RAM.add(new CopiaTicket(c.getNombreCocina(), t.finalCommandSet().getBytes()));
-            }
-
-            feedPrinter(t.finalCommandSet().getBytes(), c.getNombreCocina());
+//            for (int i = 0; i < cantidadCopias; i++) {
+//                RAM.add(new CopiaTicket(c.getNombreCocina(), t.finalCommandSet().getBytes()));
+//            }
+//
+//            feedPrinter(t.finalCommandSet().getBytes(), c.getNombreCocina());
 
         } else {
             System.out.println("No existen platos de la cocina "
@@ -879,17 +892,14 @@ public class Impresion {
         p.feed((byte) 3);
         p.finit();
 
-   
-            feedPrinter(p.finalCommandSet().getBytes(), DEFAULT_KITCHEN_PRINTER_LOCATION);
-            feedPrinter(p.finalCommandSet().getBytes(), DEFAULT_KITCHEN_PRINTER_LOCATION);
-        
-
+        //  feedPrinter(p.finalCommandSet().getBytes(), DEFAULT_KITCHEN_PRINTER_LOCATION);
+        //feedPrinter(p.finalCommandSet().getBytes(), DEFAULT_KITCHEN_PRINTER_LOCATION);
     }
 
     private void cleanAndPrintRAM() {
         while (!RAM.isEmpty()) {
-                feedPrinter(RAM.get(0).getImpresionData(), RAM.get(0).getNombreImpresora());
-                RAM.remove(0);
+            feedPrinter(RAM.get(0).getImpresionData(), RAM.get(0).getNombreImpresora());
+            RAM.remove(0);
         }
     }
 
