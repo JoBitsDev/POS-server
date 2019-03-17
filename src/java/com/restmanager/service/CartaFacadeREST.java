@@ -48,6 +48,13 @@ public class CartaFacadeREST extends AbstractFacade<Carta> {
         super.edit(entity);
     }
 
+          @GET
+    @Path("NOMBRE_REST")
+    @Produces({MediaType.TEXT_PLAIN})
+    public String getNombreRest() {
+        return super.find("Mnu-1").getNombreCarta();
+    }
+    
     @DELETE
     @Path("{id}")
     public void remove(@PathParam("id") String id) {

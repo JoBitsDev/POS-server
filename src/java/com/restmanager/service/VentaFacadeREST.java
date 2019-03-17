@@ -6,6 +6,7 @@
 package com.restmanager.service;
 
 import com.restmanager.Venta;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -34,6 +35,11 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")
     private EntityManager em;
 
+        private Date d;
+    SimpleDateFormat 
+            Format = new SimpleDateFormat("dd'/'MM'/'yy"),
+            hour = new SimpleDateFormat(" hh ':' mm ' ' a ");
+    
     public VentaFacadeREST() {
         super(Venta.class);
     }
@@ -56,6 +62,28 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
         return ("Caller IP = " + callerIpAddress);
     }
 
+     @GET
+    @Path("START")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String addVenta() {
+        super.create(new Venta(d));
+        return "1";
+    }
+    
+    @GET
+    @Path("date")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getToday() {
+        return Format.format(new Date());
+    }
+    
+    @GET
+    @Path("hour")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getHour() {
+        return hour.format(new Date());
+    }
+    
     @PUT
     @Path("{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})

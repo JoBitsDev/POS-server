@@ -13,18 +13,14 @@ import com.restmanager.printservice.Impresion;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
-import javax.print.PrintException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import restmanager.resources.Res;
+import restmanager.resources.R;
 
 /**
  *
@@ -233,7 +229,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
             } else {
                 po.get(contains).setCantidad(0);
-                Impresion i = new Impresion(getEntityManager().find(Carta.class, "Mnu-1"));
+                Impresion i = new Impresion();
                 i.printCancelationTicket(o);
                 po.remove(contains);
                 getEntityManager().getTransaction().begin();
@@ -282,7 +278,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
         for (ProductovOrden x : o.getProductovOrdenList()) {
 
-            if (Res.TABLETS_EN_COCINA) {
+            if (R.TABLETS_EN_COCINA) {
                 if (!x.getNotificacionEnvioCocinaList().isEmpty()) {
                     return "2";
                 }
@@ -295,7 +291,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         }
 
         o.setHoraTerminada(new Date());
-        Impresion i = new Impresion(getEntityManager().find(Carta.class, "Mnu-1"));
+        Impresion i = new Impresion();
         i.print(o, false);
 
         m.setEstado(ESTADO_MESA_VACIA);
@@ -322,13 +318,9 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
         Orden o = super.find(codOrden);
         Mesa m = getEntityManager().find(Mesa.class, o.getMesacodMesa().getCodMesa());
-        if (!Res.TABLETS_EN_COCINA) {
-            Impresion i = new Impresion(getEntityManager().find(Carta.class, "Mnu-1"));
-            try {
+        if (!R.TABLETS_EN_COCINA) {
+            Impresion i = new Impresion();
                 i.printKitchen(o);
-            } catch (PrintException | NullPointerException ex) {
-                Logger.getLogger(OrdenFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
-            }
         } else {
             for (ProductovOrden x : o.getProductovOrdenList()) {
                 if (x.getEnviadosacocina() < x.getCantidad()) {
@@ -481,7 +473,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
         Orden o = super.find(codOrden);
         Mesa m = getEntityManager().find(Mesa.class, o.getMesacodMesa().getCodMesa());
-        Impresion i = new Impresion(getEntityManager().find(Carta.class, "Mnu-1"), false, 24);
+        Impresion i = new Impresion();
         i.print(o, false);
 
         super.edit(o);
@@ -540,81 +532,6 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         super.edit(o);
 
         getEntityManager().getTransaction().commit();
-        return "1";
-    }//TODO: METODoS ARCAICOS
-
-    @GET
-    @Path("MENUINFANTIL_{codOrden}_{entrante}_{platoFuerte}_{postre}_{liquido}_{nota}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String menuInfantil(@PathParam("entrante") int entrante,
-            @PathParam("platoFuerte") int platoFuerte,
-            @PathParam("postre") int postre,
-            @PathParam("liquido") int liquido,
-            @PathParam("nota") String nota,
-            @PathParam("codOrden") String codOrden) {
-
-        String[] entrantes = {"Albondiguillas entomatadas",
-            "Burritos Surtidos",
-            "Coronitas de salchichas",
-            "Crema de Queso, Jamon",
-            "Croquetas mixtas",
-            "Ensaladillas Frias",
-            "Huevitos de codornis primavera",
-            "Moldes de gelatinas con queso",
-            "Papas Fritas",
-            "Papitas rellenas con queso y carne",
-            "Pure Africano",
-            "Pure Bretonam",
-            "Rollitos de Jamon con Piña",
-            "Sopa Campesina con vianda y arroz"};
-
-        String[] platos_Principales = {
-            "Bistec de res al bambino",
-            "Canoitas de cordero en su jugo",
-            "Espaguetis Matrichana",
-            "Espaguetis napolitano",
-            "Espaguetis Pulpetin",
-            "Fileticos de pescado al nido",
-            "Hamburguesa",
-            "Mini Pizza 3 quesos",
-            "Mini Pizza Napolitana ",
-            "Muslitos de pollo rellenos con jamon",
-            "Pechuguitas de pollo gratinadas",
-            "Picadillos a la criolla",
-            "Pinchitos de carne al erizo",
-            "Tres delicias a la plancha"
-        };
-
-        String[] postres = {
-            "Flan de caramelo",
-            "Gelatina de varios sabores",
-            "Helados caprichosos del sodero",
-            "Helados sorpresa del sodero"
-        };
-
-        String[] liquidos = {
-            "Refresco Tu Kola",
-            "Refresco Naranja",
-            "Refresco Limon",
-            "Malta",
-            "Jugo Natural",
-            "Agua natural"
-        };
-
-        Orden o = super.find(codOrden);
-        Impresion i = new Impresion(getEntityManager().find(Carta.class, "Mnu-1"));
-        try {
-
-            i.printMenuInfantil(o, entrantes[entrante],
-                    platos_Principales[platoFuerte], postres[postre],
-                    liquidos[liquido], nota);
-
-        } catch (NullPointerException ex) {
-            Logger.getLogger(OrdenFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        super.edit(o);
-
         return "1";
     }//TODO: METODoS ARCAICOS
 

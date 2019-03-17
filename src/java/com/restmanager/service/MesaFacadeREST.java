@@ -76,6 +76,23 @@ public class MesaFacadeREST extends AbstractFacade<Mesa> {
         }
         return ret;
     }
+    
+       @GET
+    @Path("MOSTRARVACIAS")
+    @Produces(MediaType.APPLICATION_XML)
+    public List<Mesa> findEmptyTables() {
+       // em1.getEntityManagerFactory().getCache().evict(Mesa.class);
+        List<Mesa> mesas = findAll();
+        List<Mesa> ret = new ArrayList<>();
+        
+        for (Mesa m : mesas) {
+            if(m.getEstado().equals("vacia")){
+                ret.add(m);
+            }
+        }
+        return ret;
+    }
+    
 
     @GET
     @Path("AREAS")
