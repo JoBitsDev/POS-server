@@ -4,13 +4,14 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group name="Librerias En Desarrollo">
             <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/printservice/Impresion.java</file>
-            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/service/OrdenFacadeREST.java</file>
-            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/XMLservice/OrdenXMLExport.java</file>
-            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/service/CocinaFacadeREST.java</file>
-            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/service/NotificacionEnvioCocinaFacadeREST.java</file>
-            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/service/MesaFacadeREST.java</file>
-            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/service/ProductoVentaFacadeREST.java</file>
-            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/XMLservice/ProductovOrdenXMLexport.java</file>
+            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/Almacen.java</file>
+            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/restmanager/resources/R.java</file>
+            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/Carta.java</file>
+            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/conf/persistence.xml</file>
+            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/Transaccion.java</file>
+            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/service/AlmacenFacadeREST.java</file>
+            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/TransaccionPK.java</file>
+            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/Cocina.java</file>
         </group>
     </open-files>
 </project-private>

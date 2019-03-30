@@ -36,8 +36,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Carta.findAll", query = "SELECT c FROM Carta c")
     , @NamedQuery(name = "Carta.findByCodCarta", query = "SELECT c FROM Carta c WHERE c.codCarta = :codCarta")
     , @NamedQuery(name = "Carta.findByNombreCarta", query = "SELECT c FROM Carta c WHERE c.nombreCarta = :nombreCarta")
-    , @NamedQuery(name = "Carta.findByMonedaPrincipal", query = "SELECT c FROM Carta c WHERE c.monedaPrincipal = :monedaPrincipal")
-    , @NamedQuery(name = "Carta.findByPorcientoPorServicio", query = "SELECT c FROM Carta c WHERE c.porcientoPorServicio = :porcientoPorServicio")})
+    , @NamedQuery(name = "Carta.findByMonedaPrincipal", query = "SELECT c FROM Carta c WHERE c.monedaPrincipal = :monedaPrincipal")})
 public class Carta implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -55,8 +54,6 @@ public class Carta implements Serializable {
     @Size(max = 3)
     @Column(name = "moneda_principal")
     private String monedaPrincipal;
-    @Column(name = "porciento_por_servicio")
-    private Integer porcientoPorServicio;
     @JoinTable(name = "carta_area", joinColumns = {
         @JoinColumn(name = "cartacod_carta", referencedColumnName = "cod_carta")}, inverseJoinColumns = {
         @JoinColumn(name = "areacod_area", referencedColumnName = "cod_area")})
@@ -99,14 +96,6 @@ public class Carta implements Serializable {
 
     public void setMonedaPrincipal(String monedaPrincipal) {
         this.monedaPrincipal = monedaPrincipal;
-    }
-
-    public Integer getPorcientoPorServicio() {
-        return porcientoPorServicio;
-    }
-
-    public void setPorcientoPorServicio(Integer porcientoPorServicio) {
-        this.porcientoPorServicio = porcientoPorServicio;
     }
 
     @XmlTransient

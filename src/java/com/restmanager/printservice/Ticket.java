@@ -14,7 +14,6 @@ public class Ticket {
      */
     final static int PAPER_LENGHT = 32;
     final static char LINE_CHAR = '*';
-
     private AlignmentState posState = AlignmentState.LEFT;
 
     public Ticket() {
@@ -23,7 +22,9 @@ public class Ticket {
     public String initialize() {
         final byte[] Init = {27, 64};
         commandSet += new String(Init);
-        return new String(Init);
+        final byte[] setCodePageLatin = {27, 116, 54};
+        commandSet += new String(setCodePageLatin);
+        return commandSet;
     }
 
     public String chooseFont(int Options) {
@@ -207,14 +208,26 @@ public class Ticket {
 
     public String finit() {
         final byte[] FeedAndCut = {29, 'V', 66, 0};
-
         String s = new String(FeedAndCut);
+        commandSet += s;
+        return s;
+    }
+
+    public String drawerKick() {
 
         final byte[] DrawerKick = {27, 70, 0, 60, 120};
-        s += new String(DrawerKick);
+        String s = new String(DrawerKick);
 
         commandSet += s;
         return s;
+    }
+
+    public String soundBuzzer() {
+        final byte[] buzzer = {27, (int) '(', (int) 'A', 4, 0, 48, 55, 3, 15};
+        String s = new String(buzzer);
+        commandSet += s;
+        return s;
+
     }
 
     public String addLineSeperator() {
@@ -231,8 +244,30 @@ public class Ticket {
         commandSet = "";
     }
 
+    public String setCodePageTable(byte codePage) {
+        final byte[] setuserDefinedCodePage = {27,37,1};
+        commandSet += new String(setuserDefinedCodePage);
+        final byte[] setCodePageLatin = {27, 116, codePage};
+        commandSet += new String(setCodePageLatin);
+        return commandSet;
+    }
+
     public void setText(String s) {
-        int sLenght = s.length();
+        int sLenght;
+        do {
+            sLenght = s.length();
+            if (sLenght > PAPER_LENGHT) {
+                writeText(s.substring(0, PAPER_LENGHT));
+                s = s.substring(PAPER_LENGHT);
+                newLine();
+            } else {
+                writeText(s);
+            }
+        } while (sLenght > PAPER_LENGHT);
+
+    }
+
+    private void writeText(String s) {
         switch (posState) {
             case LEFT:
                 commandSet += s;
@@ -240,13 +275,12 @@ public class Ticket {
             case CENTER:
                 commandSet += (addBlankSpaces((PAPER_LENGHT - s.length()) / 2)
                         + s
-                        + addBlankSpaces((PAPER_LENGHT-s.length()) / 2));
+                        + addBlankSpaces((PAPER_LENGHT - s.length()) / 2));
                 break;
             case RIGHT:
-                commandSet += (addBlankSpaces(PAPER_LENGHT-s.length()) + s);
+                commandSet += (addBlankSpaces(PAPER_LENGHT - s.length()) + s);
                 break;
         }
-        //commandSet += s;
     }
 
     public String finalCommandSet() {
@@ -256,7 +290,7 @@ public class Ticket {
     private String addBlankSpaces(int amount) {
         String ret = "";
         for (int i = 0; i < amount; i++) {
-           ret += " "; 
+            ret += " ";
         }
         return ret;
     }

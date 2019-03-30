@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.restmanager;
 
 import java.io.Serializable;
@@ -21,8 +20,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
 @Entity
 @Table(name = "ipv_registro")
@@ -31,6 +31,11 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "IpvRegistro.findAll", query = "SELECT i FROM IpvRegistro i")
     , @NamedQuery(name = "IpvRegistro.findByIpvinsumocodInsumo", query = "SELECT i FROM IpvRegistro i WHERE i.ipvRegistroPK.ipvinsumocodInsumo = :ipvinsumocodInsumo")
     , @NamedQuery(name = "IpvRegistro.findByIpvcocinacodCocina", query = "SELECT i FROM IpvRegistro i WHERE i.ipvRegistroPK.ipvcocinacodCocina = :ipvcocinacodCocina")
+    , @NamedQuery(name = "IpvRegistro.findByIpvcocinacodCocinaAndFecha",
+            query = "SELECT i FROM IpvRegistro i WHERE i.ipvRegistroPK.ipvcocinacodCocina = :ipvcocinacodCocina AND i.ipvRegistroPK.fecha = :fecha")
+    ,@NamedQuery(name = "IpvRegistro.findByIpvcocinacodCocinaAndFechaAndInsumo",
+            query = "SELECT i FROM IpvRegistro i WHERE i.ipvRegistroPK.ipvcocinacodCocina = :ipvcocinacodCocina AND "
+            + "i.ipvRegistroPK.fecha = :fecha AND i.ipvRegistroPK.ipvinsumocodInsumo = :codinsumo")
     , @NamedQuery(name = "IpvRegistro.findByFecha", query = "SELECT i FROM IpvRegistro i WHERE i.ipvRegistroPK.fecha = :fecha")
     , @NamedQuery(name = "IpvRegistro.findByInicio", query = "SELECT i FROM IpvRegistro i WHERE i.inicio = :inicio")
     , @NamedQuery(name = "IpvRegistro.findByEntrada", query = "SELECT i FROM IpvRegistro i WHERE i.entrada = :entrada")

@@ -21,9 +21,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
@@ -32,15 +29,14 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @Entity
 @Table(name = "transaccion")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Transaccion.findAll", query = "SELECT t FROM Transaccion t")
-    , @NamedQuery(name = "Transaccion.findByInsumocodInsumo", query = "SELECT t FROM Transaccion t WHERE t.transaccionPK.insumocodInsumo = :insumocodInsumo")
-    , @NamedQuery(name = "Transaccion.findByAlmacencodAlmacen", query = "SELECT t FROM Transaccion t WHERE t.transaccionPK.almacencodAlmacen = :almacencodAlmacen")
-    , @NamedQuery(name = "Transaccion.findByFecha", query = "SELECT t FROM Transaccion t WHERE t.transaccionPK.fecha = :fecha")
-    , @NamedQuery(name = "Transaccion.findByHora", query = "SELECT t FROM Transaccion t WHERE t.transaccionPK.hora = :hora")
-    , @NamedQuery(name = "Transaccion.findByCantidad", query = "SELECT t FROM Transaccion t WHERE t.cantidad = :cantidad")
-    , @NamedQuery(name = "Transaccion.findByDescripcion", query = "SELECT t FROM Transaccion t WHERE t.descripcion = :descripcion")})
+    @NamedQuery(name = "Transaccion.findAll", query = "SELECT t FROM Transaccion t"),
+    @NamedQuery(name = "Transaccion.findByInsumocodInsumo", query = "SELECT t FROM Transaccion t WHERE t.transaccionPK.insumocodInsumo = :insumocodInsumo"),
+    @NamedQuery(name = "Transaccion.findByAlmacencodAlmacen", query = "SELECT t FROM Transaccion t WHERE t.transaccionPK.almacencodAlmacen = :almacencodAlmacen"),
+    @NamedQuery(name = "Transaccion.findByFecha", query = "SELECT t FROM Transaccion t WHERE t.transaccionPK.fecha = :fecha"),
+    @NamedQuery(name = "Transaccion.findByHora", query = "SELECT t FROM Transaccion t WHERE t.transaccionPK.hora = :hora"),
+    @NamedQuery(name = "Transaccion.findByCantidad", query = "SELECT t FROM Transaccion t WHERE t.cantidad = :cantidad"),
+    @NamedQuery(name = "Transaccion.findByDescripcion", query = "SELECT t FROM Transaccion t WHERE t.descripcion = :descripcion")})
 public class Transaccion implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -49,7 +45,6 @@ public class Transaccion implements Serializable {
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "cantidad")
     private Float cantidad;
-    @Size(max = 255)
     @Column(name = "descripcion")
     private String descripcion;
     @JoinTable(name = "transaccion_salida", joinColumns = {
@@ -58,8 +53,8 @@ public class Transaccion implements Serializable {
         , @JoinColumn(name = "transaccionfecha", referencedColumnName = "fecha")
         , @JoinColumn(name = "transaccionhora", referencedColumnName = "hora")}, inverseJoinColumns = {
         @JoinColumn(name = "cocinacod_cocina", referencedColumnName = "cod_cocina")})
-    @ManyToMany
-    private List<Cocina> cocinaList;
+    @OneToOne(cascade = CascadeType.ALL)
+    private Cocina cocina;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaccion")
     private TransaccionEntrada transaccionEntrada;
     @JoinColumn(name = "almacencod_almacen", referencedColumnName = "cod_almacen", insertable = false, updatable = false)
@@ -106,13 +101,12 @@ public class Transaccion implements Serializable {
         this.descripcion = descripcion;
     }
 
-    @XmlTransient
-    public List<Cocina> getCocinaList() {
-        return cocinaList;
+    public Cocina getCocina() {
+        return cocina;
     }
 
-    public void setCocinaList(List<Cocina> cocinaList) {
-        this.cocinaList = cocinaList;
+    public void setCocina(Cocina cocinaList) {
+        this.cocina = cocinaList;
     }
 
     public TransaccionEntrada getTransaccionEntrada() {
@@ -169,7 +163,7 @@ public class Transaccion implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.Transaccion[ transaccionPK=" + transaccionPK + " ]";
+        return getTransaccionPK().getInsumocodInsumo() +" "+ getTransaccionPK().getAlmacencodAlmacen();
     }
 
 }
