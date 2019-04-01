@@ -84,7 +84,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         o.setDeLaCasa(false);
         o.setHoraComenzada(new Date());
         o.setOrdenvalorMonetario(Float.valueOf("0"));
-        o.setPorciento(Float.valueOf("0"));
+        o.setPorciento(R.PERCENTAGE);
 
         super.create(o);
 

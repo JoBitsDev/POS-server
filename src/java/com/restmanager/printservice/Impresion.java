@@ -45,14 +45,12 @@ public class Impresion {
     /**
      * @param args the command line arguments
      */
-
-
     private boolean MONEDA_CUC;
     private final boolean REDONDEO_POR_EXCESO = true;
     private static EstadoImpresion estadoImpresion = EstadoImpresion.UKNOWN;
     private final boolean SHOW_PRICES = true;
-    private final boolean PRINT_IN_CENTRAL_KITCHEN = false;
-    private final String DEFAULT_KITCHEN_PRINTER_LOCATION = null;
+    private final boolean PRINT_IN_CENTRAL_KITCHEN = true;
+    private final String DEFAULT_KITCHEN_PRINTER_LOCATION = "Cocina";
     private final String DEFAULT_PRINT_LOCATION = null;
     private final boolean IMPRIMIR_TICKET_COCINA = true;
     private static int cantidadCopias = 0;
@@ -124,7 +122,7 @@ public class Impresion {
         if (footer != null) {
             PIE = footer;
         }
-        if ((MONEDA_CUC = R.COIN_SUFFIX.trim().toUpperCase().equals(CUC))) {
+        if ((MONEDA_CUC = R.COIN_SUFFIX.toUpperCase().equals(CUC))) {
             MONEDA = CUC;
         } else {
             MONEDA = MN;
@@ -201,7 +199,7 @@ public class Impresion {
      */
     public Orden printKitchen(Orden o) {
         if (PRINT_IN_CENTRAL_KITCHEN) {
-            return printKitchenForced(printKitchen(printCancelationTicket(o), R.em1.find(Cocina.class,"C-2"), ""));
+            return printKitchenForced(printKitchen(printCancelationTicket(o), R.em1.find(Cocina.class, "C-2"), ""));
         } else {
             printCancelationTicket(o);
             Ticket t = new Ticket();
@@ -241,41 +239,43 @@ public class Impresion {
     }
 
     public Orden printCancelationTicket(Orden o) {
-
-        // return printCancelationKitchenForced(printCancelationKitchen(o, staticContent.cocinaJPA.findCocina("C-2")));
-        Ticket t = new Ticket();
-
-        addHeader(t);
-
-        addMetaData(t, o, new Date());
-
-        List<Cocina> cocinasExistentesEnLaOrden = new ArrayList<>();
-        for (ProductovOrden x : o.getProductovOrdenList()) {
-            if (!cocinasExistentesEnLaOrden.contains(x.getProductoVenta().getCocinacodCocina())) {
-                cocinasExistentesEnLaOrden.add(x.getProductoVenta().getCocinacodCocina());
-            }
-        }
-        if (cocinasExistentesEnLaOrden.size() > 1) {
-            for (int i = 0; i < cocinasExistentesEnLaOrden.size(); i++) {
-                String sync = SYNC;
-                for (int j = 0; j < cocinasExistentesEnLaOrden.size(); j++) {
-                    if (i == j) {
-                        continue;
-                    }
-                    sync += cocinasExistentesEnLaOrden.get(j).getNombreCocina() + " ";
-                }
-                printKitchen(o, cocinasExistentesEnLaOrden.get(i), sync);
-            }
+        if (PRINT_IN_CENTRAL_KITCHEN) {
+            return printCancelationKitchenForced(printCancelationKitchen(o, R.em1.find(Cocina.class, "C-2")));
         } else {
-            if (cocinasExistentesEnLaOrden.size() > 0) {
-                printKitchen(o, cocinasExistentesEnLaOrden.get(0), "");
+            Ticket t = new Ticket();
+
+            addHeader(t);
+
+            addMetaData(t, o, new Date());
+
+            List<Cocina> cocinasExistentesEnLaOrden = new ArrayList<>();
+            for (ProductovOrden x : o.getProductovOrdenList()) {
+                if (!cocinasExistentesEnLaOrden.contains(x.getProductoVenta().getCocinacodCocina())) {
+                    cocinasExistentesEnLaOrden.add(x.getProductoVenta().getCocinacodCocina());
+                }
+            }
+            if (cocinasExistentesEnLaOrden.size() > 1) {
+                for (int i = 0; i < cocinasExistentesEnLaOrden.size(); i++) {
+                    String sync = SYNC;
+                    for (int j = 0; j < cocinasExistentesEnLaOrden.size(); j++) {
+                        if (i == j) {
+                            continue;
+                        }
+                        sync += cocinasExistentesEnLaOrden.get(j).getNombreCocina() + " ";
+                    }
+                    printKitchen(o, cocinasExistentesEnLaOrden.get(i), sync);
+                }
+            } else {
+                if (cocinasExistentesEnLaOrden.size() > 0) {
+                    printKitchen(o, cocinasExistentesEnLaOrden.get(0), "");
+                }
+
             }
 
+            cleanAndPrintRAM();
+
+            return o;
         }
-
-        cleanAndPrintRAM();
-
-        return o;
 //    }
 //
 //    public Orden printKitchenForced(Orden o) throws PrintException {
@@ -579,7 +579,7 @@ public class Impresion {
                 t.alignLeft();
                 x.setEnviadosacocina(x.getCantidad());
                 try {
-                   R.em1.merge(x);
+                    R.em1.merge(x);
                 } catch (Exception ex) {
                     Logger.getLogger(Impresion.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -698,7 +698,6 @@ public class Impresion {
 //        addTotalAndFinal(t, total);
 //
 //        sendToPrinter(t.finalCommandSet().getBytes(), DEFAULT_PRINT_LOCATION);
-
     }
 
     public void printResumenCasa(List<ProductovOrden> resumenVentasCasa, Date fecha) {
@@ -764,15 +763,15 @@ public class Impresion {
             t.setText(String.format(TOTAL_VENTAS + "%.2f" + MONEDA, total));
             t.newLine();
 
-           if (MONEDA_CUC) {
+            if (MONEDA_CUC) {
                 if (REDONDEO_POR_EXCESO) {
-                    t.setText(TOTAL_VENTAS + comun.redondeoPorExceso(total * R.COINCHANGE));
+                    t.setText(TOTAL_VENTAS + comun.redondeoPorExcesoFloat(total * R.COINCHANGE) + MN);
                 } else {
                     t.setText(String.format(TOTAL_VENTAS + "%.2f" + MN, total * R.COINCHANGE));
                 }
             } else {
                 if (REDONDEO_POR_EXCESO) {
-                    t.setText(TOTAL_VENTAS + comun.redondeoPorExceso(total / R.COINCHANGE).split(" ")[0] + CUC);
+                    t.setText(TOTAL_VENTAS + comun.redondeoPorExcesoFloat(total / R.COINCHANGE) + CUC);
                 } else {
                     t.setText(String.format(TOTAL_VENTAS + "%.2f" + CUC, total / R.COINCHANGE));
                 }
@@ -1148,7 +1147,6 @@ public class Impresion {
     //Inner Classes
     //
     private class JobListener implements PrintJobListener {
-
 
         public JobListener() {
         }
