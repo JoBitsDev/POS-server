@@ -122,6 +122,32 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     }
 
     @GET
+    @Path("ISVALID_{codOrden}")
+    @Produces({MediaType.TEXT_XML})
+    public String isValid(@PathParam("codOrden") String codOrden) {
+        Orden o = super.find(codOrden);
+
+        if (o != null) {
+            if (o.getHoraTerminada() != null) {
+                Mesa m = o.getMesacodMesa();
+                m.setEstado(ESTADO_MESA_VACIA);
+
+                em1.getTransaction().begin();
+                em1.merge(m);
+                em1.flush();
+                if (em1.getTransaction().isActive()) {
+                    em1.getTransaction().commit();
+                }
+                return "0";
+            } else {
+                return "1";
+            }
+        } else {
+            return "0";
+        }
+    }
+
+    @GET
     @Path("ADD_{codOrden}_{codProductoVenta}")
     @Produces(MediaType.TEXT_PLAIN)
     public String addProducto(@PathParam("codOrden") String codOrden,
@@ -163,11 +189,11 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         return "1";
     }//TODO: METODoS ARCAICOS
 
-      @GET
+    @GET
     @Path("ADD_{codOrden}_{codProductoVenta}_{cantidad}")
     @Produces(MediaType.TEXT_PLAIN)
     public String addProducto(@PathParam("codOrden") String codOrden,
-            @PathParam("codProductoVenta") String codProducto,@PathParam("cantidad") Float cantidad) {
+            @PathParam("codProductoVenta") String codProducto, @PathParam("cantidad") Float cantidad) {
 
         Orden o = super.find(codOrden);
         ProductoVenta producto = getEntityManager().find(ProductoVenta.class, codProducto);
@@ -204,7 +230,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         super.edit(o);
         return "1";
     }//TODO: METODoS ARCAICOS
-    
+
     @GET
     @Path("REMOVE_{codOrden}_{codProductoVenta}")
     @Produces(MediaType.TEXT_PLAIN)
@@ -320,7 +346,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         Mesa m = getEntityManager().find(Mesa.class, o.getMesacodMesa().getCodMesa());
         if (!R.TABLETS_EN_COCINA) {
             Impresion i = new Impresion();
-                i.printKitchen(o);
+            i.printKitchen(o);
         } else {
             for (ProductovOrden x : o.getProductovOrdenList()) {
                 if (x.getEnviadosacocina() < x.getCantidad()) {

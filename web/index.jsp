@@ -4,6 +4,7 @@
     Author     : Jorge
 --%>
 
+<%@page import="restmanager.resources.R"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -12,10 +13,9 @@
         <title>Restaurant Manager </title>
     </head>
     <body>
-        <%! int a = 5; %>
         <h1>
             <% 
-            out.println("El numero es "+ a);
+            out.println(R.RELEASE_VERSION);
             %>
         </h1>
         
