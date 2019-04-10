@@ -364,12 +364,13 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                     not.setHoraNotificacion(new Date());
                     not.setProductovOrden(x);
                     not.setIp_dependiente(inRequest.getRemoteHost());
-                    not.setCantidad(x.getCantidad() - x.getEnviadosacocina());
                     super.em1.getTransaction().begin();
                     if (exist) {
                         super.em1.merge(not);
+                        not.setCantidad(not.getCantidad() + (x.getCantidad() - x.getEnviadosacocina()));
                     } else {
                         super.em1.persist(not);
+                        not.setCantidad(x.getCantidad() - x.getEnviadosacocina());
                     }
 
                     enviarNotificacion(not);
