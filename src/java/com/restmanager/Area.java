@@ -37,6 +37,7 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Area.findByNombre", query = "SELECT a FROM Area a WHERE a.nombre = :nombre")})
 public class Area implements Serializable {
 
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -49,6 +50,8 @@ public class Area implements Serializable {
     @Size(max = 20)
     @Column(name = "nombre")
     private String nombre;
+    @Column(name = "porciento_por_servicio")
+    private Integer porcientoPorServicio;
     @ManyToMany(mappedBy = "areaList")
     private List<Carta> cartaList;
     @OneToMany(mappedBy = "areacodArea")
@@ -126,6 +129,14 @@ public class Area implements Serializable {
     @Override
     public String toString() {
         return "com.restmanager.Area[ codArea=" + codArea + " ]";
+    }
+
+    public Integer getPorcientoPorServicio() {
+        return porcientoPorServicio;
+    }
+
+    public void setPorcientoPorServicio(Integer porcientoPorServicio) {
+        this.porcientoPorServicio = porcientoPorServicio;
     }
 
 }

@@ -38,8 +38,6 @@ public class R {
 
     public static final Date TODAYS_DATE = new Date();
 
-    public static final float PERCENTAGE = 10;
-
     public static final int COINCHANGE = 25;
 
     public static String MAIN_COIN = em1.find(Negocio.class, 1).getMonedaPrincipal();
@@ -54,9 +52,9 @@ public class R {
 
     public static DecimalFormat formatoMoneda = new DecimalFormat("0.00");
 
-    public static String RELEASE_VERSION = "Version 2.5.2";
+    public static String RELEASE_VERSION = "Version 2.5.3";
 
-    public static int BUILD_VERSION = 3;
+    public static int BUILD_VERSION = 4;
 
     public static enum UM {
         U("U"),

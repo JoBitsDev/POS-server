@@ -71,7 +71,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         Mesa m = getEntityManager().find(Mesa.class, codMesa);
         Personal p = getEntityManager().find(Personal.class, usuarioTrabajador);
 
-        Venta v = getEntityManager().find(Venta.class, today);
+        Venta v = findVenta();
 
         if (v == null) {
             return "2";
@@ -84,7 +84,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         o.setDeLaCasa(false);
         o.setHoraComenzada(new Date());
         o.setOrdenvalorMonetario(Float.valueOf("0"));
-        o.setPorciento(R.PERCENTAGE);
+        o.setPorciento(m.getAreacodArea().getPorcientoPorServicio().floatValue());
 
         super.create(o);
 
@@ -647,6 +647,23 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         }
         return "Notificacion Exitosa";
 
+    }
+
+    private Venta findVenta() {
+        Venta ret;
+        e.getCache().evictAll();
+        em1.close();
+        em1 = e.createEntityManager();
+        javax.persistence.criteria.CriteriaQuery cq = em1.getCriteriaBuilder().createQuery();
+        cq.select(cq.from(Venta.class));
+        List<Venta> ventas = em1.createQuery(cq).getResultList();
+        for (int i = ventas.size() - 1; i >= 0; i--) {
+            if (ventas.get(i).getVentaTotal() == null) {
+                return ventas.get(i);
+            }
+        }
+
+        return null;
     }
 
 }
