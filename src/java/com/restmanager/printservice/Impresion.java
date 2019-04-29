@@ -49,7 +49,7 @@ public class Impresion {
     private final boolean REDONDEO_POR_EXCESO = true;
     private static EstadoImpresion estadoImpresion = EstadoImpresion.UKNOWN;
     private final boolean SHOW_PRICES = true;
-    private final boolean PRINT_IN_CENTRAL_KITCHEN = true;
+    private final boolean PRINT_IN_CENTRAL_KITCHEN = false;
     private final String DEFAULT_KITCHEN_PRINTER_LOCATION = "Cocina";
     private final String DEFAULT_PRINT_LOCATION = null;
     private final boolean IMPRIMIR_TICKET_COCINA = true;
@@ -263,11 +263,11 @@ public class Impresion {
                         }
                         sync += cocinasExistentesEnLaOrden.get(j).getNombreCocina() + " ";
                     }
-                    printKitchen(o, cocinasExistentesEnLaOrden.get(i), sync);
+                    printCancelationKitchen(o, cocinasExistentesEnLaOrden.get(i));
                 }
             } else {
                 if (cocinasExistentesEnLaOrden.size() > 0) {
-                    printKitchen(o, cocinasExistentesEnLaOrden.get(0), "");
+                    printCancelationKitchen(o, cocinasExistentesEnLaOrden.get(0));
                 }
 
             }
@@ -861,9 +861,9 @@ public class Impresion {
             t.newLine();
             t.alignRight();
             if (!x.getOrden().getDeLaCasa()) {
-                t.setText(comun.redondeoPorExceso(x.getCantidad() * x.getProductoVenta().getPrecioVenta()));
+                t.setText(comun.setDosLugaresDecimales(x.getCantidad() * x.getProductoVenta().getPrecioVenta()));
             } else {
-                t.setText(comun.redondeoPorExceso(x.getCantidad() * x.getProductoVenta().getGasto()));
+                t.setText(comun.setDosLugaresDecimales(x.getCantidad() * x.getProductoVenta().getGasto()));
             }
             t.newLine();
             if (x.getOrden().getDeLaCasa()) {

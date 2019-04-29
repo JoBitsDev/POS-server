@@ -21,7 +21,7 @@ import javax.persistence.Persistence;
  */
 public class R {
 
-    public static boolean TABLETS_EN_COCINA = true;
+    public static boolean TABLETS_EN_COCINA = false;
 
     public static final EntityManagerFactory e = Persistence.createEntityManagerFactory("Restaurant_Manager_Web_ServicePU");
     public static final EntityManager em1 = e.createEntityManager();
@@ -52,9 +52,9 @@ public class R {
 
     public static DecimalFormat formatoMoneda = new DecimalFormat("0.00");
 
-    public static String RELEASE_VERSION = "Version 2.5.3";
+    public static String RELEASE_VERSION = "Version 2.5.4";
 
-    public static int BUILD_VERSION = 4;
+    public static int BUILD_VERSION = 5;
 
     public static enum UM {
         U("U"),

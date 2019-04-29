@@ -95,7 +95,7 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
         
         
         
-        for (Orden x : super.em1.find(Venta.class, new Date()).getOrdenList()) {
+        for (Orden x : super.em1.find(Venta.class, findVenta()).getOrdenList()) {
             String nombre = x.getPersonalusuario().getUsuario();
             if(!aux.contains(nombre)){
                 aux.add(nombre);

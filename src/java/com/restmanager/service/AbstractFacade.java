@@ -5,6 +5,7 @@
  */
 package com.restmanager.service;
 
+import com.restmanager.Venta;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
@@ -106,6 +107,21 @@ public abstract class AbstractFacade<T> {
         cq.select(em1.getCriteriaBuilder().count(rt));
         javax.persistence.Query q = em1.createQuery(cq);
         return ((Long) q.getSingleResult()).intValue();
+    }
+    
+    protected Venta findVenta() {
+        Venta ret;
+        e.getCache().evictAll();
+        javax.persistence.criteria.CriteriaQuery cq = em1.getCriteriaBuilder().createQuery();
+        cq.select(cq.from(Venta.class));
+        List<Venta> ventas = em1.createQuery(cq).getResultList();
+        for (int i = ventas.size() - 1; i >= 0; i--) {
+            if (ventas.get(i).getVentaTotal() == null) {
+                return ventas.get(i);
+            }
+        }
+
+        return null;
     }
 
 }
