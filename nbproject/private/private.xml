@@ -4,10 +4,14 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group name="Librerias En Desarrollo">
             <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/printservice/Impresion.java</file>
+            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/service/PersonalFacadeREST.java</file>
             <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/service/OrdenFacadeREST.java</file>
             <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/restmanager/resources/R.java</file>
-            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/Area.java</file>
-            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/service/MesaFacadeREST.java</file>
+            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/printservice/Ticket.java</file>
+            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/Ipv.java</file>
+            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/service/AlmacenFacadeREST.java</file>
+            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/service/AbstractFacade.java</file>
+            <file>file:/Users/Jorge/Desktop/Desarrollo/FirstDream/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/Cocina.java</file>
         </group>
     </open-files>
 </project-private>

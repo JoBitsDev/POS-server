@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.restmanager.service;
 
 import com.restmanager.Orden;
@@ -26,10 +25,10 @@ import javax.ws.rs.core.MediaType;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
- 
 @Path("com.restmanager.personal")
 public class PersonalFacadeREST extends AbstractFacade<Personal> {
 
@@ -71,11 +70,11 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
     @Path("{action}_{user}_{pass}")
     @Produces(MediaType.TEXT_PLAIN)
     public String find(@PathParam("action") String action,
-            @PathParam("user") String user , @PathParam("pass") String pass){
+            @PathParam("user") String user, @PathParam("pass") String pass) {
         List<Personal> list = super.findAll();
-        
+
         for (Personal x : list) {
-            if(x.getUsuario().equals(user)){
+            if (x.getUsuario().equals(user)) {
                 if (x.getContrasenna().equals(pass)) {
                     if (!x.getOnline()) {
                         return "1";
@@ -86,31 +85,28 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
         }
         return "0";
     }
-    
+
     @GET
     @Path("MOSTRAR_PERSONAL_TRABAJANDO")
     @Produces({MediaType.TEXT_PLAIN})
     public String findActiveUsers() {
         ArrayList<String> aux = new ArrayList<>();
-        
-        
-        
-        for (Orden x : super.em1.find(Venta.class, findVenta()).getOrdenList()) {
+
+        for (Orden x : super.em1.find(Venta.class, findVenta().getFecha()).getOrdenList()) {
             String nombre = x.getPersonalusuario().getUsuario();
-            if(!aux.contains(nombre)){
+            if (!aux.contains(nombre)) {
                 aux.add(nombre);
             }
         }
-        
+
         String ret = "";
-        
-        
+
         for (int i = 0; i < aux.size(); i++) {
-            ret += aux.get(i)+ ",";
+            ret += aux.get(i) + ",";
         }
         return ret;
     }
-    
+
     @GET
     @Override
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})

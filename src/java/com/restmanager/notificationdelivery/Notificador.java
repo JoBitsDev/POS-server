@@ -9,6 +9,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 import org.eclipse.persistence.oxm.json.JsonObjectBuilderResult;
 
@@ -18,7 +19,7 @@ import org.eclipse.persistence.oxm.json.JsonObjectBuilderResult;
  * @author Jorge
  *
  */
-public class Notificador extends Thread{
+public class Notificador extends Thread {
 
     private ObjectOutputStream output; // output stream to server
     private ObjectInputStream input; // input stream from server
@@ -26,9 +27,10 @@ public class Notificador extends Thread{
     private Socket client; // socket to communicate with server
     private final String host;
     private final Notificable notificacion;
+    public  boolean NOTIFICACION_ENVIADA = false;
 
     // initialize chatServer and set up GUI
-    public Notificador(String host, Notificable notificacion)  {
+    public Notificador(String host, Notificable notificacion) {
         this.host = host;
         this.notificacion = notificacion;
     }
@@ -38,24 +40,23 @@ public class Notificador extends Thread{
         notificar();
     }
 
-    
-    
     public void notificar() {
         try // connect to server, get streams, process connection
         {
-            connectToServer(); // create a Socket to make connection
-            getStreams(); // get the input and output streams
-            sendNotification(notificacion);
-            closeConnection();
-        } // end try
+            if (InetAddress.getByName(host).isReachable(100)) {
+                connectToServer(); // create a Socket to make connection
+                getStreams(); // get the input and output streams
+                sendNotification(notificacion);
+                closeConnection();
+            }
+        }// end try
         catch (EOFException eofException) {
-            retry();
+            closeConnection();
         } // end catch
         catch (IOException ioException) {
-
+            closeConnection();
         } // end catch
         catch (Exception e) {
-            e.printStackTrace();
             closeConnection(); // close connection
         }
 // end finally
@@ -67,15 +68,15 @@ public class Notificador extends Thread{
         try {
             output.writeObject(notificacion.getTituloNotificacion() + "_" + notificacion.getMensajeNotificacion() + "_" + notificacion.getDescripcionNotificacion());
             output.flush();
+            NOTIFICACION_ENVIADA = true;
 
         } catch (IOException iOException) {
+            closeConnection();
         }
     }
 
     private void connectToServer() throws IOException {
-
         client = new Socket(host, 8888);
-
     } // end method connectToServer
 
     // get streams to send and receive data

@@ -85,9 +85,10 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         o.setHoraComenzada(new Date());
         o.setOrdenvalorMonetario(Float.valueOf("0"));
         o.setPorciento(m.getAreacodArea().getPorcientoPorServicio().floatValue());
-
+        
+        em1.getTransaction().begin();
         super.create(o);
-
+        em1.getTransaction().commit();
         return "1";
     }
 
@@ -308,7 +309,8 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                 if (!x.getNotificacionEnvioCocinaList().isEmpty()) {
                     return "2";
                 }
-            } else {
+            }
+            if (Impresion.getDefaultInstance().IMPRIMIR_TICKET_COCINA) {
                 if (x.getCantidad() > x.getEnviadosacocina()) {
                     return "2";
                 }
@@ -344,10 +346,8 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
         Orden o = super.find(codOrden);
         Mesa m = getEntityManager().find(Mesa.class, o.getMesacodMesa().getCodMesa());
-        if (!R.TABLETS_EN_COCINA) {
-            Impresion i = new Impresion();
-            i.printKitchen(o);
-        } else {
+
+        if (R.TABLETS_EN_COCINA) {
             for (ProductovOrden x : o.getProductovOrdenList()) {
                 if (x.getEnviadosacocina() < x.getCantidad()) {
                     NotificacionEnvioCocinaPK notPK = new NotificacionEnvioCocinaPK();
@@ -366,19 +366,28 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                     not.setIp_dependiente(inRequest.getRemoteHost());
                     super.em1.getTransaction().begin();
                     if (exist) {
-                        super.em1.merge(not);
                         not.setCantidad(not.getCantidad() + (x.getCantidad() - x.getEnviadosacocina()));
+                        super.em1.merge(not);
                     } else {
-                        super.em1.persist(not);
                         not.setCantidad(x.getCantidad() - x.getEnviadosacocina());
+                        super.em1.persist(not);
                     }
 
-                    enviarNotificacion(not);
-                    super.em1.getTransaction().commit();
-                    x.setEnviadosacocina(x.getCantidad());
+                    if (enviarNotificacion(not)) {
+                        super.em1.getTransaction().commit();
+                    } else {
+                        super.em1.getTransaction().rollback();
+                    }
+                    if (!Impresion.getDefaultInstance().IMPRIMIR_TICKET_COCINA) {
+                        x.setEnviadosacocina(x.getCantidad());
+                    }
                     x.setListoParaRecoger(false);
                 }
             }
+        }
+        if (Impresion.getDefaultInstance().IMPRIMIR_TICKET_COCINA) {
+            Impresion i = new Impresion();
+            i.printKitchen(o);
         }
 
         super.edit(o);
@@ -624,10 +633,11 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         return ordenGastosEnInsumos;
     }
 
-    private String enviarNotificacion(NotificacionEnvioCocina c) {
+    private boolean enviarNotificacion(NotificacionEnvioCocina c) {
+        Notificador n;
         for (Impresora i : c.getCocina().getImpresoraList()) {
             if (i.getIpImpresora() != null) {
-                new Notificador(i.getIpImpresora(), new Notificable() {
+                n = new Notificador(i.getIpImpresora(), new Notificable() {
                     @Override
                     public String getMensajeNotificacion() {
                         return "Productos a elaborar " + c.getProductovOrden().getProductoVenta().getNombre();
@@ -642,10 +652,12 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                     public String getDescripcionNotificacion() {
                         return c.getCantidad() + " de " + c.getProductovOrden().getProductoVenta().getNombre();
                     }
-                }).notificar();
+                });
+                n.notificar();
+                return n.NOTIFICACION_ENVIADA;
             }
         }
-        return "Notificacion Exitosa";
+        return false;
 
     }
 

@@ -49,10 +49,10 @@ public class Impresion {
     private final boolean REDONDEO_POR_EXCESO = true;
     private static EstadoImpresion estadoImpresion = EstadoImpresion.UKNOWN;
     private final boolean SHOW_PRICES = true;
-    private final boolean PRINT_IN_CENTRAL_KITCHEN = false;
+    private final boolean PRINT_IN_CENTRAL_KITCHEN = true;
     private final String DEFAULT_KITCHEN_PRINTER_LOCATION = "Cocina";
     private final String DEFAULT_PRINT_LOCATION = null;
-    private final boolean IMPRIMIR_TICKET_COCINA = true;
+    public final boolean IMPRIMIR_TICKET_COCINA = true;
     private static int cantidadCopias = 0;
 
     ArrayList<CopiaTicket> RAM = new ArrayList<>();

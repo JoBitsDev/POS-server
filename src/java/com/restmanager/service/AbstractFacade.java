@@ -24,8 +24,8 @@ public abstract class AbstractFacade<T> {
 
     private Class<T> entityClass;
 
-    protected EntityManagerFactory e = Persistence.createEntityManagerFactory("Restaurant_Manager_Web_ServicePU");
-    protected EntityManager em1 = e.createEntityManager();
+    public static EntityManagerFactory e = Persistence.createEntityManagerFactory("Restaurant_Manager_Web_ServicePU");
+    public static EntityManager em1 = e.createEntityManager();
 
     public AbstractFacade(Class<T> entityClass) {
         this.entityClass = entityClass;
@@ -109,7 +109,7 @@ public abstract class AbstractFacade<T> {
         return ((Long) q.getSingleResult()).intValue();
     }
     
-    protected Venta findVenta() {
+    public static Venta findVenta() {
         Venta ret;
         e.getCache().evictAll();
         javax.persistence.criteria.CriteriaQuery cq = em1.getCriteriaBuilder().createQuery();

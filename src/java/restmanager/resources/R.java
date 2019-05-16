@@ -52,9 +52,9 @@ public class R {
 
     public static DecimalFormat formatoMoneda = new DecimalFormat("0.00");
 
-    public static String RELEASE_VERSION = "Version 2.5.4";
+    public static String RELEASE_VERSION = "Version 2.6";
 
-    public static int BUILD_VERSION = 5;
+    public static int BUILD_VERSION = 6;
 
     public static enum UM {
         U("U"),

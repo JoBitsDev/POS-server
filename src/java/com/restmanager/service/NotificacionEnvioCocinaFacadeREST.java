@@ -80,7 +80,9 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
         List<NotificacionEnvioCocina> all = findAll();
         for (NotificacionEnvioCocina x : all) {
             if (x.getProductovOrden().getOrden().getHoraTerminada() != null) {
+                em1.getTransaction().begin();
                 super.remove(x);
+                em1.getTransaction().commit();
                 continue;
             }
             if (x.getCocina().getCodCocina().equals(codCocina)) {
@@ -99,6 +101,7 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
             if (x.getNotificacionEnvioCocinaPK().getProductovOrdenordencodOrden().equals(codOrden)
                     && x.getNotificacionEnvioCocinaPK().getProductovOrdenproductoVentapCod().equals(codProducto)) {
                 x.getProductovOrden().setListoParaRecoger(Boolean.TRUE);
+                x.getProductovOrden().setEnviadosacocina(x.getProductovOrden().getCantidad());
                 super.em1.getTransaction().begin();
                 super.em1.merge(x.getProductovOrden());
                 super.em1.getTransaction().commit();
@@ -204,4 +207,8 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
         }
     }
 
+    private void logOutDevice(HttpServletRequest inRequest, String cod_cocina){
+        //TODO : finish
+    }
+    
 }

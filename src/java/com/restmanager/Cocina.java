@@ -144,7 +144,7 @@ public class Cocina implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.Cocina[ codCocina=" + codCocina + " ]";
+        return  nombreCocina + "("+codCocina+")";
     }
 
 }

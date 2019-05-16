@@ -33,7 +33,6 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "TransaccionEntrada.findByTransaccionfecha", query = "SELECT t FROM TransaccionEntrada t WHERE t.transaccionEntradaPK.transaccionfecha = :transaccionfecha")
     , @NamedQuery(name = "TransaccionEntrada.findByTransaccionhora", query = "SELECT t FROM TransaccionEntrada t WHERE t.transaccionEntradaPK.transaccionhora = :transaccionhora")
     , @NamedQuery(name = "TransaccionEntrada.findByTransaccionalmacencodAlmacen", query = "SELECT t FROM TransaccionEntrada t WHERE t.transaccionEntradaPK.transaccionalmacencodAlmacen = :transaccionalmacencodAlmacen")
-    , @NamedQuery(name = "TransaccionEntrada.findByConsumido", query = "SELECT t FROM TransaccionEntrada t WHERE t.consumido = :consumido")
     , @NamedQuery(name = "TransaccionEntrada.findByPrecioPorUnidad", query = "SELECT t FROM TransaccionEntrada t WHERE t.precioPorUnidad = :precioPorUnidad")
     , @NamedQuery(name = "TransaccionEntrada.findByValorTotal", query = "SELECT t FROM TransaccionEntrada t WHERE t.valorTotal = :valorTotal")})
 public class TransaccionEntrada implements Serializable {
@@ -41,8 +40,6 @@ public class TransaccionEntrada implements Serializable {
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected TransaccionEntradaPK transaccionEntradaPK;
-    @Column(name = "consumido")
-    private Boolean consumido;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "precio_por_unidad")
     private Float precioPorUnidad;
@@ -73,14 +70,6 @@ public class TransaccionEntrada implements Serializable {
 
     public void setTransaccionEntradaPK(TransaccionEntradaPK transaccionEntradaPK) {
         this.transaccionEntradaPK = transaccionEntradaPK;
-    }
-
-    public Boolean getConsumido() {
-        return consumido;
-    }
-
-    public void setConsumido(Boolean consumido) {
-        this.consumido = consumido;
     }
 
     public Float getPrecioPorUnidad() {
