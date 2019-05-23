@@ -222,7 +222,7 @@ public class Insumo implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.Insumo[ codInsumo=" + codInsumo + " ]";
+        return nombre + "(" + codInsumo + ")" ;
     }
 
 }

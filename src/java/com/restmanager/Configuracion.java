@@ -32,6 +32,10 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "Configuracion.findByValor", query = "SELECT c FROM Configuracion c WHERE c.valor = :valor")})
 public class Configuracion implements Serializable {
 
+    @Size(max = 255)
+    @Column(name = "valor_string")
+    private String valorString;
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -88,6 +92,14 @@ public class Configuracion implements Serializable {
     @Override
     public String toString() {
         return "com.restmanager.Configuracion[ nombre=" + nombre + " ]";
+    }
+
+    public String getValorString() {
+        return valorString;
+    }
+
+    public void setValorString(String valorString) {
+        this.valorString = valorString;
     }
 
 }

@@ -5,7 +5,10 @@
  */
 package restmanager.resources;
 
+import com.restmanager.Configuracion;
 import com.restmanager.Negocio;
+import com.restmanager.printservice.Impresion;
+import com.restmanager.printservice.Ticket;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,12 +23,14 @@ import javax.persistence.Persistence;
  *
  */
 public class R {
+    
 
-    public static boolean TABLETS_EN_COCINA = false;
-
+   
     public static final EntityManagerFactory e = Persistence.createEntityManagerFactory("Restaurant_Manager_Web_ServicePU");
     public static final EntityManager em1 = e.createEntityManager();
 
+    public static boolean TABLETS_EN_COCINA = R.em1.find(Configuracion.class, R.SettingID.GENERAL_TABLET_COCINA.getValue()).getValor() == 1;
+    
     public static final String SEPARADOR = "_";
     
     public static boolean AUTO_UPDATE_INSUMO_PRICE = true;
@@ -38,7 +43,7 @@ public class R {
 
     public static final Date TODAYS_DATE = new Date();
 
-    public static final int COINCHANGE = 25;
+    public static  int COINCHANGE = R.em1.find(Configuracion.class, R.SettingID.GENERAL_CAMBIO_MONEDA.getValue()).getValor();
 
     public static String MAIN_COIN = em1.find(Negocio.class, 1).getMonedaPrincipal();
 
@@ -52,10 +57,48 @@ public class R {
 
     public static DecimalFormat formatoMoneda = new DecimalFormat("0.00");
 
-    public static String RELEASE_VERSION = "Version 2.6";
+    public static String RELEASE_VERSION = "Version 2.6.1";
 
-    public static int BUILD_VERSION = 6;
+    public static int BUILD_VERSION = 7;
 
+      public static enum SettingID{
+        
+        //
+        //GENERALES
+        //
+        
+        GENERAL_CAMBIO_MONEDA("GENERAL_CAMBIO_MONEDA"),
+        GENERAL_TURNOS_VARIOS("GENERAL_MULTIPLES_TURNOS"),
+        GENERAL_CAJERO_PERMISOS_ESP("GENERAL_CAJERO_PERMISOS_ESP"),
+        GENERAL_CONSUMO_CASA_ESTADISTICAL("GENERAL_CONSUMO_CASA_ESTADISTICAS"),
+        GENERAL_SERVER_IP("GENERAL_SERVIDOR_IP"),
+        GENERAL_TABLET_COCINA("GENERAL_TABLET_COCINA"),
+        
+        
+        //
+        //IMPRESION
+        //
+        
+        IMPRESION_TICKET_TAMANO_PAPEL("PRINTING_TICKET_PAPER_SIZE"),
+        IMPRESION_TICKET_CARACTER_SEPARADOR("PRINTING_TICKET_SEPARATOR_CHAR"),
+        IMPRESION_IMPRIMIR_COCINA_CENTRAL("PRINTING_CENTRAL_KITCHEN"),
+        IMPRESION_IMPRIMIR_GASTOS_AUTORIZOS("PRINTING_EXPENSES_IN_HAUSE_TICKETS"),
+        IMPRESION_IMPRIMIR_TICKET_EN_COCINA("PRINTING_PRINT_KITCHEN_TICKET"),
+        IMPRESION_CANTIDAD_COPIAS("PRINTING_COPIES"),
+        IMPRESION_REDONDEO_EXCESO("PRINTING_ROUNDING");
+        
+        private final String value;
+
+        private SettingID(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+        
+    }  
+    
     public static enum UM {
         U("U"),
         Gr("Gr"),

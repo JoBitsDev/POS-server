@@ -18,6 +18,7 @@ import com.restmanager.TransaccionEntradaPK;
 import com.restmanager.TransaccionMerma;
 import com.restmanager.TransaccionMermaPK;
 import com.restmanager.TransaccionPK;
+import com.restmanager.printservice.Impresion;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -94,7 +95,25 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
         return addTransaccionEntrada(em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(), super.find(almacenCod), cant, valor).toString();
 
     }
+    
+    @GET
+    @Path("IMPRIMIR_ESTADO_ALMACEN")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public String ticketEntrada() {
+        Impresion i = Impresion.getDefaultInstance();
+        i.printResumenAlmacen(super.findAll().get(0));
+        return "1";
+    }
 
+    @GET
+    @Path("IMPRIMIR_TICKET_COMPRA")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public String ticketCompra() {
+        Impresion i = Impresion.getDefaultInstance();
+        i.printTicketCompra(super.findAll().get(0));
+        return "1";
+    }
+    
     @GET
     @Path("SALIDA_{almacenCod}_{insumoCod}_{cant}_{destino}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})

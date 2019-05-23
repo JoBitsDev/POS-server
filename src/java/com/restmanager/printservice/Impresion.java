@@ -7,6 +7,7 @@ package com.restmanager.printservice;
 
 import com.restmanager.Almacen;
 import com.restmanager.Cocina;
+import com.restmanager.Configuracion;
 import com.restmanager.Insumo;
 import com.restmanager.InsumoAlmacen;
 import com.restmanager.IpvRegistro;
@@ -46,17 +47,17 @@ public class Impresion {
      * @param args the command line arguments
      */
     private boolean MONEDA_CUC;
-    private final boolean REDONDEO_POR_EXCESO = true;
+    private final boolean REDONDEO_POR_EXCESO = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_REDONDEO_EXCESO.getValue()).getValor() == 1;
     private static EstadoImpresion estadoImpresion = EstadoImpresion.UKNOWN;
-    private final boolean SHOW_PRICES = true;
-    private final boolean PRINT_IN_CENTRAL_KITCHEN = true;
+    private boolean SHOW_PRICES = true;
+    private final boolean PRINT_IN_CENTRAL_KITCHEN = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_IMPRIMIR_COCINA_CENTRAL.getValue()).getValor() == 1;
     private final String DEFAULT_KITCHEN_PRINTER_LOCATION = "Cocina";
     private final String DEFAULT_PRINT_LOCATION = null;
-    public final boolean IMPRIMIR_TICKET_COCINA = true;
-    private static int cantidadCopias = 0;
+    public  boolean IMPRIMIR_TICKET_COCINA = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_IMPRIMIR_TICKET_EN_COCINA.getValue()).getValor() == 1;
+    private static int cantidadCopias = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_CANTIDAD_COPIAS.getValue()).getValor() ;
 
     ArrayList<CopiaTicket> RAM = new ArrayList<>();
-
+    
     /**
      * String referentes a la impresion de ordenes
      */
@@ -1084,12 +1085,13 @@ public class Impresion {
 
         for (InsumoAlmacen in : ret) {
             t.alignLeft();
-            t.setText(in.getInsumo().toString() + "{" + in.getInsumo().getUm() + "}");
+            t.setText(in.getInsumo().toString());
             t.newLine();
             t.alignRight();
             t.setText("" + in.getCantidad());
-//            t.setText(String.format("%.2f | %+.2f", in.getCantidadExistente(), in.getCantidadExistente() - in.getStockEstimation()));
-            t.newLine();
+            float diferencia = comun.setDosLugaresDecimalesFloat(in.getCantidad() - in.getInsumo().getStockEstimation());
+            String dif = diferencia >= 0 ? "+" + diferencia : "-" + diferencia;
+            t.setText(comun.setDosLugaresDecimalesFloat(in.getCantidad()) + " | " + dif);
         }
 
         t.newLine();
@@ -1141,6 +1143,39 @@ public class Impresion {
 //        addFinal(t);
 //
 //        sendToPrinter(t.finalCommandSet().getBytes(), DEFAULT_PRINT_LOCATION);
+    }
+
+    public void printTicketCompra(Almacen a) {
+        ArrayList<InsumoAlmacen> ret = new ArrayList<>(a.getInsumoAlmacenList());
+        Collections.sort(ret, (InsumoAlmacen o1, InsumoAlmacen o2) -> o1.getInsumo().getNombre().compareTo(o2.getInsumo().getNombre()));
+        Ticket t = new Ticket();
+        addHeader(t);
+        addCustomMetaData(t, STOCK_BALANCE, new Date());
+
+        t.alignCenter();
+        t.setText(STOCK_FORMAT);
+        t.newLine();
+        t.newLine();
+
+        for (InsumoAlmacen in : ret) {
+            float diferencia = comun.setDosLugaresDecimalesFloat(in.getCantidad() - in.getInsumo().getStockEstimation());
+            if (diferencia <= 0) {
+                t.alignLeft();
+                t.setText(in.getInsumo().toString());
+                t.newLine();
+                t.alignRight();
+                t.setText("" + in.getCantidad());
+                String dif = diferencia >= 0 ? "+" + diferencia : "-" + diferencia;
+                t.setText(comun.setDosLugaresDecimalesFloat(in.getCantidad()) + " | " + dif);
+            }
+        }
+
+        t.newLine();
+        t.addLineSeperator();
+
+        addFinal(t);
+
+        sendToPrinter(t.finalCommandSet().getBytes(), DEFAULT_PRINT_LOCATION);
     }
 
     //
