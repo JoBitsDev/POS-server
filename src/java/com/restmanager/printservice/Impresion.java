@@ -161,11 +161,11 @@ public class Impresion {
         total = addPvOrden(t, o.getProductovOrdenList());
 
         float subTotalPrint = comun.redondeoPorExcesoFloat(total);
-        float sumaPorciento = comun.redondeoPorExcesoFloat(subTotalPrint / o.getPorciento());
+        float sumaPorciento = comun.redondeoPorExcesoFloat((subTotalPrint * o.getPorciento())/100);
         float totalPrint = subTotalPrint;
         t.alignRight();
         t.newLine();
-        // t.setText(SUBTOTAL + subTotalPrint + MONEDA);
+        t.setText(SUBTOTAL + subTotalPrint + MONEDA);
         if (o.getPorciento() != 0) {
             t.newLine();
             t.setText("+ " + o.getPorciento() + PORCIENTO + sumaPorciento + MONEDA);
