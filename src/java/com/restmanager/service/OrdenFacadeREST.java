@@ -85,7 +85,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         o.setHoraComenzada(new Date());
         o.setOrdenvalorMonetario(Float.valueOf("0"));
         o.setPorciento(m.getAreacodArea().getPorcientoPorServicio().floatValue());
-        
+
         em1.getTransaction().begin();
         super.create(o);
         em1.getTransaction().commit();
@@ -310,12 +310,12 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                     return "2";
                 }
             }
-            if (Impresion.getDefaultInstance().IMPRIMIR_TICKET_COCINA) {
-                if (x.getCantidad() > x.getEnviadosacocina()) {
-                    return "2";
-                }
-
+//            if (Impresion.getDefaultInstance().IMPRIMIR_TICKET_COCINA) {
+            if (x.getCantidad() > x.getEnviadosacocina()) {
+                return "2";
             }
+
+            //         }
         }
 
         o.setHoraTerminada(new Date());
@@ -373,11 +373,12 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                         super.em1.persist(not);
                     }
 
-                    if (enviarNotificacion(not)) {
-                        super.em1.getTransaction().commit();
-                    } else {
-                        super.em1.getTransaction().rollback();
-                    }
+                    enviarNotificacion(not);
+                    //if (enviarNotificacion(not)) {
+                    super.em1.getTransaction().commit();
+                    //} else {
+                    //  super.em1.getTransaction().rollback();
+                    // }
                     if (!Impresion.getDefaultInstance().IMPRIMIR_TICKET_COCINA) {
                         x.setEnviadosacocina(x.getCantidad());
                     }

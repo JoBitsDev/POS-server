@@ -43,7 +43,7 @@ public class Notificador extends Thread {
     public void notificar() {
         try // connect to server, get streams, process connection
         {
-            if (InetAddress.getByName(host).isReachable(100)) {
+            if (InetAddress.getByName(host).isReachable(2000)) {
                 connectToServer(); // create a Socket to make connection
                 getStreams(); // get the input and output streams
                 sendNotification(notificacion);

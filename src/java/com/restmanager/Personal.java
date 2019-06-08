@@ -63,7 +63,7 @@ public class Personal implements Serializable {
     private Boolean online;
     @Column(name = "frecuencia")
     private Short frecuencia;
-    @Column(name = "ultimodia_trabajo")
+    @Column(name = "ultimodia_pago")
     @Temporal(TemporalType.DATE)
     private Date ultimodiaTrabajo;
     @Lob
