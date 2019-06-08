@@ -37,6 +37,9 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Area.findByNombre", query = "SELECT a FROM Area a WHERE a.nombre = :nombre")})
 public class Area implements Serializable {
 
+    @OneToMany(mappedBy = "areacodArea")
+    private List<PuestoTrabajo> puestoTrabajoList;
+
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -137,6 +140,14 @@ public class Area implements Serializable {
 
     public void setPorcientoPorServicio(Integer porcientoPorServicio) {
         this.porcientoPorServicio = porcientoPorServicio;
+    }
+
+    public List<PuestoTrabajo> getPuestoTrabajoList() {
+        return puestoTrabajoList;
+    }
+
+    public void setPuestoTrabajoList(List<PuestoTrabajo> puestoTrabajoList) {
+        this.puestoTrabajoList = puestoTrabajoList;
     }
 
 }

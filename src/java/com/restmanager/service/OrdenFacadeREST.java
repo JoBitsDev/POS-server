@@ -546,6 +546,9 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         mesaDestino.setEstado(o.getCodOrden() + " " + o.getPersonalusuario().getUsuario());
         getEntityManager().merge(mesaDestino);
         o.setMesacodMesa(mesaDestino);
+        if (mesaDestino.getAreacodArea().getPorcientoPorServicio() != null) {
+            o.setPorciento(mesaDestino.getAreacodArea().getPorcientoPorServicio().floatValue());
+        }
         mesaOrigen.setEstado(ESTADO_MESA_VACIA);
         getEntityManager().merge(mesaOrigen);
         super.edit(o);

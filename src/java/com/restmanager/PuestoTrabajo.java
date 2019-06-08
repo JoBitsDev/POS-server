@@ -16,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -47,6 +48,13 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "PuestoTrabajo.findByIdPuesto", query = "SELECT p FROM PuestoTrabajo p WHERE p.idPuesto = :idPuesto")})
 public class PuestoTrabajo implements Serializable {
 
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "salario_fijo")
+    private Float salarioFijo;
+    @JoinColumn(name = "areacod_area", referencedColumnName = "cod_area")
+    @ManyToOne
+    private Area areacodArea;
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -54,8 +62,6 @@ public class PuestoTrabajo implements Serializable {
     @Size(min = 1, max = 30)
     @Column(name = "nombre_puesto")
     private String nombrePuesto;
-    @Column(name = "salario_fijo")
-    private Integer salarioFijo;
     @Size(max = 30)
     @Column(name = "area_pago")
     private String areaPago;
@@ -98,11 +104,11 @@ public class PuestoTrabajo implements Serializable {
         this.nombrePuesto = nombrePuesto;
     }
 
-    public Integer getSalarioFijo() {
+    public Float getSalarioFijo() {
         return salarioFijo;
     }
 
-    public void setSalarioFijo(Integer salarioFijo) {
+    public void setSalarioFijo(Float salarioFijo) {
         this.salarioFijo = salarioFijo;
     }
 
@@ -211,6 +217,14 @@ public class PuestoTrabajo implements Serializable {
     @Override
     public String toString() {
         return "com.restmanager.PuestoTrabajo[ nombrePuesto=" + nombrePuesto + " ]";
+    }
+
+    public Area getAreacodArea() {
+        return areacodArea;
+    }
+
+    public void setAreacodArea(Area areacodArea) {
+        this.areacodArea = areacodArea;
     }
 
 }

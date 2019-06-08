@@ -47,6 +47,13 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Personal.findByUltimodiaTrabajo", query = "SELECT p FROM Personal p WHERE p.ultimodiaTrabajo = :ultimodiaTrabajo")})
 public class Personal implements Serializable {
 
+    @Lob
+    @Column(name = "foto")
+    private byte[] foto;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "pago_pendiente")
+    private Float pagoPendiente;
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -66,9 +73,6 @@ public class Personal implements Serializable {
     @Column(name = "ultimodia_pago")
     @Temporal(TemporalType.DATE)
     private Date ultimodiaTrabajo;
-    @Lob
-    @Column(name = "foto")
-    private byte[] foto;
     @ManyToMany(mappedBy = "personalList")
     private List<PuestoTrabajo> puestoTrabajoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "personalusuario")
@@ -131,13 +135,6 @@ public class Personal implements Serializable {
         this.ultimodiaTrabajo = ultimodiaTrabajo;
     }
 
-    public byte[] getFoto() {
-        return foto;
-    }
-
-    public void setFoto(byte[] foto) {
-        this.foto = foto;
-    }
 
     @XmlTransient
     public List<PuestoTrabajo> getPuestoTrabajoList() {
@@ -196,6 +193,22 @@ public class Personal implements Serializable {
     @Override
     public String toString() {
         return "com.restmanager.Personal[ usuario=" + usuario + " ]";
+    }
+
+    public byte[] getFoto() {
+        return foto;
+    }
+
+    public void setFoto(byte[] foto) {
+        this.foto = foto;
+    }
+
+    public Float getPagoPendiente() {
+        return pagoPendiente;
+    }
+
+    public void setPagoPendiente(Float pagoPendiente) {
+        this.pagoPendiente = pagoPendiente;
     }
 
 }
