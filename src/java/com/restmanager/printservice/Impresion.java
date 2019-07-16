@@ -50,14 +50,16 @@ public class Impresion {
     private final boolean REDONDEO_POR_EXCESO = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_REDONDEO_EXCESO.getValue()).getValor() == 1;
     private static EstadoImpresion estadoImpresion = EstadoImpresion.UKNOWN;
     private boolean SHOW_PRICES = true;
+    public static boolean SHOW_HEADER = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_TICKET_ENCABEZADO_RESTAURANTE.getValue()).getValor() == 1;
+    public static boolean SHOW_SUBTOTAL = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_TICKET_SUBTOTAL.getValue()).getValor() == 1;
     private final boolean PRINT_IN_CENTRAL_KITCHEN = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_IMPRIMIR_COCINA_CENTRAL.getValue()).getValor() == 1;
     private final String DEFAULT_KITCHEN_PRINTER_LOCATION = "Cocina";
     private final String DEFAULT_PRINT_LOCATION = null;
-    public  boolean IMPRIMIR_TICKET_COCINA = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_IMPRIMIR_TICKET_EN_COCINA.getValue()).getValor() == 1;
-    private static int cantidadCopias = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_CANTIDAD_COPIAS.getValue()).getValor() ;
+    public boolean IMPRIMIR_TICKET_COCINA = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_IMPRIMIR_TICKET_EN_COCINA.getValue()).getValor() == 1;
+    private static int cantidadCopias = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_CANTIDAD_COPIAS.getValue()).getValor();
 
     ArrayList<CopiaTicket> RAM = new ArrayList<>();
-    
+
     /**
      * String referentes a la impresion de ordenes
      */
@@ -161,11 +163,13 @@ public class Impresion {
         total = addPvOrden(t, o.getProductovOrdenList());
 
         float subTotalPrint = comun.redondeoPorExcesoFloat(total);
-        float sumaPorciento = comun.redondeoPorExcesoFloat((subTotalPrint * o.getPorciento())/100);
+        float sumaPorciento = comun.redondeoPorExcesoFloat((subTotalPrint * o.getPorciento()) / 100);
         float totalPrint = subTotalPrint;
         t.alignRight();
         t.newLine();
-        t.setText(SUBTOTAL + subTotalPrint + MONEDA);
+        if (SHOW_SUBTOTAL) {
+            t.setText(SUBTOTAL + subTotalPrint + MONEDA);
+        }
         if (o.getPorciento() != 0) {
             t.newLine();
             t.setText("+ " + o.getPorciento() + PORCIENTO + sumaPorciento + MONEDA);
@@ -811,12 +815,18 @@ public class Impresion {
     private void addHeader(Ticket t) {
         t.resetAll();
         t.initialize();
-        //p.feedBack((byte)2);
+        t.feedBack((byte) 2);
         t.alignCenter();
-        t.setText(CABECERA);
-        t.newLine();
-        t.setText(R.REST_NAME);
-        t.newLine();
+        if (SHOW_HEADER) {
+            t.setText(CABECERA);
+            t.newLine();
+            t.setText(R.REST_NAME);
+            t.newLine();
+        } else {
+            t.setText("BIENVENIDO");
+            t.newLine();
+            t.newLine();
+        }
     }
 
     private void addCustomMetaData(Ticket t, String customHeader, Date fecha) {
