@@ -7,6 +7,8 @@
 package com.restmanager.service;
 
 import com.restmanager.Carta;
+import com.restmanager.Configuracion;
+import com.restmanager.Negocio;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -19,6 +21,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import restmanager.resources.R;
 
 /**
  * FirstDream
@@ -52,7 +55,7 @@ public class CartaFacadeREST extends AbstractFacade<Carta> {
     @Path("NOMBRE_REST")
     @Produces({MediaType.TEXT_PLAIN})
     public String getNombreRest() {
-        return super.find("Mnu-1").getNombreCarta();
+        return  R.em1.find(Negocio.class, 1).getNombre();
     }
     
     @DELETE
