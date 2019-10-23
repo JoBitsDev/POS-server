@@ -12,12 +12,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -26,13 +26,12 @@ import javax.xml.bind.annotation.XmlRootElement;
  * 
  */
 @Entity
-@Table(name = "transaccion_merma")
+@Table(name = "transaccion_salida")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "TransaccionMerma.findAll", query = "SELECT t FROM TransaccionMerma t")
-    , @NamedQuery(name = "TransaccionMerma.findByTransaccionnoTransaccion", query = "SELECT t FROM TransaccionMerma t WHERE t.transaccionnoTransaccion = :transaccionnoTransaccion")
-    , @NamedQuery(name = "TransaccionMerma.findByRazon", query = "SELECT t FROM TransaccionMerma t WHERE t.razon = :razon")})
-public class TransaccionMerma implements Serializable {
+    @NamedQuery(name = "TransaccionSalida.findAll", query = "SELECT t FROM TransaccionSalida t")
+    , @NamedQuery(name = "TransaccionSalida.findByTransaccionnoTransaccion", query = "SELECT t FROM TransaccionSalida t WHERE t.transaccionnoTransaccion = :transaccionnoTransaccion")})
+public class TransaccionSalida implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -40,17 +39,17 @@ public class TransaccionMerma implements Serializable {
     @NotNull
     @Column(name = "transaccionno_transaccion")
     private Integer transaccionnoTransaccion;
-    @Size(max = 255)
-    @Column(name = "razon")
-    private String razon;
+    @JoinColumn(name = "cocinacod_cocina", referencedColumnName = "cod_cocina")
+    @ManyToOne(optional = false)
+    private Cocina cocinacodCocina;
     @JoinColumn(name = "transaccionno_transaccion", referencedColumnName = "no_transaccion", insertable = false, updatable = false)
     @OneToOne(optional = false)
     private Transaccion transaccion;
 
-    public TransaccionMerma() {
+    public TransaccionSalida() {
     }
 
-    public TransaccionMerma(Integer transaccionnoTransaccion) {
+    public TransaccionSalida(Integer transaccionnoTransaccion) {
         this.transaccionnoTransaccion = transaccionnoTransaccion;
     }
 
@@ -62,12 +61,12 @@ public class TransaccionMerma implements Serializable {
         this.transaccionnoTransaccion = transaccionnoTransaccion;
     }
 
-    public String getRazon() {
-        return razon;
+    public Cocina getCocinacodCocina() {
+        return cocinacodCocina;
     }
 
-    public void setRazon(String razon) {
-        this.razon = razon;
+    public void setCocinacodCocina(Cocina cocinacodCocina) {
+        this.cocinacodCocina = cocinacodCocina;
     }
 
     public Transaccion getTransaccion() {
@@ -88,10 +87,10 @@ public class TransaccionMerma implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof TransaccionMerma)) {
+        if (!(object instanceof TransaccionSalida)) {
             return false;
         }
-        TransaccionMerma other = (TransaccionMerma) object;
+        TransaccionSalida other = (TransaccionSalida) object;
         if ((this.transaccionnoTransaccion == null && other.transaccionnoTransaccion != null) || (this.transaccionnoTransaccion != null && !this.transaccionnoTransaccion.equals(other.transaccionnoTransaccion))) {
             return false;
         }
@@ -100,7 +99,7 @@ public class TransaccionMerma implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.TransaccionMerma[ transaccionnoTransaccion=" + transaccionnoTransaccion + " ]";
+        return "com.restmanager.TransaccionSalida[ transaccionnoTransaccion=" + transaccionnoTransaccion + " ]";
     }
 
 }

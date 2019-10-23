@@ -29,12 +29,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "Configuracion.findAll", query = "SELECT c FROM Configuracion c")
     , @NamedQuery(name = "Configuracion.findByNombre", query = "SELECT c FROM Configuracion c WHERE c.nombre = :nombre")
-    , @NamedQuery(name = "Configuracion.findByValor", query = "SELECT c FROM Configuracion c WHERE c.valor = :valor")})
+    , @NamedQuery(name = "Configuracion.findByValor", query = "SELECT c FROM Configuracion c WHERE c.valor = :valor")
+    , @NamedQuery(name = "Configuracion.findByValorString", query = "SELECT c FROM Configuracion c WHERE c.valorString = :valorString")})
 public class Configuracion implements Serializable {
-
-    @Size(max = 255)
-    @Column(name = "valor_string")
-    private String valorString;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -45,6 +42,9 @@ public class Configuracion implements Serializable {
     private String nombre;
     @Column(name = "valor")
     private Integer valor;
+    @Size(max = 255)
+    @Column(name = "valor_string")
+    private String valorString;
 
     public Configuracion() {
     }
@@ -67,6 +67,14 @@ public class Configuracion implements Serializable {
 
     public void setValor(Integer valor) {
         this.valor = valor;
+    }
+
+    public String getValorString() {
+        return valorString;
+    }
+
+    public void setValorString(String valorString) {
+        this.valorString = valorString;
     }
 
     @Override
@@ -92,14 +100,6 @@ public class Configuracion implements Serializable {
     @Override
     public String toString() {
         return "com.restmanager.Configuracion[ nombre=" + nombre + " ]";
-    }
-
-    public String getValorString() {
-        return valorString;
-    }
-
-    public void setValorString(String valorString) {
-        this.valorString = valorString;
     }
 
 }

@@ -50,7 +50,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
     @GET
     @Override
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     public List<Orden> findAll() {
         return super.findAll();
     }
@@ -363,7 +363,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                     not.setCocina(x.getProductoVenta().getCocinacodCocina());
                     not.setHoraNotificacion(new Date());
                     not.setProductovOrden(x);
-                    not.setIp_dependiente(inRequest.getRemoteHost());
+                    not.setIpDependiente(inRequest.getRemoteHost());
                     super.em1.getTransaction().begin();
                     if (exist) {
                         not.setCantidad(not.getCantidad() + (x.getCantidad() - x.getEnviadosacocina()));

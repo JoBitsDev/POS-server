@@ -106,7 +106,7 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
                 super.em1.merge(x.getProductovOrden());
                 super.em1.getTransaction().commit();
                 super.remove(x);
-                new Notificador(x.getIp_dependiente(), new Notificable() {
+                new Notificador(x.getIpDependiente(), new Notificable() {
                     @Override
                     public String getMensajeNotificacion() {
                         return "Productos a recoger en " + x.getProductovOrden().getProductoVenta().getCocinacodCocina().getNombreCocina();

@@ -1169,14 +1169,13 @@ public class Impresion {
 
         for (InsumoAlmacen in : ret) {
             float diferencia = comun.setDosLugaresDecimalesFloat(in.getCantidad() - in.getInsumo().getStockEstimation());
-            if (diferencia <= 0) {
+            if (diferencia < 0) {
                 t.alignLeft();
                 t.setText(in.getInsumo().toString());
                 t.newLine();
                 t.alignRight();
                 t.setText("" + in.getCantidad());
-                String dif = diferencia >= 0 ? "+" + diferencia : "-" + diferencia;
-                t.setText(comun.setDosLugaresDecimalesFloat(in.getCantidad()) + " | " + dif);
+                t.setText(comun.setDosLugaresDecimalesFloat(in.getCantidad()) + " | " + diferencia);
             }
         }
 

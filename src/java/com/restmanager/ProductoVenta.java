@@ -40,7 +40,8 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "ProductoVenta.findByGanancia", query = "SELECT p FROM ProductoVenta p WHERE p.ganancia = :ganancia")
     , @NamedQuery(name = "ProductoVenta.findByGasto", query = "SELECT p FROM ProductoVenta p WHERE p.gasto = :gasto")
     , @NamedQuery(name = "ProductoVenta.findByDescripcion", query = "SELECT p FROM ProductoVenta p WHERE p.descripcion = :descripcion")
-    , @NamedQuery(name = "ProductoVenta.findByVisible", query = "SELECT p FROM ProductoVenta p WHERE p.visible = :visible")})
+    , @NamedQuery(name = "ProductoVenta.findByVisible", query = "SELECT p FROM ProductoVenta p WHERE p.visible = :visible")
+    , @NamedQuery(name = "ProductoVenta.findByPagoPorVenta", query = "SELECT p FROM ProductoVenta p WHERE p.pagoPorVenta = :pagoPorVenta")})
 public class ProductoVenta implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -69,6 +70,8 @@ public class ProductoVenta implements Serializable {
     private String descripcion;
     @Column(name = "visible")
     private Boolean visible;
+    @Column(name = "pago_por_venta")
+    private Float pagoPorVenta;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "productoVenta")
     private List<ProductoInsumo> productoInsumoList;
     @JoinColumn(name = "cocinacod_cocina", referencedColumnName = "cod_cocina")
@@ -147,6 +150,14 @@ public class ProductoVenta implements Serializable {
 
     public void setVisible(Boolean visible) {
         this.visible = visible;
+    }
+
+    public Float getPagoPorVenta() {
+        return pagoPorVenta;
+    }
+
+    public void setPagoPorVenta(Float pagoPorVenta) {
+        this.pagoPorVenta = pagoPorVenta;
     }
 
     @XmlTransient

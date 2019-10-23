@@ -9,18 +9,26 @@ package com.restmanager;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
@@ -29,60 +37,90 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "transaccion")
+@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Transaccion.findAll", query = "SELECT t FROM Transaccion t"),
-    @NamedQuery(name = "Transaccion.findByInsumocodInsumo", query = "SELECT t FROM Transaccion t WHERE t.transaccionPK.insumocodInsumo = :insumocodInsumo"),
-    @NamedQuery(name = "Transaccion.findByAlmacencodAlmacen", query = "SELECT t FROM Transaccion t WHERE t.transaccionPK.almacencodAlmacen = :almacencodAlmacen"),
-    @NamedQuery(name = "Transaccion.findByFecha", query = "SELECT t FROM Transaccion t WHERE t.transaccionPK.fecha = :fecha"),
-    @NamedQuery(name = "Transaccion.findByHora", query = "SELECT t FROM Transaccion t WHERE t.transaccionPK.hora = :hora"),
-    @NamedQuery(name = "Transaccion.findByCantidad", query = "SELECT t FROM Transaccion t WHERE t.cantidad = :cantidad"),
-    @NamedQuery(name = "Transaccion.findByDescripcion", query = "SELECT t FROM Transaccion t WHERE t.descripcion = :descripcion")})
+    @NamedQuery(name = "Transaccion.findAll", query = "SELECT t FROM Transaccion t")
+    , @NamedQuery(name = "Transaccion.findByNoTransaccion", query = "SELECT t FROM Transaccion t WHERE t.noTransaccion = :noTransaccion")
+    , @NamedQuery(name = "Transaccion.findByFecha", query = "SELECT t FROM Transaccion t WHERE t.fecha = :fecha")
+    , @NamedQuery(name = "Transaccion.findByHora", query = "SELECT t FROM Transaccion t WHERE t.hora = :hora")
+    , @NamedQuery(name = "Transaccion.findByCantidad", query = "SELECT t FROM Transaccion t WHERE t.cantidad = :cantidad")
+    , @NamedQuery(name = "Transaccion.findByDescripcion", query = "SELECT t FROM Transaccion t WHERE t.descripcion = :descripcion")})
 public class Transaccion implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @EmbeddedId
-    protected TransaccionPK transaccionPK;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "no_transaccion")
+    private Integer noTransaccion;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "fecha")
+    @Temporal(TemporalType.DATE)
+    private Date fecha;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "hora")
+    @Temporal(TemporalType.TIME)
+    private Date hora;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "cantidad")
     private Float cantidad;
+    @Size(max = 255)
     @Column(name = "descripcion")
     private String descripcion;
-    @JoinTable(name = "transaccion_salida", joinColumns = {
-        @JoinColumn(name = "transaccioninsumocod_insumo", referencedColumnName = "insumocod_insumo")
-        , @JoinColumn(name = "transaccionalmacencod_almacen", referencedColumnName = "almacencod_almacen")
-        , @JoinColumn(name = "transaccionfecha", referencedColumnName = "fecha")
-        , @JoinColumn(name = "transaccionhora", referencedColumnName = "hora")}, inverseJoinColumns = {
-        @JoinColumn(name = "cocinacod_cocina", referencedColumnName = "cod_cocina")})
-    @OneToOne(cascade = CascadeType.ALL)
-    private Cocina cocina;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaccion")
+    private TransaccionSalida transaccionSalida;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaccion")
+    private TransaccionTraspaso transaccionTraspaso;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaccion")
     private TransaccionEntrada transaccionEntrada;
-    @JoinColumn(name = "almacencod_almacen", referencedColumnName = "cod_almacen", insertable = false, updatable = false)
+    @JoinColumn(name = "almacencod_almacen", referencedColumnName = "cod_almacen")
     @ManyToOne(optional = false)
-    private Almacen almacen;
-    @JoinColumn(name = "insumocod_insumo", referencedColumnName = "cod_insumo", insertable = false, updatable = false)
+    private Almacen almacencodAlmacen;
+    @JoinColumn(name = "insumocod_insumo", referencedColumnName = "cod_insumo")
     @ManyToOne(optional = false)
-    private Insumo insumo;
+    private Insumo insumocodInsumo;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaccion")
     private TransaccionMerma transaccionMerma;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "transaccion")
+    private List<TransaccionTransformacion> transaccionTransformacionList;
 
     public Transaccion() {
     }
 
-    public Transaccion(TransaccionPK transaccionPK) {
-        this.transaccionPK = transaccionPK;
+    public Transaccion(Integer noTransaccion) {
+        this.noTransaccion = noTransaccion;
     }
 
-    public Transaccion(String insumocodInsumo, String almacencodAlmacen, Date fecha, Date hora) {
-        this.transaccionPK = new TransaccionPK(insumocodInsumo, almacencodAlmacen, fecha, hora);
+    public Transaccion(Integer noTransaccion, Date fecha, Date hora) {
+        this.noTransaccion = noTransaccion;
+        this.fecha = fecha;
+        this.hora = hora;
     }
 
-    public TransaccionPK getTransaccionPK() {
-        return transaccionPK;
+    public Integer getNoTransaccion() {
+        return noTransaccion;
     }
 
-    public void setTransaccionPK(TransaccionPK transaccionPK) {
-        this.transaccionPK = transaccionPK;
+    public void setNoTransaccion(Integer noTransaccion) {
+        this.noTransaccion = noTransaccion;
+    }
+
+    public Date getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(Date fecha) {
+        this.fecha = fecha;
+    }
+
+    public Date getHora() {
+        return hora;
+    }
+
+    public void setHora(Date hora) {
+        this.hora = hora;
     }
 
     public Float getCantidad() {
@@ -101,12 +139,20 @@ public class Transaccion implements Serializable {
         this.descripcion = descripcion;
     }
 
-    public Cocina getCocina() {
-        return cocina;
+    public TransaccionSalida getTransaccionSalida() {
+        return transaccionSalida;
     }
 
-    public void setCocina(Cocina cocinaList) {
-        this.cocina = cocinaList;
+    public void setTransaccionSalida(TransaccionSalida transaccionSalida) {
+        this.transaccionSalida = transaccionSalida;
+    }
+
+    public TransaccionTraspaso getTransaccionTraspaso() {
+        return transaccionTraspaso;
+    }
+
+    public void setTransaccionTraspaso(TransaccionTraspaso transaccionTraspaso) {
+        this.transaccionTraspaso = transaccionTraspaso;
     }
 
     public TransaccionEntrada getTransaccionEntrada() {
@@ -117,20 +163,20 @@ public class Transaccion implements Serializable {
         this.transaccionEntrada = transaccionEntrada;
     }
 
-    public Almacen getAlmacen() {
-        return almacen;
+    public Almacen getAlmacencodAlmacen() {
+        return almacencodAlmacen;
     }
 
-    public void setAlmacen(Almacen almacen) {
-        this.almacen = almacen;
+    public void setAlmacencodAlmacen(Almacen almacencodAlmacen) {
+        this.almacencodAlmacen = almacencodAlmacen;
     }
 
-    public Insumo getInsumo() {
-        return insumo;
+    public Insumo getInsumocodInsumo() {
+        return insumocodInsumo;
     }
 
-    public void setInsumo(Insumo insumo) {
-        this.insumo = insumo;
+    public void setInsumocodInsumo(Insumo insumocodInsumo) {
+        this.insumocodInsumo = insumocodInsumo;
     }
 
     public TransaccionMerma getTransaccionMerma() {
@@ -141,10 +187,19 @@ public class Transaccion implements Serializable {
         this.transaccionMerma = transaccionMerma;
     }
 
+    @XmlTransient
+    public List<TransaccionTransformacion> getTransaccionTransformacionList() {
+        return transaccionTransformacionList;
+    }
+
+    public void setTransaccionTransformacionList(List<TransaccionTransformacion> transaccionTransformacionList) {
+        this.transaccionTransformacionList = transaccionTransformacionList;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (transaccionPK != null ? transaccionPK.hashCode() : 0);
+        hash += (noTransaccion != null ? noTransaccion.hashCode() : 0);
         return hash;
     }
 
@@ -155,7 +210,7 @@ public class Transaccion implements Serializable {
             return false;
         }
         Transaccion other = (Transaccion) object;
-        if ((this.transaccionPK == null && other.transaccionPK != null) || (this.transaccionPK != null && !this.transaccionPK.equals(other.transaccionPK))) {
+        if ((this.noTransaccion == null && other.noTransaccion != null) || (this.noTransaccion != null && !this.noTransaccion.equals(other.noTransaccion))) {
             return false;
         }
         return true;
@@ -163,7 +218,7 @@ public class Transaccion implements Serializable {
 
     @Override
     public String toString() {
-        return getTransaccionPK().getInsumocodInsumo() +" "+ getTransaccionPK().getAlmacencodAlmacen();
+        return "com.restmanager.Transaccion[ noTransaccion=" + noTransaccion + " ]";
     }
 
 }

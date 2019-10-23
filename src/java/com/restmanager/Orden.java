@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.restmanager;
 
 import java.io.Serializable;
@@ -26,11 +25,13 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.eclipse.persistence.oxm.annotations.XmlReadOnly;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
 @Entity
 @Table(name = "orden")
@@ -75,17 +76,22 @@ public class Orden implements Serializable {
     private Float ordengastoEninsumos;
     @JoinColumn(name = "clientecod_cliente", referencedColumnName = "cod_cliente")
     @ManyToOne
+    @XmlReadOnly
     private Cliente clientecodCliente;
     @JoinColumn(name = "mesacod_mesa", referencedColumnName = "cod_mesa")
     @ManyToOne
+    @XmlReadOnly
     private Mesa mesacodMesa;
     @JoinColumn(name = "personalusuario", referencedColumnName = "usuario")
-    @ManyToOne(optional = false)
+    @ManyToOne
+    @XmlReadOnly
     private Personal personalusuario;
     @JoinColumn(name = "ventafecha", referencedColumnName = "fecha")
     @ManyToOne(optional = false)
+    @XmlReadOnly
     private Venta ventafecha;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "orden")
+    @XmlReadOnly
     private List<ProductovOrden> productovOrdenList;
 
     public Orden() {

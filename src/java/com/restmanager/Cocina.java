@@ -13,7 +13,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -34,7 +33,9 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "Cocina.findAll", query = "SELECT c FROM Cocina c")
     , @NamedQuery(name = "Cocina.findByCodCocina", query = "SELECT c FROM Cocina c WHERE c.codCocina = :codCocina")
-    , @NamedQuery(name = "Cocina.findByNombreCocina", query = "SELECT c FROM Cocina c WHERE c.nombreCocina = :nombreCocina")})
+    , @NamedQuery(name = "Cocina.findByNombreCocina", query = "SELECT c FROM Cocina c WHERE c.nombreCocina = :nombreCocina")
+    , @NamedQuery(name = "Cocina.findByLimitarVentaInsumoAgotado", query = "SELECT c FROM Cocina c WHERE c.limitarVentaInsumoAgotado = :limitarVentaInsumoAgotado")
+    , @NamedQuery(name = "Cocina.findByRecibirNotificacion", query = "SELECT c FROM Cocina c WHERE c.recibirNotificacion = :recibirNotificacion")})
 public class Cocina implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -49,13 +50,19 @@ public class Cocina implements Serializable {
     @Size(min = 1, max = 30)
     @Column(name = "nombre_cocina")
     private String nombreCocina;
+    @Column(name = "limitar_venta_insumo_agotado")
+    private Boolean limitarVentaInsumoAgotado;
+    @Column(name = "recibir_notificacion")
+    private Boolean recibirNotificacion;
     @OneToMany(mappedBy = "cocinacodCocina")
     private List<ProductoVenta> productoVentaList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cocinacodCocina")
+    private List<TransaccionSalida> transaccionSalidaList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cocina")
     private List<NotificacionEnvioCocina> notificacionEnvioCocinaList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cocina")
     private List<Ipv> ipvList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cocinacodCocina")
+    @OneToMany(mappedBy = "cocinacodCocina")
     private List<Impresora> impresoraList;
 
     public Cocina() {
@@ -86,6 +93,22 @@ public class Cocina implements Serializable {
         this.nombreCocina = nombreCocina;
     }
 
+    public Boolean getLimitarVentaInsumoAgotado() {
+        return limitarVentaInsumoAgotado;
+    }
+
+    public void setLimitarVentaInsumoAgotado(Boolean limitarVentaInsumoAgotado) {
+        this.limitarVentaInsumoAgotado = limitarVentaInsumoAgotado;
+    }
+
+    public Boolean getRecibirNotificacion() {
+        return recibirNotificacion;
+    }
+
+    public void setRecibirNotificacion(Boolean recibirNotificacion) {
+        this.recibirNotificacion = recibirNotificacion;
+    }
+
     @XmlTransient
     public List<ProductoVenta> getProductoVentaList() {
         return productoVentaList;
@@ -93,6 +116,15 @@ public class Cocina implements Serializable {
 
     public void setProductoVentaList(List<ProductoVenta> productoVentaList) {
         this.productoVentaList = productoVentaList;
+    }
+
+    @XmlTransient
+    public List<TransaccionSalida> getTransaccionSalidaList() {
+        return transaccionSalidaList;
+    }
+
+    public void setTransaccionSalidaList(List<TransaccionSalida> transaccionSalidaList) {
+        this.transaccionSalidaList = transaccionSalidaList;
     }
 
     @XmlTransient

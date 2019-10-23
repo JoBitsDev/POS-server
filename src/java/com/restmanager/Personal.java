@@ -44,15 +44,9 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Personal.findByContrasenna", query = "SELECT p FROM Personal p WHERE p.contrasenna = :contrasenna")
     , @NamedQuery(name = "Personal.findByOnline", query = "SELECT p FROM Personal p WHERE p.online = :online")
     , @NamedQuery(name = "Personal.findByFrecuencia", query = "SELECT p FROM Personal p WHERE p.frecuencia = :frecuencia")
-    , @NamedQuery(name = "Personal.findByUltimodiaTrabajo", query = "SELECT p FROM Personal p WHERE p.ultimodiaTrabajo = :ultimodiaTrabajo")})
+    , @NamedQuery(name = "Personal.findByUltimodiaPago", query = "SELECT p FROM Personal p WHERE p.ultimodiaPago = :ultimodiaPago")
+    , @NamedQuery(name = "Personal.findByPagoPendiente", query = "SELECT p FROM Personal p WHERE p.pagoPendiente = :pagoPendiente")})
 public class Personal implements Serializable {
-
-    @Lob
-    @Column(name = "foto")
-    private byte[] foto;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "pago_pendiente")
-    private Float pagoPendiente;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -72,13 +66,21 @@ public class Personal implements Serializable {
     private Short frecuencia;
     @Column(name = "ultimodia_pago")
     @Temporal(TemporalType.DATE)
-    private Date ultimodiaTrabajo;
+    private Date ultimodiaPago;
+    @Lob
+    @Column(name = "foto")
+    private byte[] foto;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "pago_pendiente")
+    private Float pagoPendiente;
     @ManyToMany(mappedBy = "personalList")
     private List<PuestoTrabajo> puestoTrabajoList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "personalusuario")
+    @OneToMany(mappedBy = "personalusuario")
     private List<Orden> ordenList;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "personal")
     private DatosPersonales datosPersonales;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "personal")
+    private List<AsistenciaPersonal> asistenciaPersonalList;
     @JoinColumn(name = "puesto_trabajonombre_puesto", referencedColumnName = "nombre_puesto")
     @ManyToOne(optional = false)
     private PuestoTrabajo puestoTrabajonombrePuesto;
@@ -127,14 +129,29 @@ public class Personal implements Serializable {
         this.frecuencia = frecuencia;
     }
 
-    public Date getUltimodiaTrabajo() {
-        return ultimodiaTrabajo;
+    public Date getUltimodiaPago() {
+        return ultimodiaPago;
     }
 
-    public void setUltimodiaTrabajo(Date ultimodiaTrabajo) {
-        this.ultimodiaTrabajo = ultimodiaTrabajo;
+    public void setUltimodiaPago(Date ultimodiaPago) {
+        this.ultimodiaPago = ultimodiaPago;
     }
 
+    public byte[] getFoto() {
+        return foto;
+    }
+
+    public void setFoto(byte[] foto) {
+        this.foto = foto;
+    }
+
+    public Float getPagoPendiente() {
+        return pagoPendiente;
+    }
+
+    public void setPagoPendiente(Float pagoPendiente) {
+        this.pagoPendiente = pagoPendiente;
+    }
 
     @XmlTransient
     public List<PuestoTrabajo> getPuestoTrabajoList() {
@@ -160,6 +177,15 @@ public class Personal implements Serializable {
 
     public void setDatosPersonales(DatosPersonales datosPersonales) {
         this.datosPersonales = datosPersonales;
+    }
+
+    @XmlTransient
+    public List<AsistenciaPersonal> getAsistenciaPersonalList() {
+        return asistenciaPersonalList;
+    }
+
+    public void setAsistenciaPersonalList(List<AsistenciaPersonal> asistenciaPersonalList) {
+        this.asistenciaPersonalList = asistenciaPersonalList;
     }
 
     public PuestoTrabajo getPuestoTrabajonombrePuesto() {
@@ -193,22 +219,6 @@ public class Personal implements Serializable {
     @Override
     public String toString() {
         return "com.restmanager.Personal[ usuario=" + usuario + " ]";
-    }
-
-    public byte[] getFoto() {
-        return foto;
-    }
-
-    public void setFoto(byte[] foto) {
-        this.foto = foto;
-    }
-
-    public Float getPagoPendiente() {
-        return pagoPendiente;
-    }
-
-    public void setPagoPendiente(Float pagoPendiente) {
-        this.pagoPendiente = pagoPendiente;
     }
 
 }

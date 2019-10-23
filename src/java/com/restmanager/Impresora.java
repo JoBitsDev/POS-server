@@ -43,9 +43,7 @@ public class Impresora implements Serializable {
     @Size(min = 1, max = 6)
     @Column(name = "cod_impresora")
     private String codImpresora;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 15)
+    @Size(max = 15)
     @Column(name = "ip_impresora")
     private String ipImpresora;
     @Column(name = "estaactiva")
@@ -53,8 +51,11 @@ public class Impresora implements Serializable {
     @Size(max = 255)
     @Column(name = "nombre_impresora")
     private String nombreImpresora;
+    @JoinColumn(name = "areacod_area", referencedColumnName = "cod_area")
+    @ManyToOne
+    private Area areacodArea;
     @JoinColumn(name = "cocinacod_cocina", referencedColumnName = "cod_cocina")
-    @ManyToOne(optional = false)
+    @ManyToOne
     private Cocina cocinacodCocina;
 
     public Impresora() {
@@ -62,11 +63,6 @@ public class Impresora implements Serializable {
 
     public Impresora(String codImpresora) {
         this.codImpresora = codImpresora;
-    }
-
-    public Impresora(String codImpresora, String ipImpresora) {
-        this.codImpresora = codImpresora;
-        this.ipImpresora = ipImpresora;
     }
 
     public String getCodImpresora() {
@@ -99,6 +95,14 @@ public class Impresora implements Serializable {
 
     public void setNombreImpresora(String nombreImpresora) {
         this.nombreImpresora = nombreImpresora;
+    }
+
+    public Area getAreacodArea() {
+        return areacodArea;
+    }
+
+    public void setAreacodArea(Area areacodArea) {
+        this.areacodArea = areacodArea;
     }
 
     public Cocina getCocinacodCocina() {

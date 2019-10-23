@@ -34,12 +34,9 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Area.findAll", query = "SELECT a FROM Area a")
     , @NamedQuery(name = "Area.findByCodArea", query = "SELECT a FROM Area a WHERE a.codArea = :codArea")
     , @NamedQuery(name = "Area.findByCapacidad", query = "SELECT a FROM Area a WHERE a.capacidad = :capacidad")
-    , @NamedQuery(name = "Area.findByNombre", query = "SELECT a FROM Area a WHERE a.nombre = :nombre")})
+    , @NamedQuery(name = "Area.findByNombre", query = "SELECT a FROM Area a WHERE a.nombre = :nombre")
+    , @NamedQuery(name = "Area.findByPorcientoPorServicio", query = "SELECT a FROM Area a WHERE a.porcientoPorServicio = :porcientoPorServicio")})
 public class Area implements Serializable {
-
-    @OneToMany(mappedBy = "areacodArea")
-    private List<PuestoTrabajo> puestoTrabajoList;
-
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -59,6 +56,10 @@ public class Area implements Serializable {
     private List<Carta> cartaList;
     @OneToMany(mappedBy = "areacodArea")
     private List<Mesa> mesaList;
+    @OneToMany(mappedBy = "areacodArea")
+    private List<Impresora> impresoraList;
+    @OneToMany(mappedBy = "areacodArea")
+    private List<PuestoTrabajo> puestoTrabajoList;
 
     public Area() {
     }
@@ -91,6 +92,14 @@ public class Area implements Serializable {
         this.nombre = nombre;
     }
 
+    public Integer getPorcientoPorServicio() {
+        return porcientoPorServicio;
+    }
+
+    public void setPorcientoPorServicio(Integer porcientoPorServicio) {
+        this.porcientoPorServicio = porcientoPorServicio;
+    }
+
     @XmlTransient
     public List<Carta> getCartaList() {
         return cartaList;
@@ -107,6 +116,24 @@ public class Area implements Serializable {
 
     public void setMesaList(List<Mesa> mesaList) {
         this.mesaList = mesaList;
+    }
+
+    @XmlTransient
+    public List<Impresora> getImpresoraList() {
+        return impresoraList;
+    }
+
+    public void setImpresoraList(List<Impresora> impresoraList) {
+        this.impresoraList = impresoraList;
+    }
+
+    @XmlTransient
+    public List<PuestoTrabajo> getPuestoTrabajoList() {
+        return puestoTrabajoList;
+    }
+
+    public void setPuestoTrabajoList(List<PuestoTrabajo> puestoTrabajoList) {
+        this.puestoTrabajoList = puestoTrabajoList;
     }
 
     @Override
@@ -132,22 +159,6 @@ public class Area implements Serializable {
     @Override
     public String toString() {
         return "com.restmanager.Area[ codArea=" + codArea + " ]";
-    }
-
-    public Integer getPorcientoPorServicio() {
-        return porcientoPorServicio;
-    }
-
-    public void setPorcientoPorServicio(Integer porcientoPorServicio) {
-        this.porcientoPorServicio = porcientoPorServicio;
-    }
-
-    public List<PuestoTrabajo> getPuestoTrabajoList() {
-        return puestoTrabajoList;
-    }
-
-    public void setPuestoTrabajoList(List<PuestoTrabajo> puestoTrabajoList) {
-        this.puestoTrabajoList = puestoTrabajoList;
     }
 
 }

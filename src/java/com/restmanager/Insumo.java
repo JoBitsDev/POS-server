@@ -67,12 +67,14 @@ public class Insumo implements Serializable {
     private Float cantidadCreada;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
     private List<ProductoInsumo> productoInsumoList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumocodInsumo")
     private List<Transaccion> transaccionList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
     private List<InsumoAlmacen> insumoAlmacenList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
     private List<Ipv> ipvList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
+    private List<TransaccionTransformacion> transaccionTransformacionList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
     private List<InsumoElaborado> insumoElaboradoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo1")
@@ -183,6 +185,15 @@ public class Insumo implements Serializable {
     }
 
     @XmlTransient
+    public List<TransaccionTransformacion> getTransaccionTransformacionList() {
+        return transaccionTransformacionList;
+    }
+
+    public void setTransaccionTransformacionList(List<TransaccionTransformacion> transaccionTransformacionList) {
+        this.transaccionTransformacionList = transaccionTransformacionList;
+    }
+
+    @XmlTransient
     public List<InsumoElaborado> getInsumoElaboradoList() {
         return insumoElaboradoList;
     }
@@ -222,7 +233,7 @@ public class Insumo implements Serializable {
 
     @Override
     public String toString() {
-        return nombre + "(" + codInsumo + ")" ;
+        return "com.restmanager.Insumo[ codInsumo=" + codInsumo + " ]";
     }
 
 }

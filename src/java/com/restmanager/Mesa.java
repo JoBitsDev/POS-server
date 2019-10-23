@@ -44,12 +44,12 @@ public class Mesa implements Serializable {
     @Id
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 4)
+    @Size(min = 1, max = 10)
     @Column(name = "cod_mesa")
     private String codMesa;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 30)
+    @Size(min = 1, max = 60)
     @Column(name = "estado")
     private String estado;
     @Column(name = "estallena")

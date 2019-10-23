@@ -35,7 +35,8 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Almacen.findByCodAlmacen", query = "SELECT a FROM Almacen a WHERE a.codAlmacen = :codAlmacen")
     , @NamedQuery(name = "Almacen.findByNombre", query = "SELECT a FROM Almacen a WHERE a.nombre = :nombre")
     , @NamedQuery(name = "Almacen.findByCantidadInsumos", query = "SELECT a FROM Almacen a WHERE a.cantidadInsumos = :cantidadInsumos")
-    , @NamedQuery(name = "Almacen.findByValorMonetario", query = "SELECT a FROM Almacen a WHERE a.valorMonetario = :valorMonetario")})
+    , @NamedQuery(name = "Almacen.findByValorMonetario", query = "SELECT a FROM Almacen a WHERE a.valorMonetario = :valorMonetario")
+    , @NamedQuery(name = "Almacen.findByCentroElaboracion", query = "SELECT a FROM Almacen a WHERE a.centroElaboracion = :centroElaboracion")})
 public class Almacen implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -53,7 +54,11 @@ public class Almacen implements Serializable {
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "valor_monetario")
     private Float valorMonetario;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "almacen")
+    @Column(name = "centro_elaboracion")
+    private Boolean centroElaboracion;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "almacenDestino")
+    private List<TransaccionTraspaso> transaccionTraspasoList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "almacencodAlmacen")
     private List<Transaccion> transaccionList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "almacen")
     private List<InsumoAlmacen> insumoAlmacenList;
@@ -95,6 +100,23 @@ public class Almacen implements Serializable {
 
     public void setValorMonetario(Float valorMonetario) {
         this.valorMonetario = valorMonetario;
+    }
+
+    public Boolean getCentroElaboracion() {
+        return centroElaboracion;
+    }
+
+    public void setCentroElaboracion(Boolean centroElaboracion) {
+        this.centroElaboracion = centroElaboracion;
+    }
+
+    @XmlTransient
+    public List<TransaccionTraspaso> getTransaccionTraspasoList() {
+        return transaccionTraspasoList;
+    }
+
+    public void setTransaccionTraspasoList(List<TransaccionTraspaso> transaccionTraspasoList) {
+        this.transaccionTraspasoList = transaccionTraspasoList;
     }
 
     @XmlTransient

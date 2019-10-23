@@ -32,6 +32,16 @@
     <class>com.restmanager.TransaccionEntrada</class>
     <class>com.restmanager.TransaccionMerma</class>
     <class>com.restmanager.Venta</class>
+    <class>com.restmanager.TransaccionTransformacion</class>
+    <class>com.restmanager.Pago</class>
+    <class>com.restmanager.TransaccionTraspaso</class>
+    <class>com.restmanager.GastoVenta</class>
+    <class>com.restmanager.TipoGasto</class>
+    <class>com.restmanager.ContabilidadCuenta</class>
+    <class>com.restmanager.Factura</class>
+    <class>com.restmanager.Gasto</class>
+    <class>com.restmanager.AsistenciaPersonal</class>
+    <class>com.restmanager.TransaccionSalida</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/Restaurant_Manager_DB"/>

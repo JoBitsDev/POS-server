@@ -37,23 +37,18 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "PuestoTrabajo.findAll", query = "SELECT p FROM PuestoTrabajo p")
     , @NamedQuery(name = "PuestoTrabajo.findByNombrePuesto", query = "SELECT p FROM PuestoTrabajo p WHERE p.nombrePuesto = :nombrePuesto")
+    , @NamedQuery(name = "PuestoTrabajo.findByIdPuesto", query = "SELECT p FROM PuestoTrabajo p WHERE p.idPuesto = :idPuesto")
     , @NamedQuery(name = "PuestoTrabajo.findBySalarioFijo", query = "SELECT p FROM PuestoTrabajo p WHERE p.salarioFijo = :salarioFijo")
-    , @NamedQuery(name = "PuestoTrabajo.findByAreaPago", query = "SELECT p FROM PuestoTrabajo p WHERE p.areaPago = :areaPago")
-    , @NamedQuery(name = "PuestoTrabajo.findByNivelAcceso", query = "SELECT p FROM PuestoTrabajo p WHERE p.nivelAcceso = :nivelAcceso")
-    , @NamedQuery(name = "PuestoTrabajo.findByRequiereAutenticar", query = "SELECT p FROM PuestoTrabajo p WHERE p.requiereAutenticar = :requiereAutenticar")
-    , @NamedQuery(name = "PuestoTrabajo.findByPuestosDisponibles", query = "SELECT p FROM PuestoTrabajo p WHERE p.puestosDisponibles = :puestosDisponibles")
     , @NamedQuery(name = "PuestoTrabajo.findBySalarioPorcientoVentaTotal", query = "SELECT p FROM PuestoTrabajo p WHERE p.salarioPorcientoVentaTotal = :salarioPorcientoVentaTotal")
     , @NamedQuery(name = "PuestoTrabajo.findBySalarioPorcientoDeArea", query = "SELECT p FROM PuestoTrabajo p WHERE p.salarioPorcientoDeArea = :salarioPorcientoDeArea")
+    , @NamedQuery(name = "PuestoTrabajo.findByAreaPago", query = "SELECT p FROM PuestoTrabajo p WHERE p.areaPago = :areaPago")
     , @NamedQuery(name = "PuestoTrabajo.findByAPartirDe", query = "SELECT p FROM PuestoTrabajo p WHERE p.aPartirDe = :aPartirDe")
-    , @NamedQuery(name = "PuestoTrabajo.findByIdPuesto", query = "SELECT p FROM PuestoTrabajo p WHERE p.idPuesto = :idPuesto")})
+    , @NamedQuery(name = "PuestoTrabajo.findByNivelAcceso", query = "SELECT p FROM PuestoTrabajo p WHERE p.nivelAcceso = :nivelAcceso")
+    , @NamedQuery(name = "PuestoTrabajo.findByPuestosDisponibles", query = "SELECT p FROM PuestoTrabajo p WHERE p.puestosDisponibles = :puestosDisponibles")
+    , @NamedQuery(name = "PuestoTrabajo.findByRequiereAutenticar", query = "SELECT p FROM PuestoTrabajo p WHERE p.requiereAutenticar = :requiereAutenticar")
+    , @NamedQuery(name = "PuestoTrabajo.findByPagoPorVentas", query = "SELECT p FROM PuestoTrabajo p WHERE p.pagoPorVentas = :pagoPorVentas")
+    , @NamedQuery(name = "PuestoTrabajo.findByPropina", query = "SELECT p FROM PuestoTrabajo p WHERE p.propina = :propina")})
 public class PuestoTrabajo implements Serializable {
-
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "salario_fijo")
-    private Float salarioFijo;
-    @JoinColumn(name = "areacod_area", referencedColumnName = "cod_area")
-    @ManyToOne
-    private Area areacodArea;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -62,25 +57,31 @@ public class PuestoTrabajo implements Serializable {
     @Size(min = 1, max = 30)
     @Column(name = "nombre_puesto")
     private String nombrePuesto;
-    @Size(max = 30)
-    @Column(name = "area_pago")
-    private String areaPago;
-    @Column(name = "nivel_acceso")
-    private Integer nivelAcceso;
-    @Column(name = "requiere_autenticar")
-    private Boolean requiereAutenticar;
-    @Column(name = "puestos_disponibles")
-    private Integer puestosDisponibles;
+    @Size(max = 10)
+    @Column(name = "id_puesto")
+    private String idPuesto;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "salario_fijo")
+    private Float salarioFijo;
     @Column(name = "salario_porciento_venta_total")
     private Float salarioPorcientoVentaTotal;
     @Column(name = "salario_porciento_de_area")
     private Float salarioPorcientoDeArea;
+    @Size(max = 30)
+    @Column(name = "area_pago")
+    private String areaPago;
     @Column(name = "a_partir_de")
-    private Integer aPartirDe;
-    @Size(max = 10)
-    @Column(name = "id_puesto")
-    private String idPuesto;
+    private Float aPartirDe;
+    @Column(name = "nivel_acceso")
+    private Integer nivelAcceso;
+    @Column(name = "puestos_disponibles")
+    private Integer puestosDisponibles;
+    @Column(name = "requiere_autenticar")
+    private Boolean requiereAutenticar;
+    @Column(name = "pago_por_ventas")
+    private Boolean pagoPorVentas;
+    @Column(name = "propina")
+    private Boolean propina;
     @JoinTable(name = "puesto_trabajo_personal", joinColumns = {
         @JoinColumn(name = "puesto_trabajonombre_puesto", referencedColumnName = "nombre_puesto")}, inverseJoinColumns = {
         @JoinColumn(name = "personalusuario", referencedColumnName = "usuario")})
@@ -88,6 +89,9 @@ public class PuestoTrabajo implements Serializable {
     private List<Personal> personalList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "puestoTrabajonombrePuesto")
     private List<Personal> personalList1;
+    @JoinColumn(name = "areacod_area", referencedColumnName = "cod_area")
+    @ManyToOne
+    private Area areacodArea;
 
     public PuestoTrabajo() {
     }
@@ -104,44 +108,20 @@ public class PuestoTrabajo implements Serializable {
         this.nombrePuesto = nombrePuesto;
     }
 
+    public String getIdPuesto() {
+        return idPuesto;
+    }
+
+    public void setIdPuesto(String idPuesto) {
+        this.idPuesto = idPuesto;
+    }
+
     public Float getSalarioFijo() {
         return salarioFijo;
     }
 
     public void setSalarioFijo(Float salarioFijo) {
         this.salarioFijo = salarioFijo;
-    }
-
-    public String getAreaPago() {
-        return areaPago;
-    }
-
-    public void setAreaPago(String areaPago) {
-        this.areaPago = areaPago;
-    }
-
-    public Integer getNivelAcceso() {
-        return nivelAcceso;
-    }
-
-    public void setNivelAcceso(Integer nivelAcceso) {
-        this.nivelAcceso = nivelAcceso;
-    }
-
-    public Boolean getRequiereAutenticar() {
-        return requiereAutenticar;
-    }
-
-    public void setRequiereAutenticar(Boolean requiereAutenticar) {
-        this.requiereAutenticar = requiereAutenticar;
-    }
-
-    public Integer getPuestosDisponibles() {
-        return puestosDisponibles;
-    }
-
-    public void setPuestosDisponibles(Integer puestosDisponibles) {
-        this.puestosDisponibles = puestosDisponibles;
     }
 
     public Float getSalarioPorcientoVentaTotal() {
@@ -160,20 +140,60 @@ public class PuestoTrabajo implements Serializable {
         this.salarioPorcientoDeArea = salarioPorcientoDeArea;
     }
 
-    public Integer getAPartirDe() {
+    public String getAreaPago() {
+        return areaPago;
+    }
+
+    public void setAreaPago(String areaPago) {
+        this.areaPago = areaPago;
+    }
+
+    public Float getAPartirDe() {
         return aPartirDe;
     }
 
-    public void setAPartirDe(Integer aPartirDe) {
+    public void setAPartirDe(Float aPartirDe) {
         this.aPartirDe = aPartirDe;
     }
 
-    public String getIdPuesto() {
-        return idPuesto;
+    public Integer getNivelAcceso() {
+        return nivelAcceso;
     }
 
-    public void setIdPuesto(String idPuesto) {
-        this.idPuesto = idPuesto;
+    public void setNivelAcceso(Integer nivelAcceso) {
+        this.nivelAcceso = nivelAcceso;
+    }
+
+    public Integer getPuestosDisponibles() {
+        return puestosDisponibles;
+    }
+
+    public void setPuestosDisponibles(Integer puestosDisponibles) {
+        this.puestosDisponibles = puestosDisponibles;
+    }
+
+    public Boolean getRequiereAutenticar() {
+        return requiereAutenticar;
+    }
+
+    public void setRequiereAutenticar(Boolean requiereAutenticar) {
+        this.requiereAutenticar = requiereAutenticar;
+    }
+
+    public Boolean getPagoPorVentas() {
+        return pagoPorVentas;
+    }
+
+    public void setPagoPorVentas(Boolean pagoPorVentas) {
+        this.pagoPorVentas = pagoPorVentas;
+    }
+
+    public Boolean getPropina() {
+        return propina;
+    }
+
+    public void setPropina(Boolean propina) {
+        this.propina = propina;
     }
 
     @XmlTransient
@@ -192,6 +212,14 @@ public class PuestoTrabajo implements Serializable {
 
     public void setPersonalList1(List<Personal> personalList1) {
         this.personalList1 = personalList1;
+    }
+
+    public Area getAreacodArea() {
+        return areacodArea;
+    }
+
+    public void setAreacodArea(Area areacodArea) {
+        this.areacodArea = areacodArea;
     }
 
     @Override
@@ -217,14 +245,6 @@ public class PuestoTrabajo implements Serializable {
     @Override
     public String toString() {
         return "com.restmanager.PuestoTrabajo[ nombrePuesto=" + nombrePuesto + " ]";
-    }
-
-    public Area getAreacodArea() {
-        return areacodArea;
-    }
-
-    public void setAreacodArea(Area areacodArea) {
-        this.areacodArea = areacodArea;
     }
 
 }

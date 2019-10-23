@@ -43,7 +43,7 @@ public class Carta implements Serializable {
     @Id
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 5)
+    @Size(min = 1, max = 7)
     @Column(name = "cod_carta")
     private String codCarta;
     @Basic(optional = false)

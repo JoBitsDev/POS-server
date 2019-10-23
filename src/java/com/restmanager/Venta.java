@@ -21,6 +21,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -36,7 +37,13 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Venta.findAll", query = "SELECT v FROM Venta v")
     , @NamedQuery(name = "Venta.findByFecha", query = "SELECT v FROM Venta v WHERE v.fecha = :fecha")
     , @NamedQuery(name = "Venta.findByVentaTotal", query = "SELECT v FROM Venta v WHERE v.ventaTotal = :ventaTotal")
-    , @NamedQuery(name = "Venta.findByVentagastosEninsumos", query = "SELECT v FROM Venta v WHERE v.ventagastosEninsumos = :ventagastosEninsumos")})
+    , @NamedQuery(name = "Venta.findByVentagastosEninsumos", query = "SELECT v FROM Venta v WHERE v.ventagastosEninsumos = :ventagastosEninsumos")
+    , @NamedQuery(name = "Venta.findByHoraPico", query = "SELECT v FROM Venta v WHERE v.horaPico = :horaPico")
+    , @NamedQuery(name = "Venta.findByVentagastosPagotrabajadores", query = "SELECT v FROM Venta v WHERE v.ventagastosPagotrabajadores = :ventagastosPagotrabajadores")
+    , @NamedQuery(name = "Venta.findByVentagastosGastos", query = "SELECT v FROM Venta v WHERE v.ventagastosGastos = :ventagastosGastos")
+    , @NamedQuery(name = "Venta.findByCambioTurno1", query = "SELECT v FROM Venta v WHERE v.cambioTurno1 = :cambioTurno1")
+    , @NamedQuery(name = "Venta.findByCambioTurno2", query = "SELECT v FROM Venta v WHERE v.cambioTurno2 = :cambioTurno2")
+    , @NamedQuery(name = "Venta.findByVentapropina", query = "SELECT v FROM Venta v WHERE v.ventapropina = :ventapropina")})
 public class Venta implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -51,8 +58,26 @@ public class Venta implements Serializable {
     private Double ventaTotal;
     @Column(name = "ventagastos_eninsumos")
     private Double ventagastosEninsumos;
+    @Column(name = "hora_pico")
+    private Integer horaPico;
+    @Column(name = "ventagastos_pagotrabajadores")
+    private Float ventagastosPagotrabajadores;
+    @Column(name = "ventagastos_gastos")
+    private Float ventagastosGastos;
+    @Size(max = 11)
+    @Column(name = "cambio_turno1")
+    private String cambioTurno1;
+    @Size(max = 11)
+    @Column(name = "cambio_turno2")
+    private String cambioTurno2;
+    @Column(name = "ventapropina")
+    private Float ventapropina;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "ventafecha")
     private List<Orden> ordenList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "venta")
+    private List<GastoVenta> gastoVentaList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "venta")
+    private List<AsistenciaPersonal> asistenciaPersonalList;
 
     public Venta() {
     }
@@ -85,6 +110,54 @@ public class Venta implements Serializable {
         this.ventagastosEninsumos = ventagastosEninsumos;
     }
 
+    public Integer getHoraPico() {
+        return horaPico;
+    }
+
+    public void setHoraPico(Integer horaPico) {
+        this.horaPico = horaPico;
+    }
+
+    public Float getVentagastosPagotrabajadores() {
+        return ventagastosPagotrabajadores;
+    }
+
+    public void setVentagastosPagotrabajadores(Float ventagastosPagotrabajadores) {
+        this.ventagastosPagotrabajadores = ventagastosPagotrabajadores;
+    }
+
+    public Float getVentagastosGastos() {
+        return ventagastosGastos;
+    }
+
+    public void setVentagastosGastos(Float ventagastosGastos) {
+        this.ventagastosGastos = ventagastosGastos;
+    }
+
+    public String getCambioTurno1() {
+        return cambioTurno1;
+    }
+
+    public void setCambioTurno1(String cambioTurno1) {
+        this.cambioTurno1 = cambioTurno1;
+    }
+
+    public String getCambioTurno2() {
+        return cambioTurno2;
+    }
+
+    public void setCambioTurno2(String cambioTurno2) {
+        this.cambioTurno2 = cambioTurno2;
+    }
+
+    public Float getVentapropina() {
+        return ventapropina;
+    }
+
+    public void setVentapropina(Float ventapropina) {
+        this.ventapropina = ventapropina;
+    }
+
     @XmlTransient
     public List<Orden> getOrdenList() {
         return ordenList;
@@ -92,6 +165,24 @@ public class Venta implements Serializable {
 
     public void setOrdenList(List<Orden> ordenList) {
         this.ordenList = ordenList;
+    }
+
+    @XmlTransient
+    public List<GastoVenta> getGastoVentaList() {
+        return gastoVentaList;
+    }
+
+    public void setGastoVentaList(List<GastoVenta> gastoVentaList) {
+        this.gastoVentaList = gastoVentaList;
+    }
+
+    @XmlTransient
+    public List<AsistenciaPersonal> getAsistenciaPersonalList() {
+        return asistenciaPersonalList;
+    }
+
+    public void setAsistenciaPersonalList(List<AsistenciaPersonal> asistenciaPersonalList) {
+        this.asistenciaPersonalList = asistenciaPersonalList;
     }
 
     @Override
