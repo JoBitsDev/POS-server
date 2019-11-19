@@ -64,7 +64,7 @@ public class Impresion {
      * String referentes a la impresion de ordenes
      */
     private final String CABECERA = "Restaurante",
-            COCINA = "Cocina: ",
+            COCINA = "Pto Elaboracion: ",
             DELACASA = "(Pedido por la casa)",
             ORDEN = "Orden No: ",
             MESA = "Mesa: ",
@@ -169,15 +169,15 @@ public class Impresion {
         t.newLine();
         if (SHOW_SUBTOTAL) {
             t.setText(SUBTOTAL + subTotalPrint + MONEDA);
+            t.newLine();
         }
         if (o.getPorciento() != 0) {
-            t.newLine();
             t.setText("+ " + o.getPorciento() + PORCIENTO + sumaPorciento + MONEDA);
             totalPrint = comun.redondeoPorExcesoFloat(subTotalPrint + sumaPorciento);
 
         }
         t.newLine();
-
+        t.newLine();
         addTotal(t, totalPrint);
 
         t.newLine();
@@ -504,9 +504,9 @@ public class Impresion {
             for (int i = 0; i < cantidadCopias; i++) {
                 // RAM.add(new CopiaTicket(c.getNombreCocina(), t.finalCommandSet().getBytes()));
             }
-
-            feedPrinter(t.finalCommandSet().getBytes(), c.getNombreCocina());
-
+            if (c.getRecibirNotificacion()) {
+                feedPrinter(t.finalCommandSet().getBytes(), c.getNombreCocina());
+            }
         } else {
             System.out.println("No existen platos de la cocina "
                     + c.getNombreCocina() + " de la orden " + o.getCodOrden() + " para imprimir");
