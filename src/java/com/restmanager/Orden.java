@@ -76,11 +76,11 @@ public class Orden implements Serializable {
     private Float ordengastoEninsumos;
     @JoinColumn(name = "clientecod_cliente", referencedColumnName = "cod_cliente")
     @ManyToOne
-    @XmlReadOnly
+    @XmlTransient
     private Cliente clientecodCliente;
     @JoinColumn(name = "mesacod_mesa", referencedColumnName = "cod_mesa")
     @ManyToOne
-    @XmlReadOnly
+    @XmlTransient
     private Mesa mesacodMesa;
     @JoinColumn(name = "personalusuario", referencedColumnName = "usuario")
     @ManyToOne
@@ -88,7 +88,7 @@ public class Orden implements Serializable {
     private Personal personalusuario;
     @JoinColumn(name = "ventafecha", referencedColumnName = "fecha")
     @ManyToOne(optional = false)
-    @XmlReadOnly
+    @XmlTransient
     private Venta ventafecha;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "orden")
     @XmlReadOnly

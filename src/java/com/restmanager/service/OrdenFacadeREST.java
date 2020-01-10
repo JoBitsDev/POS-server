@@ -6,6 +6,7 @@
 package com.restmanager.service;
 
 import com.restmanager.*;
+import com.restmanager.XMLservice.OrdenXMLExport;
 import com.restmanager.XMLservice.ProductovOrdenXMLexport;
 import com.restmanager.notificationdelivery.Notificable;
 import com.restmanager.notificationdelivery.Notificador;
@@ -43,9 +44,12 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
     @GET
     @Path("{id}")
-    @Produces({MediaType.APPLICATION_XML})
-    public Orden find(@PathParam("id") String id) {
-        return super.find(id);
+    @Produces({MediaType.TEXT_PLAIN})
+    public String find(@PathParam("id") String id) {
+        Orden o = super.find(id);
+        ArrayList<Orden> ordens = new ArrayList<>();
+        ordens.add(o);
+      return  OrdenXMLExport.exportEntities(ordens);
     }
 
     @GET
