@@ -66,7 +66,15 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
         return super.find(id);
     }
 
-    @GET
+    /**
+     * @deprecated solo esta aqui por compatibilidad hasta que se actualize la app POS Cocina
+     * @param action
+     * @param user
+     * @param pass
+     * @param level
+     * @return 1 si true, 2 si false, 0 si no pincha
+     */
+     @GET
     @Path("{action}_{user}_{pass}")
     @Produces(MediaType.TEXT_PLAIN)
     public String find(@PathParam("action") String action,
@@ -76,8 +84,31 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
         for (Personal x : list) {
             if (x.getUsuario().equals(user)) {
                 if (x.getContrasenna().equals(pass)) {
-                    if (!x.getOnline()) {
-                        return "1";
+                        if (!x.getOnline()) {
+                            return "1";
+                        }
+                }
+                return "2";
+            }
+        }
+        return "0";
+    }
+    
+    @GET
+    @Path("{action}_{user}_{pass}_{appSecurityLevel}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String findNew(@PathParam("action") String action,
+            @PathParam("user") String user, @PathParam("pass") String pass,
+            @PathParam("appSecurityLevel") int level) {
+        List<Personal> list = super.findAll();
+
+        for (Personal x : list) {
+            if (x.getUsuario().equals(user)) {
+                if (x.getContrasenna().equals(pass)) {
+                    if (x.getPuestoTrabajonombrePuesto().getNivelAcceso() >= level) {
+                        if (!x.getOnline()) {
+                            return "1";
+                        }
                     }
                 }
                 return "2";
