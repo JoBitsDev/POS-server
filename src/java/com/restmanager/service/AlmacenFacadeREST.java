@@ -76,13 +76,31 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
     }
 
     @GET
+    @Path("FILTRAR_{codCocina}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<InsumoAlmacen> filterBy(@PathParam("codCocina") String codCocina) {
+        List<InsumoAlmacen> lista = super.findAll().get(0).getInsumoAlmacenList();
+        List<InsumoAlmacen> ret = new ArrayList<>();
+        for (InsumoAlmacen x : lista) {
+            for (Ipv v : x.getInsumo().getIpvList()) {
+                if (v.getCocina().getCodCocina().equals(codCocina)) {
+                    ret.add(x);
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    @GET
     @Path("ENTRADA_{almacenCod}_{insumoCod}_{cant}_{valor}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public String entrada(@PathParam("almacenCod") String almacenCod,
             @PathParam("insumoCod") String insumoCod,
             @PathParam("cant") float cant,
             @PathParam("valor") float valor) {
-        return new TransaccionController(em1).addTransaccionEntrada(em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(), super.find(almacenCod), cant, valor).toString();
+        return "1";
+//   return new TransaccionController(em1).addTransaccionEntrada(em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(), super.find(almacenCod), cant, valor).toString();
 
     }
 
