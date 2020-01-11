@@ -6,6 +6,7 @@
 package com.restmanager.service;
 
 import com.restmanager.Venta;
+import com.restmanager.models.VentaResumenModel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -22,6 +23,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.xml.ws.handler.MessageContext;
+import org.eclipse.persistence.oxm.json.JsonArrayBuilderResult;
 
 /**
  * FirstDream
@@ -44,11 +46,14 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
         super(Venta.class);
     }
 
+
     @POST
-    @Override
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void create(Venta entity) {
-        super.create(entity);
+    @Path("SALES")
+    @Consumes(MediaType.TEXT_PLAIN)
+    public VentaResumenModel getResumenVentas(Date fecha){
+        Venta v = find(fecha);
+        return new VentaResumenModel(v);
+     
     }
 
     @GET
@@ -84,19 +89,6 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
         return hour.format(new Date());
     }
     
-    @PUT
-    @Path("{id}")
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void edit(@PathParam("id") Date id, Venta entity) {
-        super.edit(entity);
-    }
-
-    @DELETE
-    @Path("{id}")
-    public void remove(@PathParam("id") Date id) {
-        super.remove(super.find(id));
-    }
-
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
