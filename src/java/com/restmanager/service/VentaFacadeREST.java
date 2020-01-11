@@ -29,7 +29,7 @@ import javax.xml.ws.handler.MessageContext;
  * @author Jorge
  *
  */
-@Path("com.restmanager.venta")
+@Path("com.jobits.pos.venta")
 public class VentaFacadeREST extends AbstractFacade<Venta> {
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")
