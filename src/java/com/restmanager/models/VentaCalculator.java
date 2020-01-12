@@ -22,6 +22,95 @@ public class VentaCalculator {
 
     //******************************************************************************************************************
     //******************************************************************************************************************
+    // ********************************Resumenes en modelos**********************************************************
+    //******************************************************************************************************************
+    //******************************************************************************************************************
+    public static DpteListModel getResumenVentasCamareroOnModel(Venta v, Personal p) {
+
+        //inicializando los datos
+        ArrayList<Orden> aux = new ArrayList(v.getOrdenList());
+
+        float total = 0;
+        int totalOrdenes = 0;
+        float pago_por_ventas = 0;
+        //llenando l array
+        for (Orden o : aux) {
+            if (o.getPersonalusuario() != null) {
+                if (!o.getDeLaCasa() && o.getPersonalusuario().equals(p) && o.getHoraTerminada() != null) {
+                    total += o.getOrdenvalorMonetario();
+                    totalOrdenes++;
+                    for (ProductovOrden pv : o.getProductovOrdenList()) {
+                        if (pv.getProductoVenta().getPagoPorVenta() != null) {
+                            pago_por_ventas += pv.getCantidad() * pv.getProductoVenta().getPagoPorVenta();
+                        }
+                    }
+                }
+            }
+        }//n
+
+        //convirtiendo a rowData
+        if (total != 0) {
+            return new DpteListModel(p.getUsuario(), utils.setDosLugaresDecimalesFloat(total), totalOrdenes, utils.setDosLugaresDecimalesFloat(pago_por_ventas));
+        }
+        return null;
+    }
+
+    public static AreaListModel getResumenVentaPorAreaOnModel(Venta v, Area a) {
+        //inicializando los datos
+        ArrayList<ProductovOrden> ret = new ArrayList<>();
+        ArrayList<Orden> aux = new ArrayList(v.getOrdenList());
+
+        //llenando l array
+        float totalReal = 0;
+        for (Orden o : aux) {
+            if (o.getMesacodMesa().getAreacodArea().equals(a) && !o.getDeLaCasa()) {
+                joinListsProductovOrdenByCocina(ret, new ArrayList<>(o.getProductovOrdenList()), null);
+                totalReal += o.getOrdenvalorMonetario();
+            }
+
+        }//nˆ3
+
+        //convirtiendo a rowData
+        float totalNeta = 0;
+        for (ProductovOrden x : ret) {
+            ProductoVenta pv = x.getProductoVenta();
+            totalNeta += pv.getPrecioVenta() * x.getCantidad();
+        }
+        if (totalNeta != 0) {
+            return new AreaListModel(a.getCodArea(), a.getNombre(), utils.setDosLugaresDecimalesFloat(totalReal), utils.setDosLugaresDecimalesFloat(totalNeta));
+        }
+        return null;
+    }
+
+    /**
+     * crea un resumen del total que ha vendido cda cocina
+     *
+     * @param v
+     * @param c
+     * @return 
+     */
+    public static PuntoElaboracionListModel getResumenVentasCocinaOnTable(Venta v, Cocina c) {
+        //inicializando los datos
+        ArrayList<ProductovOrden> ret = new ArrayList<>();
+        ArrayList<Orden> aux = new ArrayList(v.getOrdenList());
+
+        //llenando l array
+        llenarArrayProductoVOrden(ret, aux, c, false, false);
+
+        //convirtiendo a rowData
+        float total = 0;
+        for (ProductovOrden x : ret) {
+            ProductoVenta pv = x.getProductoVenta();
+            total += pv.getPrecioVenta() * x.getCantidad();
+        }
+        if (total != 0) {
+            return new PuntoElaboracionListModel(c.getCodCocina(), c.getNombreCocina(), utils.setDosLugaresDecimalesFloat(total));
+        }
+        return null;
+    }
+
+    //******************************************************************************************************************
+    //******************************************************************************************************************
     // ********************************Resumenes en objetos**********************************************************
     //******************************************************************************************************************
     //******************************************************************************************************************
@@ -121,6 +210,10 @@ public class VentaCalculator {
             }
         }
         return ret;
+    }
+
+    public static void getValorTotalVentasDpte(Venta v, Personal p) {
+
     }
 
     //******************************************************************************************************************
@@ -286,6 +379,7 @@ public class VentaCalculator {
     }
 
     public static float getValorTotalVentasCasa(Venta v) {
+        float total = 0;
         return getResumenVentasCasa(v).stream().map((pd) -> pd.getCantidad() * pd.getProductoVenta().getPrecioVenta()).reduce(total, (accumulator, _item) -> accumulator + _item);
     }
 
@@ -388,5 +482,4 @@ public class VentaCalculator {
         }
 
     }
-
 }
