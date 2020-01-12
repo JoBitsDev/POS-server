@@ -8,6 +8,7 @@ package com.restmanager.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.restmanager.Venta;
+import com.restmanager.controller.VentaResumenController;
 import com.restmanager.models.VentaResumenModel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -71,7 +72,7 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
             if (v == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
-            return Response.ok(new ObjectMapper().writeValueAsString(new VentaResumenModel(v))).build();
+            return Response.ok(new ObjectMapper().writeValueAsString(VentaResumenController.createResumenFromVenta(v))).build();
         } catch (ParseException ex) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         } catch (JsonProcessingException ex) {
