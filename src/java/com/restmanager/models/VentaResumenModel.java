@@ -6,6 +6,10 @@
 package com.restmanager.models;
 
 import com.restmanager.Venta;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -25,14 +29,20 @@ public class VentaResumenModel {
             autorizos,
             gastosOtros;
 
-    public VentaResumenModel(Venta v) {
+    private final  List<AreaListModel> areas;
+    private final List<DpteListModel> dptes;
+    private final List<PuntoElaboracionListModel> ptosElaboracion;
+
+    public VentaResumenModel(Venta v,List<AreaListModel> areas, List<DpteListModel> dptes, List<PuntoElaboracionListModel> ptosElaboracion) {
         ventaTotal = VentaCalculator.getValorTotalVentas(v);
         ventaNeta = VentaCalculator.getValorTotalVentasNeta(v);
         gastosInsumo = VentaCalculator.getValorTotalGastosInsumo(v);
         gastosSalario = VentaCalculator.getValorTotalPagoTrabajadores(v);
-        float total = 0;
         autorizos = VentaCalculator.getValorTotalVentasCasa(v);
         gastosOtros = VentaCalculator.getValorTotalOtrosGastos(v);
+        this.areas = areas;
+        this.dptes = dptes;
+        this.ptosElaboracion = ptosElaboracion;
     }
 
     public float getVentaTotal() {
@@ -59,4 +69,15 @@ public class VentaResumenModel {
         return gastosOtros;
     }
 
+    public List<AreaListModel> getAreas() {
+        return areas;
+    }
+
+    public List<DpteListModel> getDptes() {
+        return dptes;
+    }
+
+    public List<PuntoElaboracionListModel> getPtosElaboracion() {
+        return ptosElaboracion;
+    }    
 }

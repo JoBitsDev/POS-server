@@ -1,0 +1,42 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package com.restmanager.models;
+
+/**
+ * FirstDream
+ * @author Jorge
+ * 
+ */
+public class DpteListModel {
+
+    private String usuario;
+    private float monto,ordenesAtendidas,pagoPorVentas;
+
+    public DpteListModel(String usuario, float monto, float ordenesAtendidas, float pagoPorVentas) {
+        this.usuario = usuario;
+        this.monto = monto;
+        this.ordenesAtendidas = ordenesAtendidas;
+        this.pagoPorVentas = pagoPorVentas;
+    }
+
+    public String getUsuario() {
+        return usuario;
+    }
+
+    public float getMonto() {
+        return monto;
+    }
+
+    public float getOrdenesAtendidas() {
+        return ordenesAtendidas;
+    }
+
+    public float getPagoPorVentas() {
+        return pagoPorVentas;
+    }
+    
+}
