@@ -1,6 +1,5 @@
 package com.restmanager.models;
 
-
 import com.restmanager.*;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -8,18 +7,15 @@ import java.util.Collections;
 import java.util.List;
 import restmanager.resources.*;
 
-
-
 /**
  * FirstDream
  *
  * @author Jorge
  *
  */
-
 /**
  * Clase para hacer los calculos con un dia de ventas en tiempo real
- * 
+ *
  * @author Jorge
  */
 public class VentaCalculator {
@@ -276,17 +272,21 @@ public class VentaCalculator {
         }
         return utils.setDosLugaresDecimalesFloat(ret);
     }
-    
+
     public static float getValorTotalPorcientoVenta(Venta v) {
-        return getValorTotalVentas(v)-getValorTotalVentasNeta(v);
+        return getValorTotalVentas(v) - getValorTotalVentasNeta(v);
     }
-    
+
     public static float getValorTotalOtrosGastos(Venta v) {
         float total = 0;
         for (GastoVenta gasto : v.getGastoVentaList()) {
             total += gasto.getImporte();
         }
         return total;
+    }
+
+    public static float getValorTotalVentasCasa(Venta v) {
+        return getResumenVentasCasa(v).stream().map((pd) -> pd.getCantidad() * pd.getProductoVenta().getPrecioVenta()).reduce(total, (accumulator, _item) -> accumulator + _item);
     }
 
     //******************************************************************************************************************
@@ -388,7 +388,5 @@ public class VentaCalculator {
         }
 
     }
-
-    
 
 }

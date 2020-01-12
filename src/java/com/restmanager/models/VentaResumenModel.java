@@ -31,8 +31,7 @@ public class VentaResumenModel {
         gastosInsumo = VentaCalculator.getValorTotalGastosInsumo(v);
         gastosSalario = VentaCalculator.getValorTotalPagoTrabajadores(v);
         float total = 0;
-        total = VentaCalculator.getResumenVentasCasa(v).stream().map((pd) -> pd.getCantidad() * pd.getProductoVenta().getPrecioVenta()).reduce(total, (accumulator, _item) -> accumulator + _item);
-        autorizos = total;
+        autorizos = VentaCalculator.getValorTotalVentasCasa(v);
         gastosOtros = VentaCalculator.getValorTotalOtrosGastos(v);
     }
 
@@ -56,8 +55,8 @@ public class VentaResumenModel {
         return autorizos;
     }
 
-    public float getPropina() {
-        return propina;
+    public float getGastosOtros() {
+        return gastosOtros;
     }
 
 }
