@@ -280,6 +280,14 @@ public class VentaCalculator {
     public static float getValorTotalPorcientoVenta(Venta v) {
         return getValorTotalVentas(v)-getValorTotalVentasNeta(v);
     }
+    
+    public static float getValorTotalOtrosGastos(Venta v) {
+        float total = 0;
+        for (GastoVenta gasto : v.getGastoVentaList()) {
+            total += gasto.getImporte();
+        }
+        return total;
+    }
 
     //******************************************************************************************************************
     //******************************************************************************************************************

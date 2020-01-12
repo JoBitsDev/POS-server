@@ -9,7 +9,8 @@ import com.restmanager.Venta;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Clase para enviar la informacion en JSON y parsearla en el dispositivo destino
+ * Clase para enviar la informacion en JSON y parsearla en el dispositivo
+ * destino
  *
  * @author Jorge
  *
@@ -22,7 +23,7 @@ public class VentaResumenModel {
             gastosInsumo,
             gastosSalario,
             autorizos,
-            propina;
+            gastosOtros;
 
     public VentaResumenModel(Venta v) {
         ventaTotal = VentaCalculator.getValorTotalVentas(v);
@@ -32,8 +33,7 @@ public class VentaResumenModel {
         float total = 0;
         total = VentaCalculator.getResumenVentasCasa(v).stream().map((pd) -> pd.getCantidad() * pd.getProductoVenta().getPrecioVenta()).reduce(total, (accumulator, _item) -> accumulator + _item);
         autorizos = total;
-        propina = v.getVentapropina();
-
+        gastosOtros = VentaCalculator.getValorTotalOtrosGastos(v);
     }
 
     public float getVentaTotal() {
