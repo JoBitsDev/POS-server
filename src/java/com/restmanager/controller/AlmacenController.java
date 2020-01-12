@@ -16,7 +16,7 @@ import com.restmanager.TransaccionMerma;
 import com.restmanager.TransaccionSalida;
 import javax.persistence.EntityManager;
 import static restmanager.resources.R.AUTO_UPDATE_INSUMO_PRICE;
-import restmanager.resources.comun;
+import restmanager.resources.utils;
 
 /**
  * FirstDream
@@ -48,9 +48,9 @@ public class AlmacenController {
             ins.setCantidad(ins.getCantidad() + cantidad);
             ins.setValorMonetario(ins.getValorMonetario() + valorTotal);
             em1.merge(ins);
-            if (comun.setDosLugaresDecimalesFloat(ins.getValorMonetario() / ins.getCantidad()) != insumo.getCostoPorUnidad()) {
+            if (utils.setDosLugaresDecimalesFloat(ins.getValorMonetario() / ins.getCantidad()) != insumo.getCostoPorUnidad()) {
                 if (AUTO_UPDATE_INSUMO_PRICE) {
-                    insumo.setCostoPorUnidad(comun.setDosLugaresDecimalesFloat(ins.getValorMonetario() / ins.getCantidad()));
+                    insumo.setCostoPorUnidad(utils.setDosLugaresDecimalesFloat(ins.getValorMonetario() / ins.getCantidad()));
                     em1.merge(insumo);
                     for (ProductoInsumo p : insumo.getProductoInsumoList()) {
                         p.setCosto(insumo.getCostoPorUnidad() * p.getCantidad());
@@ -89,7 +89,7 @@ public class AlmacenController {
         }
         em1.merge(reg);
         float precioMedio
-                = comun.setDosLugaresDecimalesFloat(insumoADarSalida.getValorMonetario() / insumoADarSalida.getCantidad());
+                = utils.setDosLugaresDecimalesFloat(insumoADarSalida.getValorMonetario() / insumoADarSalida.getCantidad());
         insumoADarSalida.setCantidad(insumoADarSalida.getCantidad() - x.getTransaccion().getCantidad());
         insumoADarSalida.setValorMonetario(insumoADarSalida.getValorMonetario() - x.getTransaccion().getCantidad() * precioMedio);
         em1.merge(insumoADarSalida);

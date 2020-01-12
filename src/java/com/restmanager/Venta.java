@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.restmanager;
 
 import java.io.Serializable;
@@ -28,7 +27,7 @@ import javax.xml.bind.annotation.XmlTransient;
 /**
  * FirstDream
  * @author Jorge
- * 
+ *
  */
 @Entity
 @Table(name = "venta")
@@ -151,7 +150,7 @@ public class Venta implements Serializable {
     }
 
     public Float getVentapropina() {
-        return ventapropina;
+        return ventapropina == null ? 0 : ventapropina;
     }
 
     public void setVentapropina(Float ventapropina) {

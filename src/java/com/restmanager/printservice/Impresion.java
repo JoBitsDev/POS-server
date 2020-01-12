@@ -39,7 +39,7 @@ import javax.print.event.PrintJobEvent;
 import javax.print.event.PrintJobListener;
 
 import restmanager.resources.R;
-import restmanager.resources.comun;
+import restmanager.resources.utils;
 
 public class Impresion {
 
@@ -162,8 +162,8 @@ public class Impresion {
 
         total = addPvOrden(t, o.getProductovOrdenList());
 
-        float subTotalPrint = comun.redondeoPorExcesoFloat(total);
-        float sumaPorciento = comun.redondeoPorExcesoFloat((subTotalPrint * o.getPorciento()) / 100);
+        float subTotalPrint = utils.redondeoPorExcesoFloat(total);
+        float sumaPorciento = utils.redondeoPorExcesoFloat((subTotalPrint * o.getPorciento()) / 100);
         float totalPrint = subTotalPrint;
         t.alignRight();
         t.newLine();
@@ -173,7 +173,7 @@ public class Impresion {
         }
         if (o.getPorciento() != 0) {
             t.setText("+ " + o.getPorciento() + PORCIENTO + sumaPorciento + MONEDA);
-            totalPrint = comun.redondeoPorExcesoFloat(subTotalPrint + sumaPorciento);
+            totalPrint = utils.redondeoPorExcesoFloat(subTotalPrint + sumaPorciento);
 
         }
         t.newLine();
@@ -770,13 +770,13 @@ public class Impresion {
 
             if (MONEDA_CUC) {
                 if (REDONDEO_POR_EXCESO) {
-                    t.setText(TOTAL_VENTAS + comun.redondeoPorExcesoFloat(total * R.COINCHANGE) + MN);
+                    t.setText(TOTAL_VENTAS + utils.redondeoPorExcesoFloat(total * R.COINCHANGE) + MN);
                 } else {
                     t.setText(String.format(TOTAL_VENTAS + "%.2f" + MN, total * R.COINCHANGE));
                 }
             } else {
                 if (REDONDEO_POR_EXCESO) {
-                    t.setText(TOTAL_VENTAS + comun.redondeoPorExcesoFloat(total / R.COINCHANGE) + CUC);
+                    t.setText(TOTAL_VENTAS + utils.redondeoPorExcesoFloat(total / R.COINCHANGE) + CUC);
                 } else {
                     t.setText(String.format(TOTAL_VENTAS + "%.2f" + CUC, total / R.COINCHANGE));
                 }
@@ -872,9 +872,9 @@ public class Impresion {
             t.newLine();
             t.alignRight();
             if (!x.getOrden().getDeLaCasa()) {
-                t.setText(comun.setDosLugaresDecimales(x.getCantidad() * x.getProductoVenta().getPrecioVenta()));
+                t.setText(utils.setDosLugaresDecimales(x.getCantidad() * x.getProductoVenta().getPrecioVenta()));
             } else {
-                t.setText(comun.setDosLugaresDecimales(x.getCantidad() * x.getProductoVenta().getGasto()));
+                t.setText(utils.setDosLugaresDecimales(x.getCantidad() * x.getProductoVenta().getGasto()));
             }
             t.newLine();
             if (x.getOrden().getDeLaCasa()) {
@@ -1099,9 +1099,9 @@ public class Impresion {
             t.newLine();
             t.alignRight();
             t.setText("" + in.getCantidad());
-            float diferencia = comun.setDosLugaresDecimalesFloat(in.getCantidad() - in.getInsumo().getStockEstimation());
+            float diferencia = utils.setDosLugaresDecimalesFloat(in.getCantidad() - in.getInsumo().getStockEstimation());
             String dif = diferencia >= 0 ? "+" + diferencia : "-" + diferencia;
-            t.setText(comun.setDosLugaresDecimalesFloat(in.getCantidad()) + " | " + dif);
+            t.setText(utils.setDosLugaresDecimalesFloat(in.getCantidad()) + " | " + dif);
         }
 
         t.newLine();
@@ -1168,14 +1168,14 @@ public class Impresion {
         t.newLine();
 
         for (InsumoAlmacen in : ret) {
-            float diferencia = comun.setDosLugaresDecimalesFloat(in.getCantidad() - in.getInsumo().getStockEstimation());
+            float diferencia = utils.setDosLugaresDecimalesFloat(in.getCantidad() - in.getInsumo().getStockEstimation());
             if (diferencia < 0) {
                 t.alignLeft();
                 t.setText(in.getInsumo().toString());
                 t.newLine();
                 t.alignRight();
                 t.setText("" + in.getCantidad());
-                t.setText(comun.setDosLugaresDecimalesFloat(in.getCantidad()) + " | " + diferencia);
+                t.setText(utils.setDosLugaresDecimalesFloat(in.getCantidad()) + " | " + diferencia);
             }
         }
 
