@@ -55,9 +55,9 @@ public class R {
 
     public static DecimalFormat formatoMoneda = new DecimalFormat("0.00");
 
-    public static String RELEASE_VERSION = "Version 2.6.2.1";
+    public static String RELEASE_VERSION = "Version 2.6.3";
 
-    public static int BUILD_VERSION = 10;
+    public static int BUILD_VERSION = 11;
 
     public static enum SettingID {
 
