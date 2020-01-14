@@ -42,8 +42,7 @@ public class OrdenXMLExport {
         ret += DELACASA.getEndTag();
         
         ret += exportSingleEntity(o.getMesacodMesa());
-        //ret += exportSingleEntity(o.getVentafecha());
-         
+       // ret += exportSingleEntity(o.getVentafecha()); 
         ret += ENTITY.getEndTag();
         
         return ret;

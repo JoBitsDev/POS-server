@@ -9,7 +9,7 @@ import com.restmanager.TransaccionEntrada;
 import com.restmanager.*;
 import java.util.Date;
 import javax.persistence.EntityManager;
-import restmanager.resources.comun;
+import restmanager.resources.utils;
 
 /**
  * FirstDream

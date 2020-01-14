@@ -4,13 +4,13 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import restmanager.resources.R;
+import restmanager.resources.utils;
 
 /**
  *
  * @author Jorge
  */
-public class comun {
+public class utils {
 
     public static void limpiarTabla(JTable table) {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
