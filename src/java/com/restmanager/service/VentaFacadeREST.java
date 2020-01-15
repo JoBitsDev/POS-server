@@ -7,6 +7,7 @@ package com.restmanager.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jobits.authentication.Secured;
 import com.restmanager.Venta;
 import com.restmanager.controller.VentaResumenController;
 import com.restmanager.models.VentaResumenModel;
@@ -14,23 +15,19 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.ws.handler.MessageContext;
-import org.eclipse.persistence.oxm.json.JsonArrayBuilderResult;
 import restmanager.resources.R;
 
 /**
@@ -57,13 +54,16 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
      * <h3> Metodo para devolver el resumen general de las ventas de un dia en
      * especifico </h3>
      * este metodo devuelve un json que es necesario parsearlo
+     * metodo con nivel 3 de seguridad
      *
      * @param fecha - la fecha que se pasa por parametro debe estar en el
      * formato  <h3>dd/mm/aaaa</h3>
      * @return un objeto de tipo {@link VentaResumenModel} convertido a json
      */
+    @RolesAllowed("3")
     @POST
     @Path("SALES")
+    @Secured
     @Consumes(MediaType.TEXT_PLAIN)
     public Response getResumenVentas(String fecha) {
         Venta v;
@@ -80,7 +80,7 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
         }
 
     }
-    
+
     @GET
     @Path("ip")
     @Consumes(MediaType.TEXT_PLAIN)
