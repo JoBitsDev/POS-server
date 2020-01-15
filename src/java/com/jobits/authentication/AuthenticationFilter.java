@@ -37,7 +37,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     @Context
     private ResourceInfo resourceInfo;
 
-    private static final String REALM = "example";
     private static final String AUTHENTICATION_SCHEME = "Bearer";
 
     /**
@@ -104,14 +103,16 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     }
 
     /**
-     * Metodo para validar el token.si el metodo se ejecuta correctamente todo ok. de lo contrario lanza excepcion
+     * Metodo para validar el token.si el metodo se ejecuta correctamente todo
+     * ok. de lo contrario lanza excepcion
      *
      * @param token el token por parametro
-     * @param roleSet la lista de roles que tiene como anotacion el metodo que se ejecutara despues
-     * @throws CredentialException 
+     * @param roleSet la lista de roles que tiene como anotacion el metodo que
+     * se ejecutara despues
+     * @throws CredentialException
      */
     private void validateToken(String token, List<String> roleSet) throws CredentialException {
-       //TODO: tiempo de espera del token
+        //TODO: tiempo de espera del token
         Credentials c = PersonalFacadeREST.tokens.get(token);
         if (c == null) {
             throw new CredentialNotFoundException("Credenciales no encontradas");
