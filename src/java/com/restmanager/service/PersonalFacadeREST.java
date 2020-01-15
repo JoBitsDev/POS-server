@@ -5,14 +5,26 @@
  */
 package com.restmanager.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.restmanager.Orden;
 import com.restmanager.Personal;
 import com.restmanager.Venta;
+import com.jobits.authentication.Credentials;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.security.auth.login.CredentialException;
+import javax.security.auth.login.CredentialExpiredException;
+import javax.security.auth.login.CredentialNotFoundException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -22,6 +34,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  * FirstDream
@@ -34,6 +47,8 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")
     private EntityManager em;
+
+    public static HashMap<String, Credentials> tokens = new HashMap<>();
 
     public PersonalFacadeREST() {
         super(Personal.class);
@@ -67,52 +82,45 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
     }
 
     /**
-     * @deprecated solo esta aqui por compatibilidad hasta que se actualize la app POS Cocina
+     * @deprecated solo esta aqui por compatibilidad hasta que se actualize la
+     * app POS Cocina
      * @param action
      * @param user
      * @param pass
-     * @param level
      * @return 1 si true, 2 si false, 0 si no pincha
      */
-     @GET
+    @GET
     @Path("{action}_{user}_{pass}")
     @Produces(MediaType.TEXT_PLAIN)
     public String find(@PathParam("action") String action,
             @PathParam("user") String user, @PathParam("pass") String pass) {
-        List<Personal> list = super.findAll();
-
-        for (Personal x : list) {
-            if (x.getUsuario().equals(user)) {
-                if (x.getContrasenna().equals(pass)) {
-                        if (!x.getOnline()) {
-                            return "1";
-                        }
-                }
-                return "2";
-            }
+        try {
+            authenticate(user, pass);
+            return "1";
+        } catch (Exception ex) {//TODO: excepciones no capturadas
         }
         return "0";
     }
-    
+
+    /**
+     * @deprecated este metodo tampoco se va a usar, se cambia por un post
+     * @param action
+     * @param user
+     * @param pass
+     * @param level
+     * @return
+     */
     @GET
     @Path("{action}_{user}_{pass}_{appSecurityLevel}")
     @Produces(MediaType.TEXT_PLAIN)
     public String findNew(@PathParam("action") String action,
             @PathParam("user") String user, @PathParam("pass") String pass,
             @PathParam("appSecurityLevel") int level) {
-        List<Personal> list = super.findAll();
+        try {
+            Personal p = authenticate(user, pass);
+            return p.getPuestoTrabajonombrePuesto().getNivelAcceso() >= level ? "1" : "0";
+        } catch (Exception ex) {
 
-        for (Personal x : list) {
-            if (x.getUsuario().equals(user)) {
-                if (x.getContrasenna().equals(pass)) {
-                    if (x.getPuestoTrabajonombrePuesto().getNivelAcceso() >= level) {
-                        if (!x.getOnline()) {
-                            return "1";
-                        }
-                    }
-                }
-                return "2";
-            }
         }
         return "0";
     }
@@ -162,6 +170,69 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
     @Override
     protected EntityManager getEntityManager() {
         return em;
+    }
+
+    @POST
+    @Path("AUTH")
+    @Consumes(MediaType.TEXT_PLAIN)
+    public Response authenticateUser(String input) {
+
+        try {
+
+            ObjectMapper mapper = new JsonMapper();
+            Credentials credentials = mapper.readValue(input, Credentials.class);
+
+            String username = credentials.getUsername();
+            String password = credentials.getPassword();
+
+            // Authenticate the user using the credentials provided
+            Personal p = authenticate(username, password);
+            credentials.setAccessLevel(p.getPuestoTrabajonombrePuesto().getNivelAcceso());
+
+            // Issue a token for the user
+            String token = issueToken(credentials);
+
+            // Return the token on the response
+            return Response.ok(token).build();
+
+        } catch (CredentialException ex) {
+            return Response.status(Response.Status.FORBIDDEN).entity(ex.getMessage()).build();
+        } catch (JsonProcessingException ex) {
+            return Response.status(Response.Status.UNSUPPORTED_MEDIA_TYPE).entity(ex.getMessage()).build();
+        }
+    }
+
+    private Personal authenticate(String username, String password) throws CredentialException {
+        List<Personal> list = super.findAll();
+
+        for (Personal x : list) {
+            if (x.getUsuario().equals(username)) {
+                if (x.getContrasenna().equals(password)) {
+                    if (!x.getOnline()) {
+                        return x;
+                    } else {
+                        throw new CredentialExpiredException("Usuario en linea");
+                    }
+                }
+                throw new CredentialException("Credenciales incorrectas");
+            }
+        }
+        throw new CredentialNotFoundException("Credenciales no encontradas");
+    }
+
+    private String issueToken(Credentials credentials) {
+        // Issue a token (can be a random String persisted to a database or a JWT token)
+        // The issued token must be associated to a user
+        // Return the issued token
+        Random random = new SecureRandom();
+        String token = new BigInteger(121, random).toString(32);
+        for (String s : tokens.keySet()) {
+            if (tokens.get(s).getUsername().equals(credentials.getUsername())) {
+                return s;
+            }
+        }
+        tokens.put(token, credentials);
+        return token;
     }
 
 }

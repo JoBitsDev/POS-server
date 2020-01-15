@@ -5,6 +5,7 @@
  */
 package com.restmanager.service;
 
+import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.core.Application;
 
@@ -23,16 +24,13 @@ public class ApplicationConfig extends Application {
 
     @Override
     public Set<Object> getSingletons() {
-        return super.getSingletons(); 
+        return super.getSingletons();
     }
-    
-    
 
     /**
-     * Do not modify addRestResourceClasses() method.
-     * It is automatically populated with
-     * all resources defined in the project.
-     * If required, comment out calling this method in getClasses().
+     * Do not modify addRestResourceClasses() method. It is automatically
+     * populated with all resources defined in the project. If required, comment
+     * out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(com.restmanager.service.AlmacenFacadeREST.class);
@@ -52,7 +50,8 @@ public class ApplicationConfig extends Application {
         resources.add(com.restmanager.service.SeccionFacadeREST.class);
         resources.add(com.restmanager.service.VentaFacadeREST.class);
         resources.add(com.restmanager.service.NotificacionEnvioCocinaFacadeREST.class);
-        
+
+        resources.add(com.jobits.authentication.AuthenticationFilter.class);
     }
-    
+
 }
