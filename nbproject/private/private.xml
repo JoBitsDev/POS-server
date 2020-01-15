@@ -3,8 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group name="Librerias En Desarrollo">
+            <file>file:/Users/Jorge/Desktop/Desarrollo/JoBits/Proyects/Restaurant%20Manager/Distribuciones/RM/src/conf/persistence.xml</file>
+            <file>file:/Users/Jorge/Desktop/Desarrollo/JoBits/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/models/VentaResumenModel.java</file>
             <file>file:/Users/Jorge/Desktop/Desarrollo/JoBits/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/service/PersonalFacadeREST.java</file>
-            <file>file:/Users/Jorge/Desktop/Desarrollo/JoBits/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/restmanager/service/VentaFacadeREST.java</file>
+            <file>file:/Users/Jorge/Desktop/Desarrollo/JoBits/Proyects/Restaurant%20Manager/Distribuciones/RM/src/java/com/jobits/authentication/AuthenticationFilter.java</file>
         </group>
     </open-files>
 </project-private>
