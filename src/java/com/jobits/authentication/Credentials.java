@@ -10,7 +10,10 @@ import java.io.Serializable;
 /**
  * Objeto credenciales para parsear, este objeto debe ser pasado por un post al
  * servicio de autenticacion del sistema.
- * 
+ *
+ * <h3> NOTA </h3> el campo de la contraseñna tiene que estas en SHA256
+ * convertido a string de lo contrario el sistema no puede matchear las contraseñas
+ *
  *
  * @author Jorge
  *
