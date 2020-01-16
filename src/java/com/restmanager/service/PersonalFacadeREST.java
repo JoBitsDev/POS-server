@@ -13,6 +13,8 @@ import com.restmanager.Personal;
 import com.restmanager.Venta;
 import com.jobits.authentication.Credentials;
 import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +30,7 @@ import javax.security.auth.login.CredentialNotFoundException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -199,15 +202,17 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
             return Response.status(Response.Status.FORBIDDEN).entity(ex.getMessage()).build();
         } catch (JsonProcessingException ex) {
             return Response.status(Response.Status.UNSUPPORTED_MEDIA_TYPE).entity(ex.getMessage()).build();
+        } catch (InternalServerErrorException ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         }
     }
 
-    private Personal authenticate(String username, String password) throws CredentialException {
+    private Personal authenticate(String username, String password) throws CredentialException, InternalServerErrorException {
         List<Personal> list = super.findAll();
 
         for (Personal x : list) {
             if (x.getUsuario().equals(username)) {
-                if (x.getContrasenna().equals(password)) {
+                if (getSHA256(x.getContrasenna()).equals(password)) {
                     if (!x.getOnline()) {
                         return x;
                     } else {
@@ -233,6 +238,15 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
         }
         tokens.put(token, credentials);
         return token;
+    }
+
+    private String getSHA256(String stringToConvert) throws InternalServerErrorException {
+        try {
+            byte[] bytes = MessageDigest.getInstance("SHA-256").digest(stringToConvert.getBytes());
+            return String.format("%064x", new BigInteger(1, bytes));
+        } catch (NoSuchAlgorithmException ex) {
+            throw new InternalServerErrorException("Error con algoritmo Hash");
+        }
     }
 
 }
