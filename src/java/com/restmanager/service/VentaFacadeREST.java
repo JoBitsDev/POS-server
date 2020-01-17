@@ -70,13 +70,13 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
         try {
             v = find(R.DATE_FORMAT.parse(fecha));
             if (v == null) {
-                return Response.status(Response.Status.NOT_FOUND).build();
+                return Response.status(Response.Status.NOT_FOUND).entity("No existe una venta registrada en la fecha seleccionada").build();
             }
             return Response.ok(new ObjectMapper().writeValueAsString(VentaResumenController.createResumenFromVenta(v))).build();
         } catch (ParseException ex) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Formato de entrada incorrecto").build();
         } catch (JsonProcessingException ex) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error en el Object Mapper. Contacte con soporte").build();
         }
 
     }
