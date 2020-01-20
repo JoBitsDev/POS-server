@@ -55,9 +55,9 @@ public class R {
 
     public static DecimalFormat formatoMoneda = new DecimalFormat("0.00");
 
-    public static String RELEASE_VERSION = "Version 2.6.3";
+    public static String RELEASE_VERSION = "Version 2.6.3.1";
 
-    public static int BUILD_VERSION = 11;
+    public static int BUILD_VERSION = 12;
 
     public static enum SettingID {
 
@@ -82,7 +82,8 @@ public class R {
         IMPRESION_IMPRIMIR_GASTOS_AUTORIZOS("PRINTING_EXPENSES_IN_HAUSE_TICKETS"),
         IMPRESION_IMPRIMIR_TICKET_EN_COCINA("PRINTING_PRINT_KITCHEN_TICKET"),
         IMPRESION_CANTIDAD_COPIAS("PRINTING_COPIES"),
-        IMPRESION_REDONDEO_EXCESO("PRINTING_ROUNDING");
+        IMPRESION_REDONDEO_EXCESO("PRINTING_ROUNDING"),
+        IMPRESION_IMPRIMIR_MONEDA_SECUNDARIA("PRINTING_SECOND_COIN");
 
         private final String value;
 
