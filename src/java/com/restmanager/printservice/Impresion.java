@@ -53,6 +53,7 @@ public class Impresion {
     public static boolean SHOW_HEADER = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_TICKET_ENCABEZADO_RESTAURANTE.getValue()).getValor() == 1;
     public static boolean SHOW_SUBTOTAL = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_TICKET_SUBTOTAL.getValue()).getValor() == 1;
     private final boolean PRINT_IN_CENTRAL_KITCHEN = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_IMPRIMIR_COCINA_CENTRAL.getValue()).getValor() == 1;
+    private final boolean PRINT_SECOND_COIN = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_IMPRIMIR_MONEDA_SECUNDARIA.getValue()).getValor() == 1;
     private final String DEFAULT_KITCHEN_PRINTER_LOCATION = "Cocina";
     private final String DEFAULT_PRINT_LOCATION = null;
     public boolean IMPRIMIR_TICKET_COCINA = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_IMPRIMIR_TICKET_EN_COCINA.getValue()).getValor() == 1;
@@ -767,21 +768,21 @@ public class Impresion {
             t.alignRight();
             t.setText(String.format(TOTAL_VENTAS + "%.2f" + MONEDA, total));
             t.newLine();
-
-            if (MONEDA_CUC) {
-                if (REDONDEO_POR_EXCESO) {
-                    t.setText(TOTAL_VENTAS + utils.redondeoPorExcesoFloat(total * R.COINCHANGE) + MN);
+            if (PRINT_SECOND_COIN) {
+                if (MONEDA_CUC) {
+                    if (REDONDEO_POR_EXCESO) {
+                        t.setText(TOTAL_VENTAS + utils.redondeoPorExcesoFloat(total * R.COINCHANGE) + MN);
+                    } else {
+                        t.setText(String.format(TOTAL_VENTAS + "%.2f" + MN, total * R.COINCHANGE));
+                    }
                 } else {
-                    t.setText(String.format(TOTAL_VENTAS + "%.2f" + MN, total * R.COINCHANGE));
-                }
-            } else {
-                if (REDONDEO_POR_EXCESO) {
-                    t.setText(TOTAL_VENTAS + utils.redondeoPorExcesoFloat(total / R.COINCHANGE) + CUC);
-                } else {
-                    t.setText(String.format(TOTAL_VENTAS + "%.2f" + CUC, total / R.COINCHANGE));
+                    if (REDONDEO_POR_EXCESO) {
+                        t.setText(TOTAL_VENTAS + utils.redondeoPorExcesoFloat(total / R.COINCHANGE) + CUC);
+                    } else {
+                        t.setText(String.format(TOTAL_VENTAS + "%.2f" + CUC, total / R.COINCHANGE));
+                    }
                 }
             }
-
         }
     }
 
