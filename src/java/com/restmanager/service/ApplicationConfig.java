@@ -34,19 +34,13 @@ public class ApplicationConfig extends Application {
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(com.restmanager.service.AlmacenFacadeREST.class);
-        resources.add(com.restmanager.service.AreaFacadeREST.class);
         resources.add(com.restmanager.service.CartaFacadeREST.class);
-        resources.add(com.restmanager.service.ClienteFacadeREST.class);
         resources.add(com.restmanager.service.CocinaFacadeREST.class);
-        resources.add(com.restmanager.service.DatosPersonalesFacadeREST.class);
-        resources.add(com.restmanager.service.InsumoFacadeREST.class);
         resources.add(com.restmanager.service.MesaFacadeREST.class);
         resources.add(com.restmanager.service.OrdenFacadeREST.class);
         resources.add(com.restmanager.service.PersonalFacadeREST.class);
-        resources.add(com.restmanager.service.ProductoInsumoFacadeREST.class);
         resources.add(com.restmanager.service.ProductoVentaFacadeREST.class);
         resources.add(com.restmanager.service.ProductovOrdenFacadeREST.class);
-        resources.add(com.restmanager.service.PuestoTrabajoFacadeREST.class);
         resources.add(com.restmanager.service.SeccionFacadeREST.class);
         resources.add(com.restmanager.service.VentaFacadeREST.class);
         resources.add(com.restmanager.service.NotificacionEnvioCocinaFacadeREST.class);
