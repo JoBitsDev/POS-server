@@ -26,7 +26,7 @@ import javax.ws.rs.core.MediaType;
  * 
  */
  
-@Path("com.restmanager.seccion")
+@Path("com.jobits.pos.seccion")
 public class SeccionFacadeREST extends AbstractFacade<Seccion> {
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")

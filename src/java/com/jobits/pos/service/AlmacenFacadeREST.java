@@ -31,7 +31,7 @@ import javax.ws.rs.core.MediaType;
  *
  * @author Jorge
  */
-@Path("com.restmanager.almacen")
+@Path("com.jobits.pos.almacen")
 public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")
@@ -40,39 +40,6 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
     public AlmacenFacadeREST() {
         super(Almacen.class);
 
-    }
-
-    @POST
-    @Override
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void create(Almacen entity) {
-        super.create(entity);
-    }
-
-    @PUT
-    @Path("{id}")
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void edit(@PathParam("id") String id, Almacen entity) {
-        super.edit(entity);
-    }
-
-    @DELETE
-    @Path("{id}")
-    public void remove(@PathParam("id") String id) {
-        super.remove(super.find(id));
-    }
-
-    @GET
-    @Path("{id}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<InsumoAlmacen> find(@PathParam("id") String id) {
-        return super.find(id).getInsumoAlmacenList();
-    }
-
-    @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<InsumoAlmacen> findFirst() {
-        return super.findAll().get(0).getInsumoAlmacenList();
     }
 
     @GET
@@ -162,13 +129,6 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
         }
 
         return cocinas.isEmpty() ? "" : cocinas.substring(0, cocinas.length() - 1);
-    }
-
-    @GET
-    @Path("count")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String countREST() {
-        return String.valueOf(super.count());
     }
 
     @Override

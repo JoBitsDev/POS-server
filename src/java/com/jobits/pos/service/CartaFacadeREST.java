@@ -28,7 +28,7 @@ import com.jobits.utils.R;
  * @author Jorge
  * 
  */
-@Path("com.restmanager.carta")
+@Path("com.jobits.pos.carta")
 public class CartaFacadeREST extends AbstractFacade<Carta> {
 
 

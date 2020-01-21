@@ -38,7 +38,7 @@ import com.jobits.utils.R;
  *
  * @author Jorge
  */
-@Path("com.restmanager.orden")
+@Path("com.jobits.pos.orden")
 public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
     SimpleDateFormat FormatDate = new SimpleDateFormat("MM'/'dd'/'yy");

@@ -31,7 +31,7 @@ import javax.ws.rs.core.PathSegment;
  * 
  */
  
-@Path("com.restmanager.productovorden")
+@Path("com.jobits.pos.productovorden")
 public class ProductovOrdenFacadeREST extends AbstractFacade<ProductovOrden> {
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")

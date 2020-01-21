@@ -27,7 +27,7 @@ import javax.ws.rs.core.MediaType;
  * @author Jorge
  *
  */
-@Path("com.restmanager.mesa")
+@Path("com.jobits.pos.mesa")
 public class MesaFacadeREST extends AbstractFacade<Mesa> {
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")

@@ -34,7 +34,7 @@ import javax.ws.rs.core.PathSegment;
  * @author Jorge
  *
  */
-@Path("com.restmanager.notificacion")
+@Path("com.jobits.pos.notificacion")
 public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<NotificacionEnvioCocina> {
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")
