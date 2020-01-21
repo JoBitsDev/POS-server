@@ -97,33 +97,17 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
     @Produces(MediaType.TEXT_PLAIN)
     public String find(@PathParam("action") String action,
             @PathParam("user") String user, @PathParam("pass") String pass) {
-        try {
-            authenticate(user, pass);
-            return "1";
-        } catch (Exception ex) {//TODO: excepciones no capturadas
-        }
-        return "0";
-    }
+        List<Personal> list = super.findAll();
 
-    /**
-     * @deprecated este metodo tampoco se va a usar, se cambia por un post
-     * @param action
-     * @param user
-     * @param pass
-     * @param level
-     * @return
-     */
-    @GET
-    @Path("{action}_{user}_{pass}_{appSecurityLevel}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String findNew(@PathParam("action") String action,
-            @PathParam("user") String user, @PathParam("pass") String pass,
-            @PathParam("appSecurityLevel") int level) {
-        try {
-            Personal p = authenticate(user, pass);
-            return p.getPuestoTrabajonombrePuesto().getNivelAcceso() >= level ? "1" : "0";
-        } catch (Exception ex) {
-
+        for (Personal x : list) {
+            if (x.getUsuario().equals(user)) {
+                if (x.getContrasenna().equals(pass)) {
+                    if (!x.getOnline()) {
+                        return "1";
+                    }
+                }
+                return "2";
+            }
         }
         return "0";
     }
