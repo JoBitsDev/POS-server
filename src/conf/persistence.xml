@@ -2,46 +2,46 @@
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
   <persistence-unit name="Restaurant_Manager_Web_ServicePU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>com.restmanager.Almacen</class>
-    <class>com.restmanager.Area</class>
-    <class>com.restmanager.Carta</class>
-    <class>com.restmanager.Cliente</class>
-    <class>com.restmanager.Cocina</class>
-    <class>com.restmanager.Configuracion</class>
-    <class>com.restmanager.DatosPersonales</class>
     <class>com.restmanager.Extraccion</class>
-    <class>com.restmanager.Impresora</class>
-    <class>com.restmanager.Insumo</class>
-    <class>com.restmanager.InsumoAlmacen</class>
-    <class>com.restmanager.InsumoElaborado</class>
-    <class>com.restmanager.Ipv</class>
-    <class>com.restmanager.IpvRegistro</class>
-    <class>com.restmanager.Log</class>
-    <class>com.restmanager.Mesa</class>
-    <class>com.restmanager.Negocio</class>
-    <class>com.restmanager.Nota</class>
-    <class>com.restmanager.NotificacionEnvioCocina</class>
-    <class>com.restmanager.Orden</class>
-    <class>com.restmanager.Personal</class>
-    <class>com.restmanager.ProductoInsumo</class>
-    <class>com.restmanager.ProductoVenta</class>
-    <class>com.restmanager.ProductovOrden</class>
-    <class>com.restmanager.PuestoTrabajo</class>
-    <class>com.restmanager.Seccion</class>
-    <class>com.restmanager.Transaccion</class>
-    <class>com.restmanager.TransaccionEntrada</class>
-    <class>com.restmanager.TransaccionMerma</class>
-    <class>com.restmanager.Venta</class>
-    <class>com.restmanager.TransaccionTransformacion</class>
-    <class>com.restmanager.Pago</class>
-    <class>com.restmanager.TransaccionTraspaso</class>
-    <class>com.restmanager.GastoVenta</class>
-    <class>com.restmanager.TipoGasto</class>
-    <class>com.restmanager.ContabilidadCuenta</class>
-    <class>com.restmanager.Factura</class>
-    <class>com.restmanager.Gasto</class>
-    <class>com.restmanager.AsistenciaPersonal</class>
-    <class>com.restmanager.TransaccionSalida</class>
+    <class>com.jobits.pos.persistence.Orden</class>
+    <class>com.jobits.pos.persistence.Log</class>
+    <class>com.jobits.pos.persistence.Cliente</class>
+    <class>com.jobits.pos.persistence.Pago</class>
+    <class>com.jobits.pos.persistence.InsumoAlmacen</class>
+    <class>com.jobits.pos.persistence.DatosPersonales</class>
+    <class>com.jobits.pos.persistence.Almacen</class>
+    <class>com.jobits.pos.persistence.Mesa</class>
+    <class>com.jobits.pos.persistence.AsistenciaPersonal</class>
+    <class>com.jobits.pos.persistence.Venta</class>
+    <class>com.jobits.pos.persistence.TransaccionTransformacion</class>
+    <class>com.jobits.pos.persistence.TipoGasto</class>
+    <class>com.jobits.pos.persistence.PuestoTrabajo</class>
+    <class>com.jobits.pos.persistence.Personal</class>
+    <class>com.jobits.pos.persistence.ProductovOrden</class>
+    <class>com.jobits.pos.persistence.TransaccionMerma</class>
+    <class>com.jobits.pos.persistence.GastoVenta</class>
+    <class>com.jobits.pos.persistence.Nota</class>
+    <class>com.jobits.pos.persistence.TransaccionTraspaso</class>
+    <class>com.jobits.pos.persistence.Ipv</class>
+    <class>com.jobits.pos.persistence.TransaccionEntrada</class>
+    <class>com.jobits.pos.persistence.ProductoVenta</class>
+    <class>com.jobits.pos.persistence.Carta</class>
+    <class>com.jobits.pos.persistence.Area</class>
+    <class>com.jobits.pos.persistence.NotificacionEnvioCocina</class>
+    <class>com.jobits.pos.persistence.TransaccionSalida</class>
+    <class>com.jobits.pos.persistence.Insumo</class>
+    <class>com.jobits.pos.persistence.Impresora</class>
+    <class>com.jobits.pos.persistence.Cocina</class>
+    <class>com.jobits.pos.persistence.Configuracion</class>
+    <class>com.jobits.pos.persistence.Factura</class>
+    <class>com.jobits.pos.persistence.Gasto</class>
+    <class>com.jobits.pos.persistence.ProductoInsumo</class>
+    <class>com.jobits.pos.persistence.IpvRegistro</class>
+    <class>com.jobits.pos.persistence.Seccion</class>
+    <class>com.jobits.pos.persistence.Negocio</class>
+    <class>com.jobits.pos.persistence.ContabilidadCuenta</class>
+    <class>com.jobits.pos.persistence.Transaccion</class>
+    <class>com.jobits.pos.persistence.InsumoElaborado</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/Restaurant_Manager_DB"/>

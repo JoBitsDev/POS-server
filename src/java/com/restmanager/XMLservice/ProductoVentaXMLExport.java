@@ -6,9 +6,9 @@
 
 package com.restmanager.XMLservice;
 
-import com.restmanager.Cocina;
-import com.restmanager.ProductoVenta;
-import com.restmanager.Seccion;
+import com.jobits.pos.persistence.Cocina;
+import com.jobits.pos.persistence.ProductoVenta;
+import com.jobits.pos.persistence.Seccion;
 
 /**
  * FirstDream
