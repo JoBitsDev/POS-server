@@ -45,7 +45,7 @@ import javax.ws.rs.core.Response;
  * @author Jorge
  *
  */
-@Path("com.jobits.pos.personal")
+@Path("com.jobits.pos.login")
 public class PersonalFacadeREST extends AbstractFacade<Personal> {
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")

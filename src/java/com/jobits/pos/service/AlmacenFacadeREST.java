@@ -5,6 +5,9 @@
  */
 package com.jobits.pos.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jobits.pos.authentication.Secured;
 import com.jobits.pos.persistence.Almacen;
 import com.jobits.pos.persistence.Cocina;
 import com.jobits.pos.persistence.Insumo;
@@ -15,17 +18,16 @@ import com.jobits.pos.printservice.Impresion;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -42,10 +44,11 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     }
 
-    @GET
-    @Path("FILTRAR_{codCocina}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<InsumoAlmacen> filterBy(@PathParam("codCocina") String codCocina) {
+    @RolesAllowed("2")
+    @Secured
+    @POST
+    @Path("FILTRAR")
+    public Response filterBy(String codCocina) {
         List<InsumoAlmacen> lista = super.findAll().get(0).getInsumoAlmacenList();
         List<InsumoAlmacen> ret = new ArrayList<>();
         for (InsumoAlmacen x : lista) {
@@ -55,8 +58,11 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
                 }
             }
         }
-
-        return ret;
+        try {
+            return Response.status(Response.Status.OK).entity(new ObjectMapper().writeValueAsString(ret)).build();
+        } catch (JsonProcessingException ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error en el Object Mapper. Contacte con soporte").build();
+        }
     }
 
     @GET
@@ -66,8 +72,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
             @PathParam("insumoCod") String insumoCod,
             @PathParam("cant") float cant,
             @PathParam("valor") float valor) {
-        return "1";
-//   return new TransaccionController(em1).addTransaccionEntrada(em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(), super.find(almacenCod), cant, valor).toString();
+        return new TransaccionController(em1).addTransaccionEntrada(em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(), super.find(almacenCod), cant, valor).toString();
 
     }
 
