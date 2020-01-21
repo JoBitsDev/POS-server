@@ -4,7 +4,7 @@
     Author     : Jorge
 --%>
 
-<%@page import="restmanager.resources.R"%>
+<%@page import="com.jobits.utils.R"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
