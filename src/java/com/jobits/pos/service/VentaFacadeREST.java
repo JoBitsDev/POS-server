@@ -64,7 +64,6 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
     @POST
     @Path("SALES")
     @Secured
-    @Consumes(MediaType.TEXT_PLAIN)
     public Response getResumenVentas(String fecha) {
         Venta v;
         try {
@@ -112,34 +111,6 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
     @Produces(MediaType.TEXT_PLAIN)
     public String getHour() {
         return hour.format(new Date());
-    }
-
-    @GET
-    @Path("{id}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Venta find(@PathParam("id") Date id) {
-        return super.find(id);
-    }
-
-    @GET
-    @Override
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Venta> findAll() {
-        return super.findAll();
-    }
-
-    @GET
-    @Path("{from}/{to}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Venta> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
-        return super.findRange(new int[]{from, to});
-    }
-
-    @GET
-    @Path("count")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String countREST() {
-        return String.valueOf(super.count());
     }
 
     @Override
