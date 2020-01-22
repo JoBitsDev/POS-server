@@ -105,6 +105,7 @@ public class MesaFacadeREST extends AbstractFacade<Mesa> {
         return ret.substring(0, ret.length() - 1);
     }
 
+    
     @GET
     @Override
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})

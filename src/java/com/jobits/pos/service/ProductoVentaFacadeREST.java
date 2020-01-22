@@ -30,7 +30,7 @@ import javax.ws.rs.core.MediaType;
  * @author Jorge
  *
  */
-@Path("com.jobits.pos.productoventa")
+@Path("productoventa")
 public class ProductoVentaFacadeREST extends AbstractFacade<ProductoVenta> {
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")

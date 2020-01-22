@@ -26,7 +26,7 @@ import javax.ws.rs.core.MediaType;
  * 
  */
  
-@Path("com.jobits.pos.cocina")
+@Path("cocina")
 public class CocinaFacadeREST extends AbstractFacade<Cocina> {
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")

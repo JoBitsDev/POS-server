@@ -25,7 +25,7 @@ import javax.ws.rs.core.MediaType;
  * @author Jorge
  * 
  */
-@Path("com.jobits.pos.configuracion")
+@Path("configuracion")
 public class ConfiguracionFacadeREST extends AbstractFacade<Configuracion> {
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")
