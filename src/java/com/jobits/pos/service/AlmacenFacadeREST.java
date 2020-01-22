@@ -14,6 +14,7 @@ import com.jobits.pos.persistence.Insumo;
 import com.jobits.pos.persistence.InsumoAlmacen;
 import com.jobits.pos.persistence.Ipv;
 import com.jobits.pos.controllers.TransaccionController;
+import com.jobits.pos.persistence.TransaccionEntrada;
 import com.jobits.pos.printservice.Impresion;
 import java.util.ArrayList;
 import java.util.Date;
@@ -61,24 +62,21 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
                 }
             }
         }
-        try {
-            return Response.status(Response.Status.OK).entity(new ObjectMapper().writeValueAsString(ret)).build();
-        } catch (JsonProcessingException ex) {
-            return handleException(ex);
-        }
+        return toJsonString(Response.Status.OK, ret);
     }
 
     @RolesAllowed("2")
     @PUT
     @Path("ENTRADA")
     @Consumes({MediaType.APPLICATION_JSON})
-    public String entrada(HashMap<String, Object> values) {
+    public Response entrada(HashMap<String, Object> values) {
         String almacenCod = (String) values.get("almacenCod");
         String insumoCod = (String) values.get("insumoCod");
         float cant = (float) values.get("cantidad");
         float valor = (float) values.get("monto");
-        return new TransaccionController(em1).addTransaccionEntrada(em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(), super.find(almacenCod), cant, valor).toString();
-
+        TransaccionController controller = new TransaccionController(em1);
+        TransaccionEntrada entrada = controller.addTransaccionEntrada(em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(), super.find(almacenCod), cant, valor);
+        return toJsonString(Response.Status.CREATED, entrada);
     }
 
     @RolesAllowed("2")

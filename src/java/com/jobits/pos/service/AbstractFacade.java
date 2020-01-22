@@ -6,8 +6,11 @@
 package com.jobits.pos.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobits.pos.persistence.Venta;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -125,7 +128,7 @@ public abstract class AbstractFacade<T> {
         return null;
     }
 
-    public Response handleException(Exception ex) {
+    protected Response handleException(Exception ex) {
         if (ex instanceof JsonProcessingException) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error en el Object Mapper. Contacte con soporte").build();
         }
@@ -133,4 +136,11 @@ public abstract class AbstractFacade<T> {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Contacte con soporte").build();
     }
 
+    protected Response toJsonString(Response.Status status, Object o) {
+        try {
+            return Response.status(status).entity(new ObjectMapper().writeValueAsString(o)).build();
+        } catch (JsonProcessingException ex) {
+            return handleException(ex);
+        }
+    }
 }

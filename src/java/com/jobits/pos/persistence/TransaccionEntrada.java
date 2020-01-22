@@ -121,7 +121,7 @@ public class TransaccionEntrada implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.TransaccionEntrada[ transaccionnoTransaccion=" + transaccionnoTransaccion + " ]";
+        return  "Transaccion No. " + transaccionnoTransaccion ;
     }
 
 }

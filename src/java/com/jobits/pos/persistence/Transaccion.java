@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -32,8 +32,9 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
 @Entity
 @Table(name = "transaccion")
@@ -70,20 +71,26 @@ public class Transaccion implements Serializable {
     @Column(name = "descripcion")
     private String descripcion;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaccion")
+    @JsonIgnore
     private TransaccionSalida transaccionSalida;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaccion")
+    @JsonIgnore
     private TransaccionTraspaso transaccionTraspaso;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaccion")
+    @JsonIgnore
     private TransaccionEntrada transaccionEntrada;
     @JoinColumn(name = "almacencod_almacen", referencedColumnName = "cod_almacen")
     @ManyToOne(optional = false)
+    @JsonIgnore
     private Almacen almacencodAlmacen;
     @JoinColumn(name = "insumocod_insumo", referencedColumnName = "cod_insumo")
     @ManyToOne(optional = false)
     private Insumo insumocodInsumo;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaccion")
+    @JsonIgnore
     private TransaccionMerma transaccionMerma;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "transaccion")
+    @JsonIgnore
     private List<TransaccionTransformacion> transaccionTransformacionList;
 
     public Transaccion() {
