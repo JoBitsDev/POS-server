@@ -15,7 +15,9 @@ import com.jobits.pos.persistence.InsumoAlmacen;
 import com.jobits.pos.persistence.Ipv;
 import com.jobits.pos.controllers.TransaccionController;
 import com.jobits.pos.persistence.TransaccionEntrada;
+import com.jobits.pos.persistence.TransaccionSalida;
 import com.jobits.pos.printservice.Impresion;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,13 +25,14 @@ import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.ws.rs.Consumes;
+
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -48,11 +51,21 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     }
 
+    /**
+     * Metodo que filtra los insumos del almacen principal por una cocina
+     * especifica
+     *
+     * @param codCocina el codigo de la cocina a filtrar
+     * @return la lista de {@link InsumoAlmacen} que contienen esa cocina
+     */
     @RolesAllowed("2")
+    @GET
     @Secured
-    @POST
     @Path("FILTRAR")
-    public Response filterBy(String codCocina) {
+    public Response filterBy(@QueryParam("cocina") String codCocina) {
+        if (codCocina == null) {
+            return toJsonString(Response.Status.BAD_REQUEST, "Peticion no válida");
+        }
         List<InsumoAlmacen> lista = super.findAll().get(0).getInsumoAlmacenList();
         List<InsumoAlmacen> ret = new ArrayList<>();
         for (InsumoAlmacen x : lista) {
@@ -66,54 +79,68 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
     }
 
     @RolesAllowed("2")
-    @PUT
+    @POST
     @Path("ENTRADA")
-    @Consumes({MediaType.APPLICATION_JSON})
-    public Response entrada(HashMap<String, Object> values) {
+    public Response entrada(String hashMap) {
+        HashMap<String, Object> values;
+        try {
+            values = new ObjectMapper().readValue(hashMap, HashMap.class);
+        } catch (JsonProcessingException ex) {
+            return handleException(ex);
+        }
         String almacenCod = (String) values.get("almacenCod");
         String insumoCod = (String) values.get("insumoCod");
-        float cant = (float) values.get("cantidad");
-        float valor = (float) values.get("monto");
+        float cant = Float.parseFloat(values.get("cantidad").toString());
+        float valor = Float.parseFloat(values.get("monto").toString());
         TransaccionController controller = new TransaccionController(em1);
         TransaccionEntrada entrada = controller.addTransaccionEntrada(em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(), super.find(almacenCod), cant, valor);
-        return toJsonString(Response.Status.CREATED, entrada);
+
+        return toJsonString(Response.Status.CREATED, entrada.getTransaccion());
     }
 
     @RolesAllowed("2")
+    @Secured
     @GET
     @Path("IMPRIMIR_ESTADO_ALMACEN")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public String ticketEntrada() {
+    public Response ticketEntrada() {
         Impresion i = Impresion.getDefaultInstance();
-        i.printResumenAlmacen(super.findAll().get(0));
-        return "1";
+        i.printResumenAlmacen(super.findAll().get(0));//TODO: solo funcionando con el almacen 1;
+        return toJsonString(Response.Status.OK, "Impresion Exitosa");
     }
 
     @RolesAllowed("2")
+    @Secured
     @GET
     @Path("IMPRIMIR_TICKET_COMPRA")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public String ticketCompra() {
+    public Response ticketCompra() {
         Impresion i = Impresion.getDefaultInstance();
         i.printTicketCompra(super.findAll().get(0));
-        return "1";
+        return toJsonString(Response.Status.OK, "Impresion Exitosa");
     }
 
     @RolesAllowed("2")
-    @PUT
-    @Path("SALIDA_{almacenCod}_{insumoCod}_{cant}_{destino}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public String salida(@PathParam("almacenCod") String almacenCod,
-            @PathParam("insumoCod") String insumoCod,
-            @PathParam("cant") float cant,
-            @PathParam("destino") String destino) {
-        return new TransaccionController(em1).addTransaccionSalida(em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(),
-                super.find(almacenCod), em1.find(Cocina.class, destino.substring(destino.length() - 4, destino.length() - 1)), cant).toString();
+    @Secured
+    @POST
+    @Path("SALIDA")
+    public Response salida(String hashMap) {
+        HashMap<String, Object> params;
+        try {
+            params = new ObjectMapper().readValue(hashMap, HashMap.class);
+        } catch (JsonProcessingException ex) {
+            return handleException(ex);
+        }
+        String almacenCod = (String) params.get("almacenCod");
+        String insumoCod = (String) params.get("insumoCod");
+        float cant = Float.parseFloat(params.get("cantidad").toString());
+        String destino = (String) params.get("destino");
+        TransaccionSalida salida = new TransaccionController(em1).addTransaccionSalida(em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(),
+                super.find(almacenCod), em1.find(Cocina.class, destino.substring(destino.length() - 4, destino.length() - 1)), cant);
+        return toJsonString(Response.Status.OK, salida.getTransaccion());
 
     }
 
-    @RolesAllowed("2")
-    @PUT
+    @RolesAllowed("4")
+    @DELETE
     @Path("MERMAR_{almacenCod}_{insumoCod}_{cant}_{razon}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public String rebaja(@PathParam("almacenCod") String almacenCod,
@@ -127,21 +154,17 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     @RolesAllowed("2")
     @GET
-    @Path("IPVS_{insumoCod}")
-    @Produces({MediaType.TEXT_PLAIN})
-    public String getIPVS(@PathParam("insumoCod") String codInsumo) {
+    @Path("IPVS-DE-INSUMO")
+    public Response getIPVS(@PathParam("insumoCod") String codInsumo) {
         em1 = e.createEntityManager();
         ArrayList<Ipv> ipvs = new ArrayList<>(em1.createNamedQuery("Ipv.findByInsumocodInsumo")
                 .setParameter("insumocodInsumo", codInsumo)
                 .getResultList());
-
-        String cocinas = "";
-
+        List<String> cocinas = new ArrayList<>();
         for (Ipv ipv : ipvs) {
-            cocinas += ipv.getCocina() + ",";
+            cocinas.add(ipv.getCocina().getCodCocina());
         }
-
-        return cocinas.isEmpty() ? "" : cocinas.substring(0, cocinas.length() - 1);
+        return toJsonString(Response.Status.OK, cocinas);
     }
 
     @Override
