@@ -5,12 +5,14 @@
  */
 package com.jobits.pos.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jobits.pos.persistence.Venta;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.ws.rs.core.Response;
 import javax.xml.ws.WebServiceContext;
 
 /**
@@ -108,9 +110,8 @@ public abstract class AbstractFacade<T> {
         javax.persistence.Query q = em1.createQuery(cq);
         return ((Long) q.getSingleResult()).intValue();
     }
-    
+
     public Venta findVenta() {
-        Venta ret;
         e.getCache().evictAll();
         javax.persistence.criteria.CriteriaQuery cq = em1.getCriteriaBuilder().createQuery();
         cq.select(cq.from(Venta.class));
@@ -122,6 +123,14 @@ public abstract class AbstractFacade<T> {
         }
 
         return null;
+    }
+
+    public Response handleException(Exception ex) {
+        if (ex instanceof JsonProcessingException) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error en el Object Mapper. Contacte con soporte").build();
+        }
+        System.out.println(ex.getStackTrace()[0]);
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Contacte con soporte").build();
     }
 
 }
