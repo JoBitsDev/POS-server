@@ -17,12 +17,15 @@ import com.jobits.pos.controllers.TransaccionController;
 import com.jobits.pos.printservice.Impresion;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -65,17 +68,20 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
         }
     }
 
-    @GET
-    @Path("ENTRADA_{almacenCod}_{insumoCod}_{cant}_{valor}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public String entrada(@PathParam("almacenCod") String almacenCod,
-            @PathParam("insumoCod") String insumoCod,
-            @PathParam("cant") float cant,
-            @PathParam("valor") float valor) {
+    @RolesAllowed("2")
+    @PUT
+    @Path("ENTRADA")
+    @Consumes({MediaType.APPLICATION_JSON})
+    public String entrada(HashMap<String, Object> values) {
+        String almacenCod = (String) values.get("almacenCod");
+        String insumoCod = (String) values.get("insumoCod");
+        float cant = (float) values.get("cantidad");
+        float valor = (float) values.get("monto");
         return new TransaccionController(em1).addTransaccionEntrada(em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(), super.find(almacenCod), cant, valor).toString();
 
     }
 
+    @RolesAllowed("2")
     @GET
     @Path("IMPRIMIR_ESTADO_ALMACEN")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -85,6 +91,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
         return "1";
     }
 
+    @RolesAllowed("2")
     @GET
     @Path("IMPRIMIR_TICKET_COMPRA")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -94,7 +101,8 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
         return "1";
     }
 
-    @GET
+    @RolesAllowed("2")
+    @PUT
     @Path("SALIDA_{almacenCod}_{insumoCod}_{cant}_{destino}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public String salida(@PathParam("almacenCod") String almacenCod,
@@ -106,7 +114,8 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     }
 
-    @GET
+    @RolesAllowed("2")
+    @PUT
     @Path("MERMAR_{almacenCod}_{insumoCod}_{cant}_{razon}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public String rebaja(@PathParam("almacenCod") String almacenCod,
@@ -118,6 +127,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     }
 
+    @RolesAllowed("2")
     @GET
     @Path("IPVS_{insumoCod}")
     @Produces({MediaType.TEXT_PLAIN})

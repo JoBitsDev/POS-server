@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -24,8 +24,9 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
 @Entity
 @Table(name = "insumo")
@@ -66,18 +67,25 @@ public class Insumo implements Serializable {
     @Column(name = "cantidad_creada")
     private Float cantidadCreada;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
+    @JsonIgnore
     private List<ProductoInsumo> productoInsumoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumocodInsumo")
+    @JsonIgnore
     private List<Transaccion> transaccionList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
+    @JsonIgnore
     private List<InsumoAlmacen> insumoAlmacenList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
+    @JsonIgnore
     private List<Ipv> ipvList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
+    @JsonIgnore
     private List<TransaccionTransformacion> transaccionTransformacionList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
+    @JsonIgnore
     private List<InsumoElaborado> insumoElaboradoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo1")
+    @JsonIgnore
     private List<InsumoElaborado> insumoElaboradoList1;
 
     public Insumo() {
