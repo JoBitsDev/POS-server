@@ -6,6 +6,8 @@
 
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -50,6 +52,7 @@ public class TransaccionEntrada implements Serializable {
     private Float valorTotal;
     @JoinColumn(name = "transaccionno_transaccion", referencedColumnName = "no_transaccion", insertable = false, updatable = false)
     @OneToOne(optional = false)
+    @JsonBackReference
     private Transaccion transaccion;
 
     public TransaccionEntrada() {
