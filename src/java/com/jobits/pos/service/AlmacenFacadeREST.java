@@ -33,7 +33,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Jorge
  */
-@Path("com.jobits.pos.almacen")
+@Path("almacen")
 public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")
@@ -61,7 +61,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
         try {
             return Response.status(Response.Status.OK).entity(new ObjectMapper().writeValueAsString(ret)).build();
         } catch (JsonProcessingException ex) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error en el Object Mapper. Contacte con soporte").build();
+            return handleException(ex);
         }
     }
 
