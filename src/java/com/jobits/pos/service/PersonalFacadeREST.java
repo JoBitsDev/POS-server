@@ -12,6 +12,7 @@ import com.jobits.pos.persistence.Orden;
 import com.jobits.pos.persistence.Personal;
 import com.jobits.pos.persistence.Venta;
 import com.jobits.pos.authentication.Credentials;
+import com.jobits.pos.authentication.Secured;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.security.auth.login.CredentialException;
@@ -110,7 +112,9 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
         return "0";
     }
 
+    @RolesAllowed("1")
     @GET
+    @Secured
     @Path("MOSTRAR_PERSONAL_TRABAJANDO")
     @Produces({MediaType.TEXT_PLAIN})
     public String findActiveUsers() {
