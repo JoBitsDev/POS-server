@@ -38,7 +38,7 @@ public class TransaccionController {
         ret.setValorTotal(importe);
         ret.setPrecioPorUnidad(ret.getValorTotal() / ret.getTransaccion().getCantidad());
         t.setTransaccionEntrada(ret);
-        a.getTransaccionList().add(t);
+      //  a.getTransaccionList().add(t);
         createNewTransaccionEntrada(ret);
         return ret;
 
@@ -59,7 +59,7 @@ public class TransaccionController {
         TransaccionMerma rebaja = new TransaccionMerma(t.getNoTransaccion());
         rebaja.setTransaccion(t);
         rebaja.setRazon(causaRebaja);
-        a.getTransaccionList().add(t);
+       // a.getTransaccionList().add(t);
         createNewTransaccionRebaja(rebaja);
         return rebaja;
     }
