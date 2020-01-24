@@ -40,7 +40,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Jorge
  */
-@Path("almacen")
+@Path("almacen/")
 public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")
@@ -72,7 +72,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
     @GET
     @Secured
     @Path("FILTRAR")
-    public Response filterBy(@QueryParam("cocina") String codCocina) {
+    public Response filterBy(@QueryParam("ptoElab") String codCocina) {
         if (codCocina == null) {
             return toJsonString(Response.Status.BAD_REQUEST, "Peticion no válida");
         }
@@ -111,7 +111,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
     @RolesAllowed("2")
     @Secured
     @GET
-    @Path("IMPRIMIR_ESTADO_ALMACEN")
+    @Path("IMPRIMIR-ESTADO-ALMACEN")
     public Response ticketEntrada() {
         Impresion i = Impresion.getDefaultInstance();
         i.printResumenAlmacen(super.findAll().get(0));//TODO: solo funcionando con el almacen 1;
@@ -121,7 +121,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
     @RolesAllowed("2")
     @Secured
     @GET
-    @Path("IMPRIMIR_TICKET_COMPRA")
+    @Path("IMPRIMIR-TICKET-COMPRA")
     public Response ticketCompra() {
         Impresion i = Impresion.getDefaultInstance();
         i.printTicketCompra(super.findAll().get(0));

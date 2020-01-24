@@ -3,11 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.jobits.pos.service;
 
 import com.jobits.pos.persistence.Cocina;
+import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.Consumes;
@@ -19,14 +20,15 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
- 
-@Path("cocina")
+@Path("cocina/")
 public class CocinaFacadeREST extends AbstractFacade<Cocina> {
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")
@@ -36,18 +38,17 @@ public class CocinaFacadeREST extends AbstractFacade<Cocina> {
         super(Cocina.class);
     }
 
-  @GET
+    @RolesAllowed("2")
+    @GET
     @Path("NAMES")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getCocinasNombres() {
-        String ret = "";
+    public Response getCocinasNombres() {
+        List<String> ret = new ArrayList<>();
         for (Cocina cocina : super.findAll()) {
-          ret += cocina.getCodCocina()+ ",";
-      }
-        return ret.substring(0, ret.length()-1);
+            ret.add(cocina.getCodCocina());
+        }
+        return toJsonString(Response.Status.OK, ret);
     }
-    
-    
+
     @GET
     @Path("count")
     @Produces(MediaType.TEXT_PLAIN)

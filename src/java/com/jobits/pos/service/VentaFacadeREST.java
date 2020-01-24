@@ -36,7 +36,7 @@ import com.jobits.utils.R;
  * @author Jorge
  *
  */
-@Path("venta")
+@Path("venta/")
 public class VentaFacadeREST extends AbstractFacade<Venta> {
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")

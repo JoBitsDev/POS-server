@@ -45,7 +45,7 @@ import javax.ws.rs.core.Response;
  * @author Jorge
  *
  */
-@Path("login")
+@Path("login/")
 public class PersonalFacadeREST extends AbstractFacade<Personal> {
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")
@@ -116,8 +116,7 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
     @GET
     @Secured
     @Path("MOSTRAR_PERSONAL_TRABAJANDO")
-    @Produces({MediaType.TEXT_PLAIN})
-    public String findActiveUsers() {
+    public Response findActiveUsers() {
         ArrayList<String> aux = new ArrayList<>();
 
         for (Orden x : super.em1.find(Venta.class, findVenta().getFecha()).getOrdenList()) {
@@ -127,12 +126,7 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
             }
         }
 
-        String ret = "";
-
-        for (int i = 0; i < aux.size(); i++) {
-            ret += aux.get(i) + ",";
-        }
-        return ret;
+        return toJsonString(Response.Status.OK,aux);
     }
 
     @GET
