@@ -50,6 +50,10 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Transaccion.findByDescripcion", query = "SELECT t FROM Transaccion t WHERE t.descripcion = :descripcion")})
 public class Transaccion implements Serializable {
 
+    @JoinColumn(name = "operacionno_operacion", referencedColumnName = "no_operacion")
+    @ManyToOne
+    private Operacion operacionnoOperacion;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -235,6 +239,14 @@ public class Transaccion implements Serializable {
     @Override
     public String toString() {
         return "com.restmanager.Transaccion[ noTransaccion=" + noTransaccion + " ]";
+    }
+
+    public Operacion getOperacionnoOperacion() {
+        return operacionnoOperacion;
+    }
+
+    public void setOperacionnoOperacion(Operacion operacionnoOperacion) {
+        this.operacionnoOperacion = operacionnoOperacion;
     }
 
 }

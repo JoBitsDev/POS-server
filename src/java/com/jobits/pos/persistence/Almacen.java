@@ -39,6 +39,9 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Almacen.findByCentroElaboracion", query = "SELECT a FROM Almacen a WHERE a.centroElaboracion = :centroElaboracion")})
 public class Almacen implements Serializable {
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "almacen")
+    private List<Operacion> operacionList;
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -58,8 +61,6 @@ public class Almacen implements Serializable {
     private Boolean centroElaboracion;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "almacenDestino")
     private List<TransaccionTraspaso> transaccionTraspasoList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "almacencodAlmacen")
-    private List<Transaccion> transaccionList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "almacen")
     private List<InsumoAlmacen> insumoAlmacenList;
 
@@ -119,16 +120,6 @@ public class Almacen implements Serializable {
         this.transaccionTraspasoList = transaccionTraspasoList;
     }
 
-    @XmlTransient
-    public List<Transaccion> getTransaccionList() {
-        return transaccionList;
-    }
-
-    public void setTransaccionList(List<Transaccion> transaccionList) {
-        this.transaccionList = transaccionList;
-    }
-
-    @XmlTransient
     public List<InsumoAlmacen> getInsumoAlmacenList() {
         return insumoAlmacenList;
     }
@@ -160,6 +151,15 @@ public class Almacen implements Serializable {
     @Override
     public String toString() {
         return "com.restmanager.Almacen[ codAlmacen=" + codAlmacen + " ]";
+    }
+
+    @XmlTransient
+    public List<Operacion> getOperacionList() {
+        return operacionList;
+    }
+
+    public void setOperacionList(List<Operacion> operacionList) {
+        this.operacionList = operacionList;
     }
 
 }

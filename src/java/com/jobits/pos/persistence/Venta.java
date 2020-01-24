@@ -45,6 +45,9 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Venta.findByVentapropina", query = "SELECT v FROM Venta v WHERE v.ventapropina = :ventapropina")})
 public class Venta implements Serializable {
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "venta1")
+    private List<IpvVentaRegistro> ipvVentaRegistroList;
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -207,6 +210,15 @@ public class Venta implements Serializable {
     @Override
     public String toString() {
         return "com.restmanager.Venta[ fecha=" + fecha + " ]";
+    }
+
+    @XmlTransient
+    public List<IpvVentaRegistro> getIpvVentaRegistroList() {
+        return ipvVentaRegistroList;
+    }
+
+    public void setIpvVentaRegistroList(List<IpvVentaRegistro> ipvVentaRegistroList) {
+        this.ipvVentaRegistroList = ipvVentaRegistroList;
     }
 
 }
