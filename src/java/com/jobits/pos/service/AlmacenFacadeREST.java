@@ -51,6 +51,16 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     }
 
+    @RolesAllowed("2")
+    @Secured
+    @GET
+    public Response getPrimerAlmacen() {
+        if (findAll().isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).entity("No existe un almacen principal. por favor cree uno.").build();
+        }
+        return toJsonString(Response.Status.OK, findAll().get(0).getInsumoAlmacenList());
+    }
+
     /**
      * Metodo que filtra los insumos del almacen principal por una cocina
      * especifica
