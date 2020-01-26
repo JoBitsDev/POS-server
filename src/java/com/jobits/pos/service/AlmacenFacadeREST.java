@@ -14,9 +14,11 @@ import com.jobits.pos.persistence.Insumo;
 import com.jobits.pos.persistence.InsumoAlmacen;
 import com.jobits.pos.persistence.Ipv;
 import com.jobits.pos.controllers.TransaccionController;
+import com.jobits.pos.persistence.IpvRegistro;
 import com.jobits.pos.persistence.TransaccionEntrada;
 import com.jobits.pos.persistence.TransaccionSalida;
 import com.jobits.pos.printservice.Impresion;
+import com.jobits.utils.R;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,8 +47,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")
     private EntityManager em;
-    
-    
+
     private final String PTO_ELAB = "ptoElab";
 
     public AlmacenFacadeREST() {
@@ -106,7 +107,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
         float cant = Float.parseFloat(values.get("cantidad").toString());
         float valor = Float.parseFloat(values.get("monto").toString());
         TransaccionController controller = new TransaccionController(em1);
-        TransaccionEntrada entrada = controller.addTransaccionEntrada(null,em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(), super.find(almacenCod), cant, valor);
+        TransaccionEntrada entrada = controller.addTransaccionEntrada(null, em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(), super.find(almacenCod), cant, valor);
 
         return toJsonString(Response.Status.OK, entrada.getTransaccion()); //TODO cambiar a 200
     }
@@ -146,7 +147,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
         String insumoCod = (String) params.get("insumoCod");
         float cant = Float.parseFloat(params.get("cantidad").toString());
         String destino = (String) params.get("destino");
-        TransaccionSalida salida = new TransaccionController(em1).addTransaccionSalida(null,em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(),
+        TransaccionSalida salida = new TransaccionController(em1).addTransaccionSalida(null, em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(),
                 super.find(almacenCod), em1.find(Cocina.class, destino), cant);
         return toJsonString(Response.Status.OK, salida.getTransaccion());
 
@@ -160,12 +161,13 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
             @PathParam("insumoCod") String insumoCod,
             @PathParam("cant") float cant,
             @PathParam("razon") String razon) {
-        return new TransaccionController(em1).addTransaccionRebaja(null,em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(),
+        return new TransaccionController(em1).addTransaccionRebaja(null, em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(),
                 super.find(almacenCod), cant, razon).toString();
 
     }
 
     @RolesAllowed("2")
+    @Secured
     @GET
     @Path("IPVS-DE-INSUMO")
     public Response getIPVS(@QueryParam("insumoCod") String codInsumo) {
@@ -178,6 +180,19 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
             cocinas.add(ipv.getCocina().getCodCocina());
         }
         return toJsonString(Response.Status.OK, cocinas);
+    }
+
+    @RolesAllowed("2")
+    @Secured
+    @GET
+    @Path("REGISTRO-IPVS")
+    public Response getRegistroIpvs(@QueryParam(PTO_ELAB) String puntoElaboracion) {
+        ArrayList<IpvRegistro> ret = new ArrayList<>(
+                em1.createNamedQuery("IpvRegistro.findByIpvcocinacodCocinaAndFecha")
+                        .setParameter("ipvcocinacodCocina", puntoElaboracion)
+                        .setParameter("fecha", findVenta().getFecha())
+                        .getResultList());
+        return toJsonString(Response.Status.OK, ret);
     }
 
     @Override
