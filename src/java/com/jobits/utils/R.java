@@ -47,7 +47,7 @@ public class R {
 
     public static final String NO_MESA = "M-0";
 
-    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd'/'MM'/'yy");
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd'-'MM'-'yy");
 
     public static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat(" hh ':' mm ' ' a ");
 
