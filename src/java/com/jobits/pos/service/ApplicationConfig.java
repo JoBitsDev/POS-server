@@ -36,7 +36,7 @@ public class ApplicationConfig extends Application {
         resources.add(com.jobits.pos.service.AlmacenFacadeREST.class);
         resources.add(com.jobits.pos.service.CartaFacadeREST.class);
         resources.add(com.jobits.pos.service.CocinaFacadeREST.class);
-        resources.add(com.jobits.pos.service.MesaFacadeREST.class);
+        resources.add(com.jobits.pos.service.AreaFacadeREST.class);
         resources.add(com.jobits.pos.service.OrdenFacadeREST.class);
         resources.add(com.jobits.pos.service.PersonalFacadeREST.class);
         resources.add(com.jobits.pos.service.ProductoVentaFacadeREST.class);
