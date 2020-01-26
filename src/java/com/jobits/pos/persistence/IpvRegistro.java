@@ -6,6 +6,7 @@
 
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
@@ -68,6 +69,7 @@ public class IpvRegistro implements Serializable {
         @JoinColumn(name = "ipvinsumocod_insumo", referencedColumnName = "insumocod_insumo", insertable = false, updatable = false)
         , @JoinColumn(name = "ipvcocinacod_cocina", referencedColumnName = "cocinacod_cocina", insertable = false, updatable = false)})
     @ManyToOne(optional = false)
+    @JsonIgnore
     private Ipv ipv;
 
     public IpvRegistro() {
