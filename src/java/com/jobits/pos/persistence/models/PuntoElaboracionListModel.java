@@ -5,6 +5,8 @@
  */
 package com.jobits.pos.persistence.models;
 
+import com.jobits.utils.utils;
+
 /**
  * FirstDream
  *
@@ -19,7 +21,7 @@ public class PuntoElaboracionListModel {
     public PuntoElaboracionListModel(String codigo, String nombre, float monto) {
         this.codigo = codigo;
         this.nombre = nombre;
-        this.monto = monto;
+        this.monto = utils.setDosLugaresDecimalesFloat(monto);
     }
 
     public String getCodigo() {

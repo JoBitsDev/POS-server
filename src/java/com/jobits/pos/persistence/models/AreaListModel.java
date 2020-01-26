@@ -5,6 +5,8 @@
  */
 package com.jobits.pos.persistence.models;
 
+import com.jobits.utils.utils;
+
 /**
  * FirstDream
  *
@@ -19,8 +21,8 @@ public class AreaListModel {
     public AreaListModel(String cod, String nombre, float ventaReal, float ventaNeta) {
         this.cod = cod;
         this.nombre = nombre;
-        this.ventaReal = ventaReal;
-        this.ventaNeta = ventaNeta;
+        this.ventaReal = utils.setDosLugaresDecimalesFloat(ventaReal);
+        this.ventaNeta = utils.setDosLugaresDecimalesFloat(ventaNeta);
     }
 
     public String getCod() {

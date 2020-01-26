@@ -6,6 +6,8 @@
 
 package com.jobits.pos.persistence.models;
 
+import com.jobits.utils.utils;
+
 /**
  * FirstDream
  * @author Jorge
@@ -18,9 +20,9 @@ public class DpteListModel {
 
     public DpteListModel(String usuario, float monto, float ordenesAtendidas, float pagoPorVentas) {
         this.usuario = usuario;
-        this.monto = monto;
-        this.ordenesAtendidas = ordenesAtendidas;
-        this.pagoPorVentas = pagoPorVentas;
+        this.monto = utils.setDosLugaresDecimalesFloat(monto);
+        this.ordenesAtendidas = utils.setDosLugaresDecimalesFloat(ordenesAtendidas);
+        this.pagoPorVentas = utils.setDosLugaresDecimalesFloat(pagoPorVentas);
     }
 
     public String getUsuario() {

@@ -6,6 +6,7 @@
 package com.jobits.pos.persistence.models;
 
 import com.jobits.pos.persistence.Venta;
+import com.jobits.utils.utils;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -34,12 +35,12 @@ public class VentaResumenModel {
     private final List<PuntoElaboracionListModel> ptosElaboracion;
 
     public VentaResumenModel(Venta v,List<AreaListModel> areas, List<DpteListModel> dptes, List<PuntoElaboracionListModel> ptosElaboracion) {
-        ventaTotal = VentaCalculator.getValorTotalVentas(v);
+        ventaTotal = utils.setDosLugaresDecimalesFloat(VentaCalculator.getValorTotalVentas(v));
         ventaNeta = VentaCalculator.getValorTotalVentasNeta(v);
-        gastosInsumo = VentaCalculator.getValorTotalGastosInsumo(v);
-        gastosSalario = VentaCalculator.getValorTotalPagoTrabajadores(v);
-        autorizos = VentaCalculator.getValorTotalVentasCasa(v);
-        gastosOtros = VentaCalculator.getValorTotalOtrosGastos(v);
+        gastosInsumo = utils.setDosLugaresDecimalesFloat(VentaCalculator.getValorTotalGastosInsumo(v));
+        gastosSalario = utils.setDosLugaresDecimalesFloat(VentaCalculator.getValorTotalPagoTrabajadores(v));
+        autorizos = utils.setDosLugaresDecimalesFloat(VentaCalculator.getValorTotalVentasCasa(v));
+        gastosOtros = utils.setDosLugaresDecimalesFloat(VentaCalculator.getValorTotalOtrosGastos(v));
         this.areas = areas;
         this.dptes = dptes;
         this.ptosElaboracion = ptosElaboracion;
