@@ -10,6 +10,7 @@ import com.jobits.pos.persistence.TransaccionSalida;
 import com.jobits.pos.persistence.Insumo;
 import com.jobits.pos.persistence.TransaccionMerma;
 import com.jobits.pos.persistence.Almacen;
+import com.jobits.pos.persistence.Operacion;
 import com.jobits.pos.persistence.Transaccion;
 import com.jobits.pos.persistence.TransaccionEntrada;
 import java.util.Date;
@@ -30,73 +31,74 @@ public class TransaccionController {
         this.em1 = em1;
     }
 
-    public TransaccionEntrada addTransaccionEntrada(Insumo insumo, Date fecha, Date hora, Almacen a, float cantidad, float importe) {
-        Transaccion t = nuevaTransaccion(insumo, fecha, hora, a, cantidad);
+    public TransaccionEntrada addTransaccionEntrada(Operacion o, Insumo insumo, Date fecha, Date hora, Almacen a, float cantidad, float importe) {
+        Transaccion t = nuevaTransaccion(o, insumo, fecha, hora, a, cantidad);
         TransaccionEntrada ret = new TransaccionEntrada(t.getNoTransaccion());
         ret.setJustificado(false);
         ret.setTransaccion(t);
         ret.setValorTotal(importe);
         ret.setPrecioPorUnidad(ret.getValorTotal() / ret.getTransaccion().getCantidad());
         t.setTransaccionEntrada(ret);
-      //  a.getTransaccionList().add(t); //TODO: revisar esto
-        createNewTransaccionEntrada(ret);
+        //  a.getTransaccionList().add(t); //TODO: revisar esto
+        createNewTransaccionEntrada(ret,a);
         return ret;
 
     }
 
-    public TransaccionSalida addTransaccionSalida(Insumo insumo, Date fecha, Date hora, Almacen a, Cocina cocina, float cantidad) {
-        Transaccion t = nuevaTransaccion(insumo, fecha, hora, a, cantidad);
+    public TransaccionSalida addTransaccionSalida(Operacion o, Insumo insumo, Date fecha, Date hora, Almacen a, Cocina cocina, float cantidad) {
+        Transaccion t = nuevaTransaccion(o, insumo, fecha, hora, a, cantidad);
         TransaccionSalida salida = new TransaccionSalida(t.getNoTransaccion());
         salida.setTransaccion(t);
         salida.setCocinacodCocina(cocina);
-        createNewTransaccionSalida(salida);
+        createNewTransaccionSalida(salida,a);
         return salida;
 
     }
 
-    public TransaccionMerma addTransaccionRebaja(Insumo insumo, Date fecha, Date hora, Almacen a, float cantidad, String causaRebaja) {
-        Transaccion t = nuevaTransaccion(insumo, fecha, hora, a, cantidad);
+    public TransaccionMerma addTransaccionRebaja(Operacion o, Insumo insumo, Date fecha, Date hora, Almacen a, float cantidad, String causaRebaja) {
+        Transaccion t = nuevaTransaccion(o, insumo, fecha, hora, a, cantidad);
         TransaccionMerma rebaja = new TransaccionMerma(t.getNoTransaccion());
         rebaja.setTransaccion(t);
         rebaja.setRazon(causaRebaja);
-       // a.getTransaccionList().add(t); //TODO: Revisar esto
-        createNewTransaccionRebaja(rebaja);
+        // a.getTransaccionList().add(t); //TODO: Revisar esto
+        createNewTransaccionRebaja(rebaja,a);
         return rebaja;
     }
 
     //
     //Private methods
     //
-    
-    void createNewTransaccionRebaja(TransaccionMerma transaccion) {
+    void createNewTransaccionRebaja(TransaccionMerma transaccion,Almacen a) {
         startTransaction();
-        AlmacenController almacenController = new AlmacenController(em1);
+        AlmacenController almacenController = new AlmacenController(em1,a);
         almacenController.darMermaInsumo(transaccion);
         em1.persist(transaccion);
         commitTransaction();
 
     }
 
-    void createNewTransaccionSalida(TransaccionSalida transaccion) {
+    void createNewTransaccionSalida(TransaccionSalida transaccion,Almacen a) {
         startTransaction();
-        AlmacenController almacenController = new AlmacenController(em1);
+        AlmacenController almacenController = new AlmacenController(em1,a);
         almacenController.darSalidaAInsumo(transaccion);
         em1.persist(transaccion);
         commitTransaction();
 
     }
 
-    void createNewTransaccionEntrada(TransaccionEntrada transaccion) {
+    void createNewTransaccionEntrada(TransaccionEntrada transaccion,Almacen a) {
         startTransaction();
-        AlmacenController controller = new AlmacenController(em1);
+        AlmacenController controller = new AlmacenController(em1,a);
         controller.darEntradaAInsumo(transaccion);
         em1.persist(transaccion);
         commitTransaction();
     }
 
-    private Transaccion nuevaTransaccion(Insumo insumo, Date fecha, Date hora, Almacen a, float cantidad) {
+    private Transaccion nuevaTransaccion(Operacion o, Insumo insumo, Date fecha, Date hora, Almacen a, float cantidad) {
         Transaccion t = new Transaccion();
-        t.setAlmacencodAlmacen(a);
+        if (o != null) {
+            t.setOperacionnoOperacion(o);
+        }
         t.setCantidad(cantidad);
         t.setInsumocodInsumo(insumo);
         t.setFecha(fecha);

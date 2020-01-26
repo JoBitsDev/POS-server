@@ -27,16 +27,17 @@ import com.jobits.utils.utils;
 public class AlmacenController {
 
     private EntityManager em1;
+    private Almacen a;
 
-    public AlmacenController(EntityManager em1) {
+    public AlmacenController(EntityManager em1,Almacen a) {
         this.em1 = em1;
+        this.a = a;
     }
 
     public void darEntradaAInsumo(TransaccionEntrada x) {
         Insumo insumo = x.getTransaccion().getInsumocodInsumo();
         float cantidad = x.getTransaccion().getCantidad();
         float valorTotal = x.getValorTotal();
-        Almacen a = x.getTransaccion().getAlmacencodAlmacen();
         InsumoAlmacen ins = null;
         for (InsumoAlmacen i : a.getInsumoAlmacenList()) {
             if (i.getInsumo().equals(insumo)) {
@@ -67,7 +68,7 @@ public class AlmacenController {
 
     void darSalidaAInsumo(TransaccionSalida x) {
         InsumoAlmacen insumoADarSalida = null;
-        for (InsumoAlmacen i : x.getTransaccion().getAlmacencodAlmacen().getInsumoAlmacenList()) {
+        for (InsumoAlmacen i : a.getInsumoAlmacenList()) {
             if (i.getInsumo().equals(x.getTransaccion().getInsumocodInsumo())) {
                 insumoADarSalida = i;
 
@@ -99,7 +100,7 @@ public class AlmacenController {
     void darMermaInsumo(TransaccionMerma x) {
         InsumoAlmacen insumoaRebajar = null;
 
-        for (InsumoAlmacen i : x.getTransaccion().getAlmacencodAlmacen().getInsumoAlmacenList()) {
+        for (InsumoAlmacen i : a.getInsumoAlmacenList()) {
             if (i.getInsumo().equals(x.getTransaccion().getInsumocodInsumo())) {
                 insumoaRebajar = i;
 
@@ -118,5 +119,5 @@ public class AlmacenController {
         //updateValorTotalAlmacen(instance);
 
     }
-
+    
 }

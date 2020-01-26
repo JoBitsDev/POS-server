@@ -24,6 +24,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -56,7 +57,8 @@ public class Transaccion implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "id_transaccion_generator")
+    @SequenceGenerator(name = "id_transaccion_generator", allocationSize = 1)
     @Basic(optional = false)
     @Column(name = "no_transaccion")
     private Integer noTransaccion;
@@ -88,11 +90,6 @@ public class Transaccion implements Serializable {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaccion")
     @JsonManagedReference
     private TransaccionEntrada transaccionEntrada;
-
-    @JoinColumn(name = "almacencod_almacen", referencedColumnName = "cod_almacen")
-    @ManyToOne(optional = false)
-    @JsonBackReference
-    private Almacen almacencodAlmacen;
 
     @JoinColumn(name = "insumocod_insumo", referencedColumnName = "cod_insumo")
     @ManyToOne(optional = false)
@@ -181,14 +178,6 @@ public class Transaccion implements Serializable {
 
     public void setTransaccionEntrada(TransaccionEntrada transaccionEntrada) {
         this.transaccionEntrada = transaccionEntrada;
-    }
-
-    public Almacen getAlmacencodAlmacen() {
-        return almacencodAlmacen;
-    }
-
-    public void setAlmacencodAlmacen(Almacen almacencodAlmacen) {
-        this.almacencodAlmacen = almacencodAlmacen;
     }
 
     public Insumo getInsumocodInsumo() {
