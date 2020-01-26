@@ -29,6 +29,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.ws.handler.MessageContext;
 import com.jobits.utils.R;
+import javax.ws.rs.QueryParam;
 
 /**
  * FirstDream
@@ -61,10 +62,10 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
      * @return un objeto de tipo {@link VentaResumenModel} convertido a json
      */
     @RolesAllowed("3")
-    @POST
+    @GET
     @Path("SALES")
     @Secured
-    public Response getResumenVentas(String fecha) {
+    public Response getResumenVentas(@QueryParam("fecha") String fecha) {
         Venta v;
         try {
             v = find(R.DATE_FORMAT.parse(fecha));
