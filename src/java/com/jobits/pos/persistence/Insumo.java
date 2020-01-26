@@ -58,6 +58,7 @@ public class Insumo implements Serializable {
     @Column(name = "um")
     private String um;
     @Column(name = "elaborado")
+    @JsonIgnore
     private Boolean elaborado;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "costo_por_unidad")
@@ -65,6 +66,7 @@ public class Insumo implements Serializable {
     @Column(name = "stock_estimation")
     private Float stockEstimation;
     @Column(name = "cantidad_creada")
+    @JsonIgnore
     private Float cantidadCreada;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
     @JsonIgnore
