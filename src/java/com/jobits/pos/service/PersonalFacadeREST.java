@@ -18,6 +18,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -57,65 +58,10 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
         super(Personal.class);
     }
 
-    @POST
-    @Override
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void create(Personal entity) {
-        super.create(entity);
-    }
-
-    @PUT
-    @Path("{id}")
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void edit(@PathParam("id") String id, Personal entity) {
-        super.edit(entity);
-    }
-
-    @DELETE
-    @Path("{id}")
-    public void remove(@PathParam("id") String id) {
-        super.remove(super.find(id));
-    }
-
-    @GET
-    @Path("{id}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Personal find(@PathParam("id") String id) {
-        return super.find(id);
-    }
-
-    /**
-     * @deprecated solo esta aqui por compatibilidad hasta que se actualize la
-     * app POS Cocina
-     * @param action
-     * @param user
-     * @param pass
-     * @return 1 si true, 2 si false, 0 si no pincha
-     */
-    @GET
-    @Path("{action}_{user}_{pass}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String find(@PathParam("action") String action,
-            @PathParam("user") String user, @PathParam("pass") String pass) {
-        List<Personal> list = super.findAll();
-
-        for (Personal x : list) {
-            if (x.getUsuario().equals(user)) {
-                if (x.getContrasenna().equals(pass)) {
-                    if (!x.getOnline()) {
-                        return "1";
-                    }
-                }
-                return "2";
-            }
-        }
-        return "0";
-    }
-
     @RolesAllowed("1")
     @GET
     @Secured
-    @Path("MOSTRAR_PERSONAL_TRABAJANDO")
+    @Path("MOSTRAR-PERSONAL-TRABAJANDO")
     public Response findActiveUsers() {
         ArrayList<String> aux = new ArrayList<>();
 
@@ -125,34 +71,8 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
                 aux.add(nombre);
             }
         }
-
-        return toJsonString(Response.Status.OK,aux);
-    }
-
-    @GET
-    @Override
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Personal> findAll() {
-        return super.findAll();
-    }
-
-    @GET
-    @Path("{from}/{to}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Personal> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
-        return super.findRange(new int[]{from, to});
-    }
-
-    @GET
-    @Path("count")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String countREST() {
-        return String.valueOf(super.count());
-    }
-
-    @Override
-    protected EntityManager getEntityManager() {
-        return em;
+        Collections.sort(aux);
+        return toJsonString(Response.Status.OK, aux);
     }
 
     @POST
@@ -185,6 +105,11 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
         } catch (InternalServerErrorException ex) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         }
+    }
+
+    @Override
+    protected EntityManager getEntityManager() {
+        return em;
     }
 
     private Personal authenticate(String username, String password) throws CredentialException, InternalServerErrorException {

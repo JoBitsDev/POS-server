@@ -5,19 +5,11 @@
  */
 package com.jobits.pos.service;
 
-import com.jobits.pos.persistence.ProductoVenta;
-import com.jobits.pos.persistence.Orden;
-import com.jobits.pos.persistence.Impresora;
-import com.jobits.pos.persistence.Mesa;
-import com.jobits.pos.persistence.Nota;
-import com.jobits.pos.persistence.NotaPK;
-import com.jobits.pos.persistence.Venta;
-import com.jobits.pos.persistence.Configuracion;
-import com.jobits.pos.persistence.NotificacionEnvioCocina;
-import com.jobits.pos.persistence.ProductovOrden;
-import com.jobits.pos.persistence.NotificacionEnvioCocinaPK;
-import com.jobits.pos.persistence.Personal;
-import com.restmanager.XMLservice.OrdenXMLExport;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jobits.pos.authentication.AuthenticationFilter;
+import com.jobits.pos.authentication.Secured;
+import com.jobits.pos.persistence.*;
 import com.restmanager.XMLservice.ProductovOrdenXMLexport;
 import com.jobits.pos.notificationdelivery.Notificable;
 import com.jobits.pos.notificationdelivery.Notificador;
@@ -25,7 +17,6 @@ import com.jobits.pos.printservice.Impresion;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +24,12 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import com.jobits.utils.R;
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.security.RolesAllowed;
+import javax.security.auth.login.CredentialNotFoundException;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -53,46 +50,35 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
     }
 
+    @RolesAllowed("0")
     @GET
-    @Path("{id}")
-    @Produces({MediaType.TEXT_PLAIN})
-    public String find(@PathParam("id") String id) {
-        Orden o = super.find(id);
-        ArrayList<Orden> ordens = new ArrayList<>();
-        ordens.add(o);
-      return  OrdenXMLExport.exportEntities(ordens);
+    @Secured
+    public Response getOrden(@QueryParam("codOrden") String codOrden) {
+        return toJsonString(Response.Status.OK, find(codOrden));
     }
 
-    @GET
-    @Override
-    @Produces({MediaType.APPLICATION_JSON})
-    public List<Orden> findAll() {
-        return super.findAll();
-    }
-
-    /**
-     *
-     *
-     * @param codMesa
-     * @param usuarioTrabajador
-     * @return
-     */
-    @GET
-    @Path("CREATE_{codMesa}_{usuarioTrabajador}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String create(@PathParam("codMesa") String codMesa,
-            @PathParam("usuarioTrabajador") String usuarioTrabajador) {
+    @RolesAllowed("0")
+    @Secured
+    @POST
+    @Path("CREATE")
+    public Response create(String codMesa, @Context HttpServletRequest inRequest) {
         Orden o = new Orden(ajustarNoOrden());
         Mesa m = getEntityManager().find(Mesa.class, codMesa);
-        Personal p = getEntityManager().find(Personal.class, usuarioTrabajador);
+        String usuarioTrabajando = null;
+        try {
+            usuarioTrabajando = AuthenticationFilter.getCredentialsFromToken(getToken(inRequest)).getUsername();
+        } catch (CredentialNotFoundException ex) {
+            return toJsonString(Response.Status.NOT_FOUND, "Credenciales no encontradas");
+        }
+        Personal p = getEntityManager().find(Personal.class, usuarioTrabajando);
 
         Venta v = findVenta();
 
         if (v == null) {
-            return "2";
+            return Response.status(Response.Status.NOT_FOUND).entity("El Cajero debe comenzar el dia de trabajo para crear ordenes").build();
         }
 
-        m.setEstado(o.getCodOrden() + " " + usuarioTrabajador);
+        m.setEstado(o.getCodOrden() + " " + usuarioTrabajando);
         o.setMesacodMesa(m);
         o.setPersonalusuario(p);
         o.setVentafecha(v);
@@ -104,43 +90,14 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         em1.getTransaction().begin();
         super.create(o);
         em1.getTransaction().commit();
-        return "1";
+        return toJsonString(Response.Status.OK, o);
     }
 
-    @GET
-    @Path("GETCAMARERO_{codOrden}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getCamarero(@PathParam("codOrden") String codOrden) {
-        return super.find(codOrden).getPersonalusuario().getUsuario();
-    }
-
-    @GET
-    @Path("LISTPRODUCTS_{codOrden}")
-    @Produces({MediaType.TEXT_XML})
-    public String getPDV(@PathParam("codOrden") String codOrden) {
-        Orden o = super.find(codOrden);
-
-        if (o != null && o.getHoraTerminada() != null) {
-            Mesa m = o.getMesacodMesa();
-            m.setEstado(ESTADO_MESA_VACIA);
-
-            em1.getTransaction().begin();
-            em1.merge(m);
-            em1.flush();
-            if (em1.getTransaction().isActive()) {
-                em1.getTransaction().commit();
-            }
-
-            return null;
-        }
-
-        return ProductovOrdenXMLexport.exportToXML(o.getProductovOrdenList());
-    }
-
-    @GET
-    @Path("ISVALID_{codOrden}")
-    @Produces({MediaType.TEXT_XML})
-    public String isValid(@PathParam("codOrden") String codOrden) {
+    @RolesAllowed("0")
+    @Secured
+    @POST
+    @Path("VALIDATE")
+    public Response isValid(String codOrden) {
         Orden o = super.find(codOrden);
 
         if (o != null) {
@@ -154,62 +111,30 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                 if (em1.getTransaction().isActive()) {
                     em1.getTransaction().commit();
                 }
-                return "0";
+                return toJsonString(Response.Status.GONE, "La mesa ya no se encuentra abierta");
             } else {
-                return "1";
+                return toJsonString(Response.Status.OK, "Orden validada");
             }
         } else {
-            return "0";
+            return toJsonString(Response.Status.GONE, "La orden se elimino de manera inesperada");
         }
     }
 
-    @GET
-    @Path("ADD_{codOrden}_{codProductoVenta}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String addProducto(@PathParam("codOrden") String codOrden,
-            @PathParam("codProductoVenta") String codProducto) {
-
-        Orden o = super.find(codOrden);
-        ProductoVenta producto = getEntityManager().find(ProductoVenta.class, codProducto);
-        ArrayList<ProductovOrden> po = new ArrayList<>(o.getProductovOrdenList());
-        int contains = -1;
-        if (!po.isEmpty()) {
-            for (int i = 0; contains == -1 && i < po.size(); i++) {
-                if (po.get(i).getProductoVenta().getPCod().equals(codProducto)) {
-                    contains = i;
-                }
-            }
+    @RolesAllowed("0")
+    @Secured
+    @POST
+    @Path("ADD")
+    public Response addProducto(String hashMap) {
+        HashMap<String, Object> values;
+        try {
+            values = new ObjectMapper().readValue(hashMap, HashMap.class);
+        } catch (JsonProcessingException ex) {
+            return handleException(ex);
         }
 
-        if (contains != -1) {
-            ProductovOrden p = po.get(contains);
-            float cant = p.getCantidad();
-            p.setCantidad(++cant);
-
-        } else {
-            ProductovOrden aux = new ProductovOrden(codProducto, codOrden);
-            aux.setOrden(o);
-            aux.setProductoVenta(producto);
-            aux.setCantidad(1);
-            aux.setEnviadosacocina((float) 0);
-            aux.setNumeroComensal(0);
-
-            //em.persist(aux);
-            po.add(aux);
-
-        }
-        o.setProductovOrdenList(po);
-        o.setOrdenvalorMonetario(calcularValorTotal(o));
-
-        super.edit(o);
-        return "1";
-    }//TODO: METODoS ARCAICOS
-
-    @GET
-    @Path("ADD_{codOrden}_{codProductoVenta}_{cantidad}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String addProducto(@PathParam("codOrden") String codOrden,
-            @PathParam("codProductoVenta") String codProducto, @PathParam("cantidad") Float cantidad) {
+        String codOrden = values.get("codOrden").toString();
+        String codProducto = values.get("codProducto").toString();
+        float cantidad = Float.parseFloat(values.get("cantidad").toString());
 
         Orden o = super.find(codOrden);
         ProductoVenta producto = getEntityManager().find(ProductoVenta.class, codProducto);
@@ -244,14 +169,26 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         o.setOrdenvalorMonetario(calcularValorTotal(o));
 
         super.edit(o);
-        return "1";
-    }//TODO: METODoS ARCAICOS
+        return toJsonString(Response.Status.OK, o);
+    }//TODO: Respuesta del servidor incorrecta
 
-    @GET
-    @Path("REMOVE_{codOrden}_{codProductoVenta}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String removeProducto(@PathParam("codOrden") String codOrden,
-            @PathParam("codProductoVenta") String codProducto) {
+    @RolesAllowed("0")
+    @Secured
+    @POST
+    @Path("REMOVE")
+    public Response removeProducto(String hashMap) {
+
+        HashMap<String, Object> values;
+        try {
+            values = new ObjectMapper().readValue(hashMap, HashMap.class);
+        } catch (JsonProcessingException ex) {
+            return handleException(ex);
+        }
+
+        String codOrden = values.get("codOrden").toString();
+        String codProducto = values.get("codProducto").toString();
+        float cantidad = Float.parseFloat(values.get("cantidad").toString());
+
         Orden o = super.find(codOrden);
 
         ArrayList<ProductovOrden> po = new ArrayList<>(o.getProductovOrdenList());
@@ -285,35 +222,14 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
             super.edit(o);
         }//TODO: aqui hay que disminuir tambien los contadores para enviado a cocina junto con los contadores de cantidad
 
-        return "1";
+        return toJsonString(Response.Status.OK, o);
     }//TODO: METODoS ARCAICOS'
 
-    @GET
-    @Path("REMOVEALL_{codOrden}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String removeAllProducto(@PathParam("codOrden") String codOrden,
-            @PathParam("codProductoVenta") String codProducto) {
-        Orden o = super.find(codOrden);
-
-        ArrayList<ProductovOrden> po = new ArrayList<>(o.getProductovOrdenList());
-        getEntityManager().getTransaction().begin();
-        while (!po.isEmpty()) {
-            ProductovOrden p = po.remove(0);
-            p = getEntityManager().find(ProductovOrden.class, p.getProductovOrdenPK());
-            getEntityManager().remove(p);
-        }
-        o.setProductovOrdenList(po);
-        o.setOrdenvalorMonetario(calcularValorTotal(o));
-        getEntityManager().getTransaction().commit();
-
-        super.edit(o);
-        return "1";
-    }//TODO: METODoS ARCAICOS
-
-    @GET
-    @Path("FINISH_{codOrden}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String finish(@PathParam("codOrden") String codOrden) {
+    @RolesAllowed("0")
+    @Secured
+    @POST
+    @Path("FINISH")
+    public Response finish(String codOrden) {
 
         Orden o = super.find(codOrden);
         Mesa m = getEntityManager().find(Mesa.class, o.getMesacodMesa().getCodMesa());
@@ -322,12 +238,12 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
             if (R.TABLETS_EN_COCINA) {
                 if (!x.getNotificacionEnvioCocinaList().isEmpty()) {
-                    return "2";
+                    return toJsonString(Response.Status.PRECONDITION_FAILED, "Existen Productos que faltan por enviar a elaborar. Envie a elaborar");
                 }
             }
 //            if (Impresion.getDefaultInstance().IMPRIMIR_TICKET_COCINA) {
             if (x.getCantidad() > x.getEnviadosacocina()) {
-                return "2";
+                return toJsonString(Response.Status.PRECONDITION_FAILED, "Existen Productos que faltan por enviar a elaborar. Envie a elaborar");
             }
 
             //         }
@@ -351,14 +267,14 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
         super.edit(o);
 
-        return "1";
+        return toJsonString(Response.Status.OK, "Orden cerrada exitosamente");
     }//TODO: METODoS ARCAICOS
 
-    @GET
-    @Path("ENVIARCOCINA_{codOrden}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String enviarACocina(@PathParam("codOrden") String codOrden, @Context HttpServletRequest inRequest) {
-
+    @RolesAllowed("0")
+    @Secured
+    @POST
+    @Path("ENVIAR-COCINA")
+    public Response enviarACocina(String codOrden, @Context HttpServletRequest inRequest) {
         Orden o = super.find(codOrden);
         Mesa m = getEntityManager().find(Mesa.class, o.getMesacodMesa().getCodMesa());
 
@@ -408,16 +324,25 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
         super.edit(o);
 
-        return "1";
+        return toJsonString(Response.Status.OK, o);
     }//TODO: METODoS ARCAICOS
 
-    @GET
-    @Path("ADDNOTA_{codOrden}_{pcod}_{nota}")
+    @POST
+    @RolesAllowed("0")
+    @Secured
+    @Path("ADD-NOTA")
     @Produces(MediaType.TEXT_PLAIN)
-    public String addNota(
-            @PathParam("codOrden") String codOrden,
-            @PathParam("pcod") String pCod,
-            @PathParam("nota") String nota) {
+    public Response addNota(String hashMap) {
+        HashMap<String, Object> values;
+        try {
+            values = new ObjectMapper().readValue(hashMap, HashMap.class);
+        } catch (JsonProcessingException ex) {
+            return handleException(ex);
+        }
+
+        String codOrden = values.get("codOrden").toString();
+        String pCod = values.get("codProd").toString();
+        String nota = values.get("nota").toString();
 
         Orden o = super.find(codOrden);
         ProductovOrden pv = null;
@@ -444,119 +369,127 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         em1.getTransaction().commit();
         super.edit(o);
 
-        return "1";
+        return toJsonString(Response.Status.OK, "Notificacion exitosa");
     }//TODO: METODoS ARCAICOS
 
+    @RolesAllowed("0")
+    @Secured
     @GET
-    @Path("GETNOTA_{codOrden}_{pcod}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getNota(
-            @PathParam("codOrden") String codOrden,
-            @PathParam("pcod") String pCod) {
-
+    @Path("GET-NOTA")
+    public Response getNota(@QueryParam("codOrden") String codOrden, @QueryParam("codProd") String pCod) {
         Orden o = super.find(codOrden);
-
         for (ProductovOrden x : o.getProductovOrdenList()) {
             if (x.getProductoVenta().getPCod().equals(pCod)) {
                 if (x.getNota() == null) {
-                    return "0";
+                    return toJsonString(Response.Status.OK, "");
                 }
-                return x.getNota().getDescripcion().replace('-', ' ');
+                return toJsonString(Response.Status.OK, x.getNota().getDescripcion());
             }
 
         }
-        return "0";
+        return toJsonString(Response.Status.OK, "");
 
-    }//TODO: METODoS ARCAICOS
+    }
 
+    @RolesAllowed("0")
+    @Secured
     @GET
-    @Path("GETCOMENSAL_{codOrden}_{pcod}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getComensal(
-            @PathParam("codOrden") String codOrden,
-            @PathParam("pcod") String pCod) {
-
+    @Path("GET-COMENSAL")
+    public Response getComensal(
+            @QueryParam("codOrden") String codOrden,
+            @QueryParam("codProd") String pCod) {
         Orden o = super.find(codOrden);
 
         for (ProductovOrden x : o.getProductovOrdenList()) {
             if (x.getProductoVenta().getPCod().equals(pCod)) {
                 if (x.getNumeroComensal() == null) {
-                    return "0";
+                    return toJsonString(Response.Status.OK, 0);
                 }
-                return "" + x.getNumeroComensal();
+                return toJsonString(Response.Status.OK, x.getNumeroComensal());
             }
 
         }
-        return "0";
+        return toJsonString(Response.Status.OK, 0);
 
     }//TODO: METODoS ARCAICOS
 
-    @GET
-    @Path("ADDCOMENSAL_{codOrden}_{pcod}_{numeroComensal}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String addComensal(
-            @PathParam("codOrden") String codOrden,
-            @PathParam("pcod") String pCod,
-            @PathParam("numeroComensal") String numero) {
+    @RolesAllowed("0")
+    @Secured
+    @POST
+    @Path("ADD-COMENSAL")
+    public Response addComensal(
+            String hashMap) {
+
+        HashMap<String, Object> values;
+        try {
+            values = new ObjectMapper().readValue(hashMap, HashMap.class);
+        } catch (JsonProcessingException ex) {
+            return handleException(ex);
+        }
+
+        String codOrden = values.get("codOrden").toString();
+        String pCod = values.get("codProd").toString();
+        int numero = Integer.parseInt(values.get("comensal").toString());
 
         Orden o = super.find(codOrden);
         ProductovOrden pv = null;
         for (ProductovOrden x : o.getProductovOrdenList()) {
             if (x.getProductoVenta().getPCod().equals(pCod)) {
-                x.setNumeroComensal(Integer.parseInt(numero));
+                x.setNumeroComensal(numero);
                 pv = x;
-
             }
-
         }
 
         em1.getTransaction().begin();
         em1.merge(pv);
         em1.getTransaction().commit();
         super.edit(o);
-        return "1";
+        return toJsonString(Response.Status.OK, "Exito");
 
     }//TODO: METODoS ARCAICOS
 
-    @GET
-    @Path("PRINT_{codOrden}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String print(@PathParam("codOrden") String codOrden) {
+    @RolesAllowed("0")
+    @Secured
+    @POST
+    @Path("SET-DE-LA-CASA")
+    public Response setDeLaCasa(String hashMap) {
+        HashMap<String, Object> values;
+        try {
+            values = new ObjectMapper().readValue(hashMap, HashMap.class);
+        } catch (JsonProcessingException ex) {
+            return handleException(ex);
+        }
+        String codOrden = values.get("codOrden").toString();
+        boolean deLaCasa = Boolean.parseBoolean(values.get("deLaCasa").toString());
 
         Orden o = super.find(codOrden);
-        Mesa m = getEntityManager().find(Mesa.class, o.getMesacodMesa().getCodMesa());
-        Impresion i = new Impresion();
-        i.print(o, false);
-
+        o.setDeLaCasa(deLaCasa);
         super.edit(o);
-
-        return "1";
+        return toJsonString(Response.Status.OK, o);
     }//TODO: METODoS ARCAICOS
 
-    @GET
-    @Path("SETDELACASA_{codOrden}_{deLaCasa}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String setDeLaCasa(@PathParam("codOrden") String codOrden,
-            @PathParam("deLaCasa") String deLaCasa) {
+    @RolesAllowed("0")
+    @Secured
+    @POST
+    @Path("MOVER-A-MESA")
+    public Response setMesa(String hashMap) {
+        HashMap<String, Object> values;
+        try {
+            values = new ObjectMapper().readValue(hashMap, HashMap.class);
+        } catch (JsonProcessingException ex) {
+            return handleException(ex);
+        }
 
-        Orden o = super.find(codOrden);
-        o.setDeLaCasa(deLaCasa.equals("true"));
-        super.edit(o);
-        return "1";
-    }//TODO: METODoS ARCAICOS
+        String codOrden = values.get("codOrden").toString();
+        String codMesa = values.get("codMesa").toString();
 
-    @GET
-    @Path("MOVERAMESA_{codOrden}_{codMesa}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String setMesa(@PathParam("codOrden") String codOrden,
-            @PathParam("codMesa") String codMesa) {
         getEntityManager().getTransaction().begin();
         Orden o = super.find(codOrden);
         Mesa mesaDestino = getEntityManager().find(Mesa.class, codMesa);
         Mesa mesaOrigen = o.getMesacodMesa();
         if (mesaDestino.getEstado().equals("ocupada")) {
             getEntityManager().getTransaction().rollback();
-            return "La mesa de destino esta ocupada";
+            return toJsonString(Response.Status.BAD_REQUEST, "La mesa de destino esta ocupada");
         }
         mesaDestino.setEstado(o.getCodOrden() + " " + o.getPersonalusuario().getUsuario());
         getEntityManager().merge(mesaDestino);
@@ -569,14 +502,24 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         super.edit(o);
         getEntityManager().getTransaction().commit();
 
-        return "1";
+        return toJsonString(Response.Status.OK, "Cambiado correctamente");
     }//TODO: METODoS ARCAICOS
 
-    @GET
-    @Path("CEDERORDEN_{codOrden}_{usuario}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String setUsuario(@PathParam("codOrden") String codOrden,
-            @PathParam("usuario") String usuario) {
+    @RolesAllowed("0")
+    @Secured
+    @POST
+    @Path("CEDER-ORDEN")
+    public Response setUsuario(String hashMap) {
+        HashMap<String, Object> values;
+        try {
+            values = new ObjectMapper().readValue(hashMap, HashMap.class);
+        } catch (JsonProcessingException ex) {
+            return handleException(ex);
+        }
+
+        String codOrden = values.get("codOrden").toString();
+        String usuario = values.get("usuario").toString();
+
         getEntityManager().getTransaction().begin();
         Orden o = super.find(codOrden);
         Personal personalDestino = getEntityManager().find(Personal.class, usuario);
@@ -587,25 +530,20 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         super.edit(o);
 
         getEntityManager().getTransaction().commit();
-        return "1";
+        return toJsonString(Response.Status.OK, "Exito");
     }//TODO: METODoS ARCAICOS
 
+    @RolesAllowed("0")
+    @Secured
     @GET
-    @Path("count")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String countREST() {
-        return String.valueOf(super.count());
-    }
-
-    @GET
-    @Path("fetch")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String siguientNoOrden() {
+    @Path("FETCH")
+    public Response siguientNoOrden() {
         Configuracion c = getEntityManager().find(Configuracion.class, "O");
         int ret = c.getValor();
         c.setValor(ret + 1);
         getEntityManager().persist(c);
-        return "O-" + (ret);
+        String r = "O-" + ret;
+        return toJsonString(Response.Status.OK, r);
     }
 
     @Override
@@ -614,16 +552,21 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     }
 
     private String ajustarNoOrden() {
-        String numeroOrdenNuevo = siguientNoOrden();
-        boolean existe = super.find(numeroOrdenNuevo) != null;
 
-        while (existe) {
-            numeroOrdenNuevo = siguientNoOrden();
-            existe = super.find(numeroOrdenNuevo) != null;
+        try {
+            String numeroOrdenNuevo = new ObjectMapper().readValue(siguientNoOrden().getEntity().toString(), String.class);
+            boolean existe = super.find(numeroOrdenNuevo) != null;
 
+            while (existe) {
+                numeroOrdenNuevo = new ObjectMapper().readValue(siguientNoOrden().getEntity().toString(), String.class);
+                existe = super.find(numeroOrdenNuevo) != null;
+
+            }
+            return numeroOrdenNuevo;
+        } catch (JsonProcessingException ex) {
+            handleException(ex);
         }
-        return numeroOrdenNuevo;
-
+        return null;
     }
 
     private float calcularValorTotal(Orden o) {
