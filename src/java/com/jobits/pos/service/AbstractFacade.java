@@ -15,6 +15,8 @@ import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.xml.ws.WebServiceContext;
 
@@ -143,4 +145,9 @@ public abstract class AbstractFacade<T> {
             return handleException(ex);
         }
     }
+
+    protected String getToken(HttpServletRequest requestContext) {
+        return requestContext.getHeader(HttpHeaders.AUTHORIZATION).substring("Bearer".length()).trim();
+    }
+    
 }
