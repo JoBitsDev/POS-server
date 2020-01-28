@@ -113,15 +113,20 @@ public class AuthenticationFilter implements ContainerRequestFilter {
      */
     private void validateToken(String token, List<String> roleSet) throws CredentialException {
         //TODO: tiempo de espera del token
-        Credentials c = PersonalFacadeREST.tokens.get(token);
-        if (c == null) {
-            throw new CredentialNotFoundException("Credenciales no encontradas");
-        }
+        Credentials c = getCredentialsFromToken(token);
         for (String s : roleSet) {
             int i = Integer.parseInt(s);
             if (i > c.getAccessLevel()) {
                 throw new CredentialException("Acceso denegado");
             }
         }
+    }
+
+    public static Credentials getCredentialsFromToken(String token) throws CredentialNotFoundException {
+        Credentials c = PersonalFacadeREST.tokens.get(token);
+        if (c == null) {
+            throw new CredentialNotFoundException("Credenciales no encontradas");
+        }
+        return c;
     }
 }
