@@ -1,8 +1,8 @@
 package com.restmanager.XMLservice;
 
-import com.restmanager.Mesa;
-import com.restmanager.Orden;
-import com.restmanager.Venta;
+import com.jobits.pos.persistence.Mesa;
+import com.jobits.pos.persistence.Orden;
+import com.jobits.pos.persistence.Venta;
 import java.util.ArrayList;
 
 /**

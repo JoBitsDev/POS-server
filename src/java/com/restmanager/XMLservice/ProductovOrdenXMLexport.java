@@ -5,7 +5,7 @@
  */
 package com.restmanager.XMLservice;
 
-import com.restmanager.ProductovOrden;
+import com.jobits.pos.persistence.ProductovOrden;
 import java.util.List;
 
 /**
