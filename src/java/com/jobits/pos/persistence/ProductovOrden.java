@@ -6,6 +6,8 @@
 
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -55,13 +57,17 @@ public class ProductovOrden implements Serializable {
     @Column(name = "numero_comensal")
     private Integer numeroComensal;
     @Column(name = "listo_para_recoger")
+    @JsonIgnore
     private Boolean listoParaRecoger;
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "productovOrden")
     private List<NotificacionEnvioCocina> notificacionEnvioCocinaList;
+    @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "productovOrden")
     private Nota nota;
     @JoinColumn(name = "ordencod_orden", referencedColumnName = "cod_orden", insertable = false, updatable = false)
     @ManyToOne(optional = false)
+    @JsonBackReference
     private Orden orden;
     @JoinColumn(name = "producto_ventap_cod", referencedColumnName = "p_cod", insertable = false, updatable = false)
     @ManyToOne(optional = false)

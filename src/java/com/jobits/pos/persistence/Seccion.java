@@ -6,6 +6,7 @@
 
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -35,7 +36,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Seccion.findAll", query = "SELECT s FROM Seccion s")
     , @NamedQuery(name = "Seccion.findByNombreSeccion", query = "SELECT s FROM Seccion s WHERE s.nombreSeccion = :nombreSeccion")
     , @NamedQuery(name = "Seccion.findByDescripcion", query = "SELECT s FROM Seccion s WHERE s.descripcion = :descripcion")})
-public class Seccion implements Serializable {
+public class Seccion implements Serializable,Comparable<Seccion> {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -48,9 +49,11 @@ public class Seccion implements Serializable {
     @Column(name = "descripcion")
     private String descripcion;
     @OneToMany(mappedBy = "seccionnombreSeccion")
+    @JsonIgnore
     private List<ProductoVenta> productoVentaList;
     @JoinColumn(name = "cartacod_carta", referencedColumnName = "cod_carta")
     @ManyToOne
+    @JsonIgnore
     private Carta cartacodCarta;
 
     public Seccion() {
@@ -116,6 +119,11 @@ public class Seccion implements Serializable {
     @Override
     public String toString() {
         return "com.restmanager.Seccion[ nombreSeccion=" + nombreSeccion + " ]";
+    }
+
+    @Override
+    public int compareTo(Seccion o) {
+        return nombreSeccion.compareToIgnoreCase(o.getNombreSeccion());
     }
 
 }

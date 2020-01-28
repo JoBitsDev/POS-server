@@ -5,6 +5,10 @@
  */
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -55,9 +59,11 @@ public class Orden implements Serializable {
     @Size(min = 1, max = 11)
     @Column(name = "cod_orden")
     private String codOrden;
+    @JsonIgnore
     @Column(name = "hora_comenzada")
     @Temporal(TemporalType.TIME)
     private Date horaComenzada;
+    @JsonIgnore
     @Column(name = "hora_terminada")
     @Temporal(TemporalType.TIME)
     private Date horaTerminada;
@@ -70,28 +76,32 @@ public class Orden implements Serializable {
     private Float porciento;
     @Column(name = "ganancia_xporciento")
     private Float gananciaXporciento;
+    @JsonIgnore
     @Column(name = "ordenvalor_monetario")
     private Float ordenvalorMonetario;
+    @JsonIgnore
     @Column(name = "ordengasto_eninsumos")
     private Float ordengastoEninsumos;
+    @JsonIgnore
     @JoinColumn(name = "clientecod_cliente", referencedColumnName = "cod_cliente")
     @ManyToOne
     @XmlTransient
     private Cliente clientecodCliente;
     @JoinColumn(name = "mesacod_mesa", referencedColumnName = "cod_mesa")
     @ManyToOne
-    @XmlTransient
+    @JsonManagedReference
     private Mesa mesacodMesa;
+    @JsonIgnore
     @JoinColumn(name = "personalusuario", referencedColumnName = "usuario")
     @ManyToOne
-    @XmlReadOnly
     private Personal personalusuario;
     @JoinColumn(name = "ventafecha", referencedColumnName = "fecha")
     @ManyToOne(optional = false)
-    @XmlTransient
+    @JsonIgnore
     private Venta ventafecha;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "orden")
     @XmlReadOnly
+    @JsonProperty("productoVentaOrdenList")
     private List<ProductovOrden> productovOrdenList;
 
     public Orden() {

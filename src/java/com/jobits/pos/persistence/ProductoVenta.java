@@ -6,6 +6,7 @@
 
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -44,8 +45,6 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "ProductoVenta.findByPagoPorVenta", query = "SELECT p FROM ProductoVenta p WHERE p.pagoPorVenta = :pagoPorVenta")})
 public class ProductoVenta implements Serializable {
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "productoVenta")
-    private List<IpvVentaRegistro> ipvVentaRegistroList;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -64,27 +63,37 @@ public class ProductoVenta implements Serializable {
     @Column(name = "precio_venta")
     private float precioVenta;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+   @JsonIgnore
     @Column(name = "ganancia")
     private Float ganancia;
     @Column(name = "gasto")
+    @JsonIgnore
     private Float gasto;
     @Size(max = 255)
     @Column(name = "descripcion")
     private String descripcion;
     @Column(name = "visible")
+    @JsonIgnore
     private Boolean visible;
     @Column(name = "pago_por_venta")
+    @JsonIgnore
     private Float pagoPorVenta;
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "productoVenta")
     private List<ProductoInsumo> productoInsumoList;
     @JoinColumn(name = "cocinacod_cocina", referencedColumnName = "cod_cocina")
     @ManyToOne
+    @JsonIgnore
     private Cocina cocinacodCocina;
     @JoinColumn(name = "seccionnombre_seccion", referencedColumnName = "nombre_seccion")
     @ManyToOne
     private Seccion seccionnombreSeccion;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "productoVenta")
+    @JsonIgnore
     private List<ProductovOrden> productovOrdenList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "productoVenta")
+    @JsonIgnore
+    private List<IpvVentaRegistro> ipvVentaRegistroList;
 
     public ProductoVenta() {
     }

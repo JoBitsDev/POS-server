@@ -3,9 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -25,8 +26,9 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
 @Entity
 @Table(name = "mesa")
@@ -38,7 +40,7 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Mesa.findByEstallena", query = "SELECT m FROM Mesa m WHERE m.estallena = :estallena")
     , @NamedQuery(name = "Mesa.findByCapacidadMax", query = "SELECT m FROM Mesa m WHERE m.capacidadMax = :capacidadMax")
     , @NamedQuery(name = "Mesa.findByUbicacion", query = "SELECT m FROM Mesa m WHERE m.ubicacion = :ubicacion")})
-public class Mesa implements Serializable {
+public class Mesa implements Serializable, Comparable<Mesa> {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -59,9 +61,11 @@ public class Mesa implements Serializable {
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "ubicacion")
     private Double ubicacion;
+    @JsonIgnore
     @JoinColumn(name = "areacod_area", referencedColumnName = "cod_area")
     @ManyToOne
     private Area areacodArea;
+    @JsonBackReference
     @OneToMany(mappedBy = "mesacodMesa")
     private List<Orden> ordenList;
 
@@ -159,4 +163,8 @@ public class Mesa implements Serializable {
         return "com.restmanager.Mesa[ codMesa=" + codMesa + " ]";
     }
 
+    @Override
+    public int compareTo(Mesa o) {
+        return codMesa.length() > o.codMesa.length() ? 1: codMesa.compareToIgnoreCase(o.codMesa);
+    }
 }
