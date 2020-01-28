@@ -42,6 +42,11 @@
     <class>com.restmanager.Gasto</class>
     <class>com.restmanager.AsistenciaPersonal</class>
     <class>com.restmanager.TransaccionSalida</class>
+    <class>com.jobits.pos.persistence.Ubicacion</class>
+    <class>com.jobits.pos.persistence.ActivoFijo</class>
+    <class>com.jobits.pos.persistence.Operacion</class>
+    <class>com.jobits.pos.persistence.IpvVentaRegistro</class>
+    <class>com.jobits.pos.persistence.Proveedor</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/Restaurant_Manager_DB"/>
