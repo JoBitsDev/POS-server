@@ -7,6 +7,7 @@ package com.jobits.pos.persistence;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -30,6 +31,7 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author Jorge
  *
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "mesa")
 @XmlRootElement

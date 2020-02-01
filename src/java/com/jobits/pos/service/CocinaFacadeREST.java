@@ -49,13 +49,6 @@ public class CocinaFacadeREST extends AbstractFacade<Cocina> {
         return toJsonString(Response.Status.OK, ret);
     }
 
-    @GET
-    @Path("count")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String countREST() {
-        return String.valueOf(super.count());
-    }
-
     @Override
     protected EntityManager getEntityManager() {
         return em;

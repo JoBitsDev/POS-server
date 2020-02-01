@@ -5,6 +5,9 @@
  */
 package com.jobits.pos.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jobits.pos.authentication.Secured;
 import com.jobits.pos.persistence.Cocina;
 import com.jobits.pos.persistence.Impresora;
 import com.jobits.pos.persistence.NotificacionEnvioCocina;
@@ -13,8 +16,13 @@ import com.jobits.pos.persistence.ProductovOrden;
 import com.restmanager.XMLservice.ProductovOrdenXMLexport;
 import com.jobits.pos.notificationdelivery.Notificable;
 import com.jobits.pos.notificationdelivery.Notificador;
+import com.jobits.pos.persistence.models.ProductoVentaOrdenModel;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
@@ -24,9 +32,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
 
 /**
  * FirstDream
@@ -71,12 +81,13 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
         super(NotificacionEnvioCocina.class);
     }
 
+    @Secured
+    @RolesAllowed("0")
     @GET
-    @Path("PENDING_{codCocina}")
-    @Produces({MediaType.TEXT_PLAIN})
-    public String showPending(@PathParam("codCocina") String codCocina, @Context HttpServletRequest inRequest) {
+    @Path("PENDING")
+    public Response showPending(@QueryParam("codCocina") String codCocina, @Context HttpServletRequest inRequest) {
         registerDevice(inRequest, codCocina);
-        List<ProductovOrden> ret = new ArrayList<>();
+        List<ProductoVentaOrdenModel> ret = new ArrayList<>();
         List<NotificacionEnvioCocina> all = findAll();
         for (NotificacionEnvioCocina x : all) {
             if (x.getProductovOrden().getOrden().getHoraTerminada() != null) {
@@ -87,16 +98,27 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
             }
             if (x.getCocina().getCodCocina().equals(codCocina)) {
                 x.getProductovOrden().setCantidad(x.getCantidad());
-                ret.add(x.getProductovOrden());
+                ret.add(addProductoVentaOrdenModel(x));
             }
         }
-        return ProductovOrdenXMLexport.exportToXML(ret);
+        return toJsonString(Response.Status.OK, ret);
     }
 
-    @GET
-    @Path("NOTIFY_{codOrden}_{codProducto}")
-    @Produces({MediaType.TEXT_PLAIN})
-    public String notify(@PathParam("codOrden") String codOrden, @PathParam("codProducto") String codProducto) {
+    @Secured
+    @RolesAllowed("0")
+    @POST
+    @Path("NOTIFY")
+    public Response notifyCocina(String hashMap) {
+        HashMap<String, Object> values;
+        try {
+            values = new ObjectMapper().readValue(hashMap, HashMap.class);
+        } catch (JsonProcessingException ex) {
+            return handleException(ex);
+        }
+
+        String codOrden = values.get("codOrden").toString();
+        String codProducto = values.get("codProducto").toString();
+
         for (NotificacionEnvioCocina x : findAll()) {
             if (x.getNotificacionEnvioCocinaPK().getProductovOrdenordencodOrden().equals(codOrden)
                     && x.getNotificacionEnvioCocinaPK().getProductovOrdenproductoVentapCod().equals(codProducto)) {
@@ -122,55 +144,12 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
                         return x.getCantidad() + " de " + x.getProductovOrden().getProductoVenta().getNombre();
                     }
                 }).notificar();
-                return "Notificacion Exitosa";
+                return toJsonString(Response.Status.OK, "Notificacion Exitosa");
 
             }
         }
-        return "Los parámetros no son válidos o la notificación ya fue enviada \n "
-                + "o el receptor no esta conectado";
-    }
-
-    @GET
-    @Path("ip")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String ip(@Context HttpServletRequest inRequest) {
-        return inRequest.getRemoteHost();
-    }
-
-    @DELETE
-    @Path("{id}")
-    public void remove(@PathParam("id") PathSegment id) {
-        com.jobits.pos.persistence.NotificacionEnvioCocinaPK key = getPrimaryKey(id);
-        super.remove(super.find(key));
-    }
-
-    @GET
-    @Path("{id}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public NotificacionEnvioCocina find(@PathParam("id") PathSegment id) {
-        com.jobits.pos.persistence.NotificacionEnvioCocinaPK key = getPrimaryKey(id);
-        return super.find(key);
-    }
-
-    @GET
-    @Override
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<NotificacionEnvioCocina> findAll() {
-        return super.findAll();
-    }
-
-    @GET
-    @Path("{from}/{to}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<NotificacionEnvioCocina> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
-        return super.findRange(new int[]{from, to});
-    }
-
-    @GET
-    @Path("count")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String countREST() {
-        return String.valueOf(super.count());
+        return toJsonString(Response.Status.NOT_MODIFIED, "Los parámetros no son válidos o la notificación ya fue enviada \n "
+                + "o el receptor no esta conectado");
     }
 
     @Override
@@ -207,8 +186,19 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
         }
     }
 
-    private void logOutDevice(HttpServletRequest inRequest, String cod_cocina){
+    private void logOutDevice(HttpServletRequest inRequest, String cod_cocina) {
         //TODO : finish
     }
-    
+
+    private ProductoVentaOrdenModel addProductoVentaOrdenModel(NotificacionEnvioCocina x) {
+        return new ProductoVentaOrdenModel(x.getProductovOrden().getEnviadosacocina()
+                , x.getProductovOrden().getProductovOrdenPK()
+                , x.getCantidad()
+                , x.getProductovOrden().getOrden()
+                , x.getProductovOrden().getProductoVenta()
+                , x.getProductovOrden().getNumeroComensal()
+                , x.getProductovOrden().getOrden().getMesacodMesa()
+                ,x.getProductovOrden().getNota() == null ? "" : x.getProductovOrden().getNota().getDescripcion());
+    }
+
 }
