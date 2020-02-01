@@ -7,6 +7,7 @@ package com.jobits.pos.persistence;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
@@ -37,6 +38,7 @@ import org.eclipse.persistence.oxm.annotations.XmlReadOnly;
  * @author Jorge
  *
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "orden")
 @XmlRootElement

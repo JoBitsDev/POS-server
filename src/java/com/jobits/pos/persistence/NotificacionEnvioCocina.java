@@ -6,6 +6,7 @@
 
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
