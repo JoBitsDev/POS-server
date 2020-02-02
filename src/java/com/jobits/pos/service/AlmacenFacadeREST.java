@@ -192,6 +192,9 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
                         .setParameter("ipvcocinacodCocina", puntoElaboracion)
                         .setParameter("fecha", findVenta().getFecha())
                         .getResultList());
+        for (IpvRegistro x : ret) {
+            x.getIpvRegistroPK().setIpvinsumocodInsumo(x.getIpv().getInsumo().toString());
+        }
         return toJsonString(Response.Status.OK, ret);
     }
 
