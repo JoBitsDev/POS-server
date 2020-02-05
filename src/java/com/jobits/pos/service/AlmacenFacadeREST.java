@@ -15,6 +15,7 @@ import com.jobits.pos.persistence.InsumoAlmacen;
 import com.jobits.pos.persistence.Ipv;
 import com.jobits.pos.controllers.TransaccionController;
 import com.jobits.pos.persistence.IpvRegistro;
+import com.jobits.pos.persistence.Transaccion;
 import com.jobits.pos.persistence.TransaccionEntrada;
 import com.jobits.pos.persistence.TransaccionSalida;
 import com.jobits.pos.printservice.Impresion;
@@ -155,7 +156,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     @RolesAllowed("4")
     @DELETE
-    @Path("MERMAR_{almacenCod}_{insumoCod}_{cant}_{razon}")
+    @Path("MERMAR_{almac-enCod}_{insumoCod}_{cant}_{razon}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public String rebaja(@PathParam("almacenCod") String almacenCod,
             @PathParam("insumoCod") String insumoCod,
@@ -196,6 +197,38 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
             x.getIpvRegistroPK().setIpvinsumocodInsumo(x.getIpv().getInsumo().toString());
         }
         return toJsonString(Response.Status.OK, ret);
+    }
+
+    @RolesAllowed("2")
+    @Secured
+    @GET
+    @Path("OPERACIONES-REALIZADAS")
+    public Response getTransaccionList() {
+        return toJsonString(Response.Status.OK, prepareTransacciones());
+    }
+
+    public List<Transaccion> prepareTransacciones() {
+        List<Transaccion> ret = super.findAll(Transaccion.class);
+        for (Transaccion t : ret) {
+            if (t.getTransaccionEntrada() != null) {
+                t.setDescripcion("ENTRADA (Total: " + t.getTransaccionEntrada().getValorTotal() + R.COIN_SUFFIX + ")");
+            }
+            if (t.getTransaccionMerma() != null) {
+                t.setDescripcion(t.getTransaccionMerma().getRazon().toUpperCase());
+            }
+            if (t.getTransaccionSalida() != null) {
+                t.setDescripcion("SALIDA: " + t.getTransaccionSalida().getCocinacodCocina());
+            }
+            if (t.getTransaccionTraspaso() != null) {
+                t.setDescripcion("TRASPASO: " + t.getTransaccionTraspaso().getAlmacenDestino());
+            }
+            if (t.getTransaccionTransformacionList() != null) {
+                if (!t.getTransaccionTransformacionList().isEmpty()) {
+                    t.setDescripcion("TRANSFORMACION: ");
+                }
+            }
+        }
+        return ret;
     }
 
     @Override

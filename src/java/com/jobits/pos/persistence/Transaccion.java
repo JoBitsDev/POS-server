@@ -7,6 +7,8 @@ package com.jobits.pos.persistence;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.io.Serializable;
 import java.util.Date;
@@ -39,6 +41,7 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author Jorge
  *
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "transaccion")
 @XmlRootElement
@@ -53,6 +56,7 @@ public class Transaccion implements Serializable {
 
     @JoinColumn(name = "operacionno_operacion", referencedColumnName = "no_operacion")
     @ManyToOne
+    @JsonIgnore
     private Operacion operacionnoOperacion;
 
     private static final long serialVersionUID = 1L;
@@ -80,15 +84,15 @@ public class Transaccion implements Serializable {
     private String descripcion;
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaccion")
-    @JsonManagedReference
+    @JsonIgnore
     private TransaccionSalida transaccionSalida;
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaccion")
-    @JsonManagedReference
+    @JsonIgnore
     private TransaccionTraspaso transaccionTraspaso;
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaccion")
-    @JsonManagedReference
+    @JsonIgnore
     private TransaccionEntrada transaccionEntrada;
 
     @JoinColumn(name = "insumocod_insumo", referencedColumnName = "cod_insumo")
@@ -96,11 +100,11 @@ public class Transaccion implements Serializable {
     private Insumo insumocodInsumo;
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaccion")
-    @JsonManagedReference
+    @JsonIgnore
     private TransaccionMerma transaccionMerma;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "transaccion")
-    @JsonManagedReference
+    @JsonIgnore
     private List<TransaccionTransformacion> transaccionTransformacionList;
 
     public Transaccion() {
