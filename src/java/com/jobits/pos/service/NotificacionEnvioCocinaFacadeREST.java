@@ -11,31 +11,21 @@ import com.jobits.pos.authentication.Secured;
 import com.jobits.pos.persistence.Cocina;
 import com.jobits.pos.persistence.Impresora;
 import com.jobits.pos.persistence.NotificacionEnvioCocina;
-import com.jobits.pos.persistence.NotificacionEnvioCocinaPK;
-import com.jobits.pos.persistence.ProductovOrden;
-import com.restmanager.XMLservice.ProductovOrdenXMLexport;
 import com.jobits.pos.notificationdelivery.Notificable;
 import com.jobits.pos.notificationdelivery.Notificador;
 import com.jobits.pos.persistence.models.ProductoVentaOrdenModel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 
 /**
@@ -49,33 +39,6 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
 
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")
     private EntityManager em;
-
-    private NotificacionEnvioCocinaPK getPrimaryKey(PathSegment pathSegment) {
-        /*
-         * pathSemgent represents a URI path segment and any associated matrix parameters.
-         * URI path part is supposed to be in form of 'somePath;cocinacodCocina=
-        cocinacodCocinaValue;productovOrdenproductoVentapCod=productovOrdenproductoVentapCodValue;
-        productovOrdenordencodOrden=productovOrdenordencodOrdenValue'.
-         * Here 'somePath' is a result of getPath() method invocation and
-         * it is ignored in the following code.
-         * Matrix parameters are used as field names to build a primary key instance.
-         */
-        com.jobits.pos.persistence.NotificacionEnvioCocinaPK key = new com.jobits.pos.persistence.NotificacionEnvioCocinaPK();
-        javax.ws.rs.core.MultivaluedMap<String, String> map = pathSegment.getMatrixParameters();
-        java.util.List<String> cocinacodCocina = map.get("cocinacodCocina");
-        if (cocinacodCocina != null && !cocinacodCocina.isEmpty()) {
-            key.setCocinacodCocina(cocinacodCocina.get(0));
-        }
-        java.util.List<String> productovOrdenproductoVentapCod = map.get("productovOrdenproductoVentapCod");
-        if (productovOrdenproductoVentapCod != null && !productovOrdenproductoVentapCod.isEmpty()) {
-            key.setProductovOrdenproductoVentapCod(productovOrdenproductoVentapCod.get(0));
-        }
-        java.util.List<String> productovOrdenordencodOrden = map.get("productovOrdenordencodOrden");
-        if (productovOrdenordencodOrden != null && !productovOrdenordencodOrden.isEmpty()) {
-            key.setProductovOrdenordencodOrden(productovOrdenordencodOrden.get(0));
-        }
-        return key;
-    }
 
     public NotificacionEnvioCocinaFacadeREST() {
         super(NotificacionEnvioCocina.class);
