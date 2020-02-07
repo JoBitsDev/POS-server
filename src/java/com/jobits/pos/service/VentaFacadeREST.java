@@ -10,6 +10,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobits.pos.authentication.Secured;
 import com.jobits.pos.persistence.Venta;
 import com.jobits.pos.controllers.VentaResumenController;
+import com.jobits.pos.persistence.Area;
+import com.jobits.pos.persistence.Cocina;
+import com.jobits.pos.persistence.Personal;
+import com.jobits.pos.persistence.models.DetallesVentasModel;
+import com.jobits.pos.persistence.models.VentaCalculator;
 import com.jobits.pos.persistence.models.VentaResumenModel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,6 +34,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.ws.handler.MessageContext;
 import com.jobits.utils.R;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.QueryParam;
 
 /**
@@ -54,8 +61,8 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
     /**
      * <h3> Metodo para devolver el resumen general de las ventas de un dia en
      * especifico </h3>
-     * este metodo devuelve un json que es necesario parsearlo
-     * metodo con nivel 3 de seguridad
+     * este metodo devuelve un json que es necesario parsearlo metodo con nivel
+     * 3 de seguridad
      *
      * @param fecha - la fecha que se pasa por parametro debe estar en el
      * formato  <h3>dd/mm/aaaa</h3>
@@ -81,37 +88,56 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
 
     }
 
+    @RolesAllowed("3")
     @GET
-    @Path("ip")
-    @Consumes(MediaType.TEXT_PLAIN)
-    public String ip() {
-        MessageContext messageContext = webServiceContext.getMessageContext();
-        HttpServletRequest request = (HttpServletRequest) messageContext.get(MessageContext.SERVLET_REQUEST);
-        String callerIpAddress = request.getRemoteAddr();
-
-        return ("Caller IP = " + callerIpAddress);
+    @Path("DETALLES-POR-AREA")
+    @Secured
+    public Response getResumenPorArea(@QueryParam("fecha") String fecha, @QueryParam("areaCod") String area) {
+        try {
+            return toJsonString(Response.Status.OK,
+                    DetallesVentasModel.createDetallesVentaFromEntity(VentaCalculator.getResumenVentaPorArea(find(R.DATE_FORMAT.parse(fecha)), em1.find(Area.class, area))));
+        } catch (ParseException ex) {
+            return handleException(ex);
+        }
     }
 
+    @RolesAllowed("3")
     @GET
-    @Path("START")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String addVenta() {
-        super.create(new Venta(d));
-        return "1";
+    @Path("DETALLES-POR-DEPENDIENTE")
+    @Secured
+    public Response getResumenPorDependiente(@QueryParam("fecha") String fecha, @QueryParam("usuario") String usuario) {
+        try {
+            return toJsonString(Response.Status.OK,
+                    DetallesVentasModel.createDetallesVentaFromEntity(VentaCalculator.getResumenVentasCamarero(find(R.DATE_FORMAT.parse(fecha)), em1.find(Personal.class, usuario))));
+        } catch (ParseException ex) {
+            return handleException(ex);
+        }
     }
 
+    @RolesAllowed("3")
     @GET
-    @Path("date")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getToday() {
-        return Format.format(new Date());
+    @Path("DETALLES-POR-COCINA")
+    @Secured
+    public Response getResumenPorCocina(@QueryParam("fecha") String fecha, @QueryParam("cocinaCod") String cocinaCod) {
+        try {
+            return toJsonString(Response.Status.OK,
+                    DetallesVentasModel.createDetallesVentaFromEntity(VentaCalculator.getResumenVentasCocina(find(R.DATE_FORMAT.parse(fecha)), em1.find(Cocina.class, cocinaCod))));
+        } catch (ParseException ex) {
+            return handleException(ex);
+        }
     }
 
+    @RolesAllowed("3")
     @GET
-    @Path("hour")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getHour() {
-        return hour.format(new Date());
+    @Path("DETALLES-POR")
+    @Secured
+    public Response getResumenPorDependiente(@QueryParam("fecha") String fecha) {
+        try {
+            return toJsonString(Response.Status.OK,
+                    DetallesVentasModel.createDetallesVentaFromEntity(VentaCalculator.getResumenVentas(find(R.DATE_FORMAT.parse(fecha)))));
+        } catch (ParseException ex) {
+            return handleException(ex);
+        }
     }
 
     @Override
