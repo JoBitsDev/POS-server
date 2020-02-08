@@ -152,14 +152,14 @@ public abstract class AbstractFacade<T> {
     }
     
     protected void startTransaction() {
-        if (!em1.getTransaction().isActive()) {
-            em1.getTransaction().begin();
+        if (!getEntityManager().getTransaction().isActive()) {
+            getEntityManager().getTransaction().begin();
         }
     }
 
     protected void commitTransaction() {
-        if (em1.getTransaction().isActive()) {
-            em1.getTransaction().commit();
+        if (getEntityManager().getTransaction().isActive()) {
+            getEntityManager().getTransaction().commit();
         }
     }
 }
