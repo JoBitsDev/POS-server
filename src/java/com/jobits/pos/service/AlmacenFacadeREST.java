@@ -48,8 +48,7 @@ import javax.ws.rs.core.Response;
 @Path("almacen/")
 public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
-    @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")
-    private EntityManager em;
+    private EntityManager em = e.createEntityManager();
 
     private final String PTO_ELAB = "ptoElab";
 
@@ -85,10 +84,10 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
             String um = (String) values.get("um");
             float estimacionStock = Float.parseFloat(values.get("estimacionStock").toString());
             startTransaction();
-            InsumoController insController = new InsumoController(em1);
+            InsumoController insController = new InsumoController(em);
             Insumo i = insController.create(insumoNombre, um, estimacionStock);
            
-            AlmacenController almacenController = new AlmacenController(em1, findAll().get(0));
+            AlmacenController almacenController = new AlmacenController(em, findAll().get(0));
             almacenController.registrarInsumoEnAlmacen(i);
             commitTransaction();
         } catch (Exception e) {
@@ -265,7 +264,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     @Override
     protected EntityManager getEntityManager() {
-        return em1;
+        return em;
     }
 
 }
