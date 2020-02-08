@@ -8,6 +8,7 @@ package com.jobits.pos.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobits.pos.persistence.Venta;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -132,10 +133,10 @@ public abstract class AbstractFacade<T> {
 
     protected Response handleException(Exception ex) {
         if (ex instanceof JsonProcessingException) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error en el Object Mapper. Contacte con soporte").build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error en el Object Mapper. Contacte con soporte" +((JsonProcessingException) ex).getMessage()).build();
         }
         System.out.println(ex.getStackTrace()[0]);
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Contacte con soporte").build();
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Contacte con soporte " + ex.getMessage()).build();
     }
 
     protected Response toJsonString(Response.Status status, Object o) {
@@ -150,4 +151,15 @@ public abstract class AbstractFacade<T> {
         return requestContext.getHeader(HttpHeaders.AUTHORIZATION).substring("Bearer".length()).trim();
     }
     
+    protected void startTransaction() {
+        if (!em1.getTransaction().isActive()) {
+            em1.getTransaction().begin();
+        }
+    }
+
+    protected void commitTransaction() {
+        if (em1.getTransaction().isActive()) {
+            em1.getTransaction().commit();
+        }
+    }
 }
