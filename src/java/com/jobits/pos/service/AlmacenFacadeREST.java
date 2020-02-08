@@ -5,9 +5,11 @@
  */
 package com.jobits.pos.service;
 
+import com.jobits.pos.controllers.InsumoController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobits.pos.authentication.Secured;
+import com.jobits.pos.controllers.AlmacenController;
 import com.jobits.pos.persistence.Almacen;
 import com.jobits.pos.persistence.Cocina;
 import com.jobits.pos.persistence.Insumo;
@@ -64,6 +66,36 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
             return Response.status(Response.Status.NOT_FOUND).entity("No existe un almacen principal. por favor cree uno.").build();
         }
         return toJsonString(Response.Status.OK, findAll().get(0).getInsumoAlmacenList());
+    }
+
+    @RolesAllowed("2")
+    @Secured
+    @POST
+    @Path("AGREGAR-INSUMO")
+    public Response addIinsumo(String hashMap) {
+        HashMap<String, Object> values;
+        try {
+            values = new ObjectMapper().readValue(hashMap, HashMap.class);
+        } catch (JsonProcessingException ex) {
+            return handleException(ex);
+        }
+
+        try {
+            String insumoNombre = (String) values.get("insumoNombre");
+            String um = (String) values.get("um");
+            float estimacionStock = Float.parseFloat(values.get("estimacionStock").toString());
+            startTransaction();
+            InsumoController insController = new InsumoController(em1);
+            Insumo i = insController.create(insumoNombre, um, estimacionStock);
+           
+            AlmacenController almacenController = new AlmacenController(em1, findAll().get(0));
+            almacenController.registrarInsumoEnAlmacen(i);
+            commitTransaction();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return handleException(e);
+        }
+        return toJsonString(Response.Status.OK, "Operacion exitosa");
     }
 
     /**
