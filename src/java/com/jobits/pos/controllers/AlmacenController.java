@@ -19,6 +19,7 @@ import static com.jobits.utils.R.AUTO_UPDATE_INSUMO_PRICE;
 import com.jobits.utils.utils;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceContext;
+import javax.ws.rs.BadRequestException;
 
 /**
  * FirstDream
@@ -92,13 +93,16 @@ public class AlmacenController {
         }
     }
 
-    void darSalidaAInsumo(TransaccionSalida x) {
+    void darSalidaAInsumo(TransaccionSalida x) throws BadRequestException{
         InsumoAlmacen insumoADarSalida = null;
         for (InsumoAlmacen i : a.getInsumoAlmacenList()) {
             if (i.getInsumo().equals(x.getTransaccion().getInsumocodInsumo())) {
                 insumoADarSalida = i;
 
             }
+        }
+        if (insumoADarSalida.getCantidad() < x.getTransaccion().getCantidad()) {
+            throw new BadRequestException("La cantidad de " + insumoADarSalida + " es mayor que la existencia actual");
         }
         IpvRegistro reg = (IpvRegistro) em1.createNamedQuery("IpvRegistro.findByIpvcocinacodCocinaAndFechaAndInsumo")
                 .setParameter("ipvcocinacodCocina", x.getCocinacodCocina().getCodCocina())
