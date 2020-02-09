@@ -6,6 +6,7 @@
 
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -45,6 +46,7 @@ public class TransaccionMerma implements Serializable {
     private String razon;
     @JoinColumn(name = "transaccionno_transaccion", referencedColumnName = "no_transaccion", insertable = false, updatable = false)
     @OneToOne(optional = false)
+    @JsonBackReference
     private Transaccion transaccion;
 
     public TransaccionMerma() {
