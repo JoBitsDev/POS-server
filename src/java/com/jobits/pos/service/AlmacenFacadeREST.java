@@ -24,6 +24,8 @@ import com.jobits.pos.printservice.Impresion;
 import com.jobits.utils.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -251,9 +253,13 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     public List<Transaccion> prepareTransacciones() {
         List<Transaccion> ret = super.findAll(Transaccion.class);
+        Collections.sort(ret, (Transaccion o1, Transaccion o2) -> {
+            int comp = o1.getFecha().compareTo(o2.getFecha()) *-1;
+            return comp == 0 ? o1.getHora().compareTo(o2.getHora())*-1 : comp;
+        });
         for (Transaccion t : ret) {
             if (t.getTransaccionEntrada() != null) {
-                t.setDescripcion("ENTRADA (Total: " + t.getTransaccionEntrada().getValorTotal() + R.COIN_SUFFIX + ")");
+                t.setDescripcion("ENTRADA T: " + t.getTransaccionEntrada().getValorTotal() + R.COIN_SUFFIX);
             }
             if (t.getTransaccionMerma() != null) {
                 t.setDescripcion(t.getTransaccionMerma().getRazon().toUpperCase());
