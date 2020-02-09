@@ -5,9 +5,11 @@
  */
 package com.jobits.pos.service;
 
+import com.jobits.pos.controllers.InsumoController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobits.pos.authentication.Secured;
+import com.jobits.pos.controllers.AlmacenController;
 import com.jobits.pos.persistence.Almacen;
 import com.jobits.pos.persistence.Cocina;
 import com.jobits.pos.persistence.Insumo;
@@ -22,12 +24,14 @@ import com.jobits.pos.printservice.Impresion;
 import com.jobits.utils.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.ws.rs.BadRequestException;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -46,8 +50,7 @@ import javax.ws.rs.core.Response;
 @Path("almacen/")
 public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
-    @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")
-    private EntityManager em;
+    private EntityManager em = e.createEntityManager();
 
     private final String PTO_ELAB = "ptoElab";
 
@@ -64,6 +67,41 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
             return Response.status(Response.Status.NOT_FOUND).entity("No existe un almacen principal. por favor cree uno.").build();
         }
         return toJsonString(Response.Status.OK, findAll().get(0).getInsumoAlmacenList());
+    }
+
+    @RolesAllowed("2")
+    @Secured
+    @POST
+    @Path("AGREGAR-INSUMO")
+    public Response addIinsumo(String hashMap) {
+        HashMap<String, Object> values;
+        try {
+            values = new ObjectMapper().readValue(hashMap, HashMap.class);
+        } catch (JsonProcessingException ex) {
+            return handleException(ex);
+        }
+
+        try {
+            String insumoNombre = (String) values.get("insumoNombre");
+            String um = (String) values.get("um");
+            float estimacionStock = Float.parseFloat(values.get("estimacionStock").toString());
+            startTransaction();
+            InsumoController insController = new InsumoController(em);
+            Insumo i = insController.create(insumoNombre, um, estimacionStock);
+
+            if (insumoNombre.isEmpty() || um.isEmpty()) {
+                return toJsonString(Response.Status.BAD_GATEWAY, "Valores vacios en nombre o unidad de medida");
+            }
+            if (estimacionStock < 0) {
+                return toJsonString(Response.Status.BAD_REQUEST, "La estimacion del stock debe ser mayor que 0");
+            }
+            AlmacenController almacenController = new AlmacenController(em, findAll().get(0));
+            almacenController.registrarInsumoEnAlmacen(i);
+            commitTransaction();
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return toJsonString(Response.Status.OK, "Operacion exitosa");
     }
 
     /**
@@ -106,6 +144,9 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
         String almacenCod = (String) values.get("almacenCod");
         String insumoCod = (String) values.get("insumoCod");
         float cant = Float.parseFloat(values.get("cantidad").toString());
+        if (cant <= 0) {
+            return toJsonString(Response.Status.BAD_REQUEST, "La cantidad de entrada no puede ser menor que 0");
+        }
         float valor = Float.parseFloat(values.get("monto").toString());
         TransaccionController controller = new TransaccionController(em1);
         TransaccionEntrada entrada = controller.addTransaccionEntrada(null, em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(), super.find(almacenCod), cant, valor);
@@ -141,16 +182,19 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
         HashMap<String, Object> params;
         try {
             params = new ObjectMapper().readValue(hashMap, HashMap.class);
-        } catch (JsonProcessingException ex) {
+            String almacenCod = (String) params.get("almacenCod");
+            String insumoCod = (String) params.get("insumoCod");
+            float cant = Float.parseFloat(params.get("cantidad").toString());
+            if (cant <= 0) {
+                return toJsonString(Response.Status.BAD_REQUEST, "La cantidad a dar salida no puede ser menor que 0");
+            }
+            String destino = (String) params.get("destino");
+            TransaccionSalida salida = new TransaccionController(em1).addTransaccionSalida(null, em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(),
+                    super.find(almacenCod), em1.find(Cocina.class, destino), cant);
+            return toJsonString(Response.Status.OK, salida.getTransaccion());
+        } catch (JsonProcessingException | NumberFormatException | BadRequestException ex) {
             return handleException(ex);
         }
-        String almacenCod = (String) params.get("almacenCod");
-        String insumoCod = (String) params.get("insumoCod");
-        float cant = Float.parseFloat(params.get("cantidad").toString());
-        String destino = (String) params.get("destino");
-        TransaccionSalida salida = new TransaccionController(em1).addTransaccionSalida(null, em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(),
-                super.find(almacenCod), em1.find(Cocina.class, destino), cant);
-        return toJsonString(Response.Status.OK, salida.getTransaccion());
 
     }
 
@@ -209,9 +253,13 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     public List<Transaccion> prepareTransacciones() {
         List<Transaccion> ret = super.findAll(Transaccion.class);
+        Collections.sort(ret, (Transaccion o1, Transaccion o2) -> {
+            int comp = o1.getFecha().compareTo(o2.getFecha()) *-1;
+            return comp == 0 ? o1.getHora().compareTo(o2.getHora())*-1 : comp;
+        });
         for (Transaccion t : ret) {
             if (t.getTransaccionEntrada() != null) {
-                t.setDescripcion("ENTRADA (Total: " + t.getTransaccionEntrada().getValorTotal() + R.COIN_SUFFIX + ")");
+                t.setDescripcion("ENTRADA T: " + t.getTransaccionEntrada().getValorTotal() + R.COIN_SUFFIX);
             }
             if (t.getTransaccionMerma() != null) {
                 t.setDescripcion(t.getTransaccionMerma().getRazon().toUpperCase());
@@ -233,7 +281,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     @Override
     protected EntityManager getEntityManager() {
-        return em1;
+        return em;
     }
 
 }

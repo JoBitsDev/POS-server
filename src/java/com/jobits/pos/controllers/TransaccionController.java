@@ -16,6 +16,7 @@ import com.jobits.pos.persistence.TransaccionEntrada;
 import java.util.Date;
 import javax.persistence.EntityManager;
 import com.jobits.utils.utils;
+import javax.ws.rs.BadRequestException;
 
 /**
  * FirstDream
@@ -45,7 +46,7 @@ public class TransaccionController {
 
     }
 
-    public TransaccionSalida addTransaccionSalida(Operacion o, Insumo insumo, Date fecha, Date hora, Almacen a, Cocina cocina, float cantidad) {
+    public TransaccionSalida addTransaccionSalida(Operacion o, Insumo insumo, Date fecha, Date hora, Almacen a, Cocina cocina, float cantidad) throws BadRequestException{
         Transaccion t = nuevaTransaccion(o, insumo, fecha, hora, a, cantidad);
         TransaccionSalida salida = new TransaccionSalida(t.getNoTransaccion());
         salida.setTransaccion(t);
@@ -77,7 +78,7 @@ public class TransaccionController {
 
     }
 
-    void createNewTransaccionSalida(TransaccionSalida transaccion,Almacen a) {
+    void createNewTransaccionSalida(TransaccionSalida transaccion,Almacen a) throws BadRequestException{
         startTransaction();
         AlmacenController almacenController = new AlmacenController(em1,a);
         almacenController.darSalidaAInsumo(transaccion);

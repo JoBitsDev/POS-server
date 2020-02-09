@@ -123,7 +123,7 @@ public class InsumoAlmacen implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.InsumoAlmacen[ insumoAlmacenPK=" + insumoAlmacenPK + " ]";
+        return getInsumo().toString();
     }
 
 }

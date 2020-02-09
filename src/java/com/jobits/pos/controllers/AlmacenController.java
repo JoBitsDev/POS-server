@@ -10,13 +10,16 @@ import com.jobits.pos.persistence.Insumo;
 import com.jobits.pos.persistence.InsumoAlmacen;
 import com.jobits.pos.persistence.IpvRegistro;
 import com.jobits.pos.persistence.ProductoInsumo;
-import com.jobits.pos.persistence.Transaccion;
+import com.jobits.pos.persistence.InsumoAlmacenPK;
 import com.jobits.pos.persistence.TransaccionEntrada;
 import com.jobits.pos.persistence.TransaccionMerma;
 import com.jobits.pos.persistence.TransaccionSalida;
 import javax.persistence.EntityManager;
 import static com.jobits.utils.R.AUTO_UPDATE_INSUMO_PRICE;
 import com.jobits.utils.utils;
+import javax.persistence.Persistence;
+import javax.persistence.PersistenceContext;
+import javax.ws.rs.BadRequestException;
 
 /**
  * FirstDream
@@ -29,9 +32,33 @@ public class AlmacenController {
     private EntityManager em1;
     private Almacen a;
 
-    public AlmacenController(EntityManager em1,Almacen a) {
+    public AlmacenController(EntityManager em1, Almacen a) {
         this.em1 = em1;
         this.a = a;
+    }
+
+    public AlmacenController(Almacen get) {
+        this.a = get;
+        em1 = Persistence.createEntityManagerFactory("Restaurant_Manager_Web_ServicePU").createEntityManager();
+    }
+
+    public InsumoAlmacen registrarInsumoEnAlmacen(Insumo selected) {
+        InsumoAlmacenPK newInsumoPK = new InsumoAlmacenPK(selected.getCodInsumo(), a.getCodAlmacen());
+        InsumoAlmacen newInsumo = new InsumoAlmacen(newInsumoPK);
+        newInsumo.setAlmacen(a);
+        newInsumo.setCantidad((float) 0);
+        newInsumo.setInsumo(selected);
+        newInsumo.setValorMonetario((float) 0);
+        if (!em1.isOpen()) {
+            em1 = Persistence.createEntityManagerFactory("Restaurant_Manager_Web_ServicePU").createEntityManager();
+            em1.getTransaction().begin();
+            em1.persist(newInsumo);
+            em1.flush();
+            em1.getTransaction().commit();
+        } else {
+            em1.persist(newInsumo);
+        }
+        return newInsumo;
     }
 
     public void darEntradaAInsumo(TransaccionEntrada x) {
@@ -66,13 +93,16 @@ public class AlmacenController {
         }
     }
 
-    void darSalidaAInsumo(TransaccionSalida x) {
+    void darSalidaAInsumo(TransaccionSalida x) throws BadRequestException{
         InsumoAlmacen insumoADarSalida = null;
         for (InsumoAlmacen i : a.getInsumoAlmacenList()) {
             if (i.getInsumo().equals(x.getTransaccion().getInsumocodInsumo())) {
                 insumoADarSalida = i;
 
             }
+        }
+        if (insumoADarSalida.getCantidad() < x.getTransaccion().getCantidad()) {
+            throw new BadRequestException("La cantidad de " + insumoADarSalida + " es mayor que la existencia actual");
         }
         IpvRegistro reg = (IpvRegistro) em1.createNamedQuery("IpvRegistro.findByIpvcocinacodCocinaAndFechaAndInsumo")
                 .setParameter("ipvcocinacodCocina", x.getCocinacodCocina().getCodCocina())
@@ -119,5 +149,5 @@ public class AlmacenController {
         //updateValorTotalAlmacen(instance);
 
     }
-    
+
 }
