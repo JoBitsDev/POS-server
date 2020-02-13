@@ -83,12 +83,12 @@ public class Insumo implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
     @JsonIgnore
     private List<TransaccionTransformacion> transaccionTransformacionList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "derivante")
+    @JsonIgnore
+    private List<InsumoElaborado> productosDerivados;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
     @JsonIgnore
-    private List<InsumoElaborado> insumoElaboradoList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo1")
-    @JsonIgnore
-    private List<InsumoElaborado> insumoElaboradoList1;
+    private List<InsumoElaborado> productosDerivantes;
 
     public Insumo() {
     }
@@ -204,21 +204,21 @@ public class Insumo implements Serializable {
     }
 
     @XmlTransient
-    public List<InsumoElaborado> getInsumoElaboradoList() {
-        return insumoElaboradoList;
+    public List<InsumoElaborado> getProductosDerivados() {
+        return productosDerivados;
     }
 
-    public void setInsumoElaboradoList(List<InsumoElaborado> insumoElaboradoList) {
-        this.insumoElaboradoList = insumoElaboradoList;
+    public void setProductosDerivados(List<InsumoElaborado> productosDerivados) {
+        this.productosDerivados = productosDerivados;
     }
 
     @XmlTransient
-    public List<InsumoElaborado> getInsumoElaboradoList1() {
-        return insumoElaboradoList1;
+    public List<InsumoElaborado> getProductosDerivantes() {
+        return productosDerivantes;
     }
 
-    public void setInsumoElaboradoList1(List<InsumoElaborado> insumoElaboradoList1) {
-        this.insumoElaboradoList1 = insumoElaboradoList1;
+    public void setProductosDerivantes(List<InsumoElaborado> productosDerivantes) {
+        this.productosDerivantes = productosDerivantes;
     }
 
     @Override
