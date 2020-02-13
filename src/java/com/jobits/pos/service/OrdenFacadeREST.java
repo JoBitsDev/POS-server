@@ -200,8 +200,8 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         if (contains != -1) {
             ProductovOrden p = po.get(contains);
             float cant = p.getCantidad();
-            if (cant > 1) {
-                p.setCantidad(cant - 1);
+            if (cant > cantidad) {
+                p.setCantidad(cant - cantidad);
 
             } else {
                 po.get(contains).setCantidad(0);
