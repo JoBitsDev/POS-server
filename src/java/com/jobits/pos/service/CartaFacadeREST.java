@@ -29,24 +29,14 @@ public class CartaFacadeREST extends AbstractFacade<Carta> {
         super(Carta.class);
     }
 
-    @RolesAllowed("0")
-    @Secured
-    @GET
-    @Path("NOMBRE-REST")
-    public Response getNombreRest() {
-        return toJsonString(Response.Status.OK, R.em1.find(Negocio.class, 1).getNombre());
-    }
-
-    @RolesAllowed("0")
-    @Secured
     @GET
     @Path("INFO")
     public Response getMonedas() {
         HashMap<String, Object> ret = new HashMap<>();
         Negocio n = R.em1.find(Negocio.class, 1);
         ret.put("nombre", n.getNombre());
-        ret.put("monedaPrincipal", n.getMonedaPrincipal());
-        String secundaria = n.getMonedaPrincipal().equals("CUC") ? "MN" : "CUC";
+        ret.put("monedaPrincipal", " " + n.getMonedaPrincipal());
+        String secundaria = n.getMonedaPrincipal().equals("CUC") ? " MN" : " CUC";
         ret.put("monedaSecundaria", secundaria);
         ret.put("cambio", R.COINCHANGE);
         return toJsonString(Response.Status.OK, ret);
