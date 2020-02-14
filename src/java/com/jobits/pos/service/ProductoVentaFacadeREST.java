@@ -12,6 +12,7 @@ import com.jobits.pos.persistence.ProductoVenta;
 import com.jobits.pos.persistence.Seccion;
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
@@ -60,6 +61,7 @@ public class ProductoVentaFacadeREST extends AbstractFacade<ProductoVenta> {
                 }
             }
         }
+        Collections.sort(ret);
         return toJsonString(Response.Status.OK, ret);
     }
 
