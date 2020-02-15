@@ -7,6 +7,7 @@ package com.jobits.pos.service;
 
 import com.jobits.pos.controllers.InsumoController;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobits.pos.authentication.Secured;
 import com.jobits.pos.controllers.AlmacenController;
@@ -16,6 +17,7 @@ import com.jobits.pos.persistence.Insumo;
 import com.jobits.pos.persistence.InsumoAlmacen;
 import com.jobits.pos.persistence.Ipv;
 import com.jobits.pos.controllers.TransaccionController;
+import com.jobits.pos.persistence.InsumoElaborado;
 import com.jobits.pos.persistence.IpvRegistro;
 import com.jobits.pos.persistence.Transaccion;
 import com.jobits.pos.persistence.TransaccionEntrada;
@@ -29,6 +31,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
 import javax.ws.rs.BadRequestException;
@@ -251,11 +255,42 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
         return toJsonString(Response.Status.OK, prepareTransacciones());
     }
 
+    @RolesAllowed("2")
+    @Secured
+    @POST
+    @Path("COMBINACIONES-CON")
+    public Response getOperacionesCon(String listaInsumo) {
+        List<InsumoAlmacen> aux = findAll().get(0).getInsumoAlmacenList(), ret = new ArrayList<>();
+        List<Insumo> admitidos = new ArrayList<>();
+        try {
+            ObjectMapper om =  new ObjectMapper();
+            List<InsumoAlmacen> lista = new ObjectMapper().readValue(listaInsumo, om.getTypeFactory().constructCollectionType(List.class, InsumoAlmacen.class) );
+
+            for (InsumoAlmacen i : lista) {
+                for (InsumoElaborado ie : getEntityManager().find(Insumo.class, i.getInsumo().getCodInsumo()).getProductosDerivados()) {
+                    admitidos.add(ie.getInsumo());
+                }
+            }
+            for (Insumo a : admitidos) {
+                for (InsumoAlmacen i : aux) {
+                    if (i.getInsumo().getCodInsumo().equals(a.getCodInsumo())) {
+                        i.setCantidad((float)0);
+                        ret.add(i);
+                    }
+                }
+            }
+            return toJsonString(Response.Status.OK, ret);
+        } catch (Exception ex) {
+            Logger.getLogger(AlmacenFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+         return   toJsonString(Response.Status.BAD_REQUEST, "La peticion se proceso incorrectamente " + ex.getMessage());
+        }
+    }
+
     public List<Transaccion> prepareTransacciones() {
         List<Transaccion> ret = super.findAll(Transaccion.class);
         Collections.sort(ret, (Transaccion o1, Transaccion o2) -> {
-            int comp = o1.getFecha().compareTo(o2.getFecha()) *-1;
-            return comp == 0 ? o1.getHora().compareTo(o2.getHora())*-1 : comp;
+            int comp = o1.getFecha().compareTo(o2.getFecha()) * -1;
+            return comp == 0 ? o1.getHora().compareTo(o2.getHora()) * -1 : comp;
         });
         for (Transaccion t : ret) {
             if (t.getTransaccionEntrada() != null) {
