@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.jobits.pos.persistence;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -28,8 +27,9 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
@@ -45,8 +45,7 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "ProductoVenta.findByDescripcion", query = "SELECT p FROM ProductoVenta p WHERE p.descripcion = :descripcion")
     , @NamedQuery(name = "ProductoVenta.findByVisible", query = "SELECT p FROM ProductoVenta p WHERE p.visible = :visible")
     , @NamedQuery(name = "ProductoVenta.findByPagoPorVenta", query = "SELECT p FROM ProductoVenta p WHERE p.pagoPorVenta = :pagoPorVenta")})
-public class ProductoVenta implements Serializable {
-
+public class ProductoVenta implements Serializable, Comparable<ProductoVenta> {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -65,7 +64,7 @@ public class ProductoVenta implements Serializable {
     @Column(name = "precio_venta")
     private float precioVenta;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-   @JsonIgnore
+    @JsonIgnore
     @Column(name = "ganancia")
     private Float ganancia;
     @Column(name = "gasto")
@@ -240,6 +239,11 @@ public class ProductoVenta implements Serializable {
 
     public void setIpvVentaRegistroList(List<IpvVentaRegistro> ipvVentaRegistroList) {
         this.ipvVentaRegistroList = ipvVentaRegistroList;
+    }
+
+    @Override
+    public int compareTo(ProductoVenta o) {
+        return getNombre().compareToIgnoreCase(o.getNombre());
     }
 
 }
