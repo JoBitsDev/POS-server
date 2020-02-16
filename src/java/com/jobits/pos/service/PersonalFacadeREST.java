@@ -13,6 +13,7 @@ import com.jobits.pos.persistence.Personal;
 import com.jobits.pos.persistence.Venta;
 import com.jobits.pos.authentication.Credentials;
 import com.jobits.pos.authentication.Secured;
+import com.jobits.utils.utils;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -117,7 +118,7 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
 
         for (Personal x : list) {
             if (x.getUsuario().equals(username)) {
-                if (getSHA256(x.getContrasenna()).equals(password)) {
+                if (utils.getSHA256(x.getContrasenna()).equals(password)) {
                     if (!x.getOnline()) {
                         return x;
                     } else {
@@ -143,15 +144,6 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
         }
         tokens.put(token, credentials);
         return token;
-    }
-
-    private String getSHA256(String stringToConvert) throws InternalServerErrorException {
-        try {
-            byte[] bytes = MessageDigest.getInstance("SHA-256").digest(stringToConvert.getBytes());
-            return String.format("%064x", new BigInteger(1, bytes));
-        } catch (NoSuchAlgorithmException ex) {
-            throw new InternalServerErrorException("Error con algoritmo Hash");
-        }
     }
 
 }

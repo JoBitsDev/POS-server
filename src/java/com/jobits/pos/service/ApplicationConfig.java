@@ -44,6 +44,7 @@ public class ApplicationConfig extends Application {
         resources.add(com.jobits.pos.service.SeccionFacadeREST.class);
         resources.add(com.jobits.pos.service.VentaFacadeREST.class);
         resources.add(com.jobits.pos.service.NotificacionEnvioCocinaFacadeREST.class);
+        resources.add(com.jobits.pos.service.ConfiguracionFacadeREST.class);
 
         resources.add(com.jobits.pos.authentication.AuthenticationFilter.class);
     }

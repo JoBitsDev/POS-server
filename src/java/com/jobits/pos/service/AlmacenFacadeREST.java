@@ -7,7 +7,9 @@ package com.jobits.pos.service;
 
 import com.jobits.pos.controllers.InsumoController;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.jobits.pos.authentication.Secured;
 import com.jobits.pos.controllers.AlmacenController;
 import com.jobits.pos.persistence.Almacen;
@@ -16,12 +18,17 @@ import com.jobits.pos.persistence.Insumo;
 import com.jobits.pos.persistence.InsumoAlmacen;
 import com.jobits.pos.persistence.Ipv;
 import com.jobits.pos.controllers.TransaccionController;
+import com.jobits.pos.persistence.InsumoAlmacenPK;
+import com.jobits.pos.persistence.InsumoElaborado;
 import com.jobits.pos.persistence.IpvRegistro;
 import com.jobits.pos.persistence.Transaccion;
 import com.jobits.pos.persistence.TransaccionEntrada;
 import com.jobits.pos.persistence.TransaccionSalida;
+import com.jobits.pos.persistence.TransaccionTransformacion;
+import com.jobits.pos.persistence.models.TransformacionModel;
 import com.jobits.pos.printservice.Impresion;
 import com.jobits.utils.R;
+import java.util.AbstractList;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,9 +36,12 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -66,7 +76,9 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
         if (findAll().isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).entity("No existe un almacen principal. por favor cree uno.").build();
         }
-        return toJsonString(Response.Status.OK, findAll().get(0).getInsumoAlmacenList());
+        List<InsumoAlmacen> ret = new ArrayList<>(findAll().get(0).getInsumoAlmacenList());
+        Collections.sort(ret);
+        return toJsonString(Response.Status.OK, ret);
     }
 
     @RolesAllowed("2")
@@ -211,6 +223,52 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     }
 
+    //@RolesAllowed("2")
+    //@Secured
+    @POST
+    @Path("TRANSFORMAR")
+    public Response transformacion(String listas) {
+        try {
+            TransformacionModel model = new ObjectMapper().readValue(listas, TransformacionModel.class);
+            if (model.getEntradas().isEmpty() || model.getSalidas().isEmpty()) {
+                throw new BadRequestException("Las listas no pueden estar vacias");
+            }
+            if (model.getSalidas().size() > 1) {
+                throw new BadRequestException("La lista de salidas debe ser 1");
+            }
+
+            InsumoAlmacen salida = em1.find(InsumoAlmacen.class, model.getSalidas().get(0).getInsumoAlmacenPK());
+            em1.refresh(salida);
+            boolean derivanteValido = false;
+            for (InsumoAlmacen ia : model.getEntradas()) {
+                derivanteValido = false;
+                for (InsumoElaborado derivante : em1.find(Insumo.class, ia.getInsumo().getCodInsumo()).getProductosDerivantes()) {
+                    if (derivante.getDerivante().equals(salida.getInsumo())) {
+                        derivanteValido = true;
+                    }
+                }
+            }
+            if (!derivanteValido) {
+                throw new BadRequestException("Existe un insumo de salida no es derivante del insumo de entrada");
+            }
+            List<TransaccionTransformacion> aux = new ArrayList<>();
+            for (InsumoAlmacen entrada : model.getEntradas()) {
+                aux.add(transformInsumoAlmacen(entrada, 0));
+            }
+            getEntityManager().getTransaction().begin();
+            new AlmacenController(getEntityManager(), findAll().get(0)).crearTransformacion(salida, model.getSalidas().get(0).getCantidad(), aux, findAll().get(0));
+            if (getEntityManager().getTransaction().isActive()) {
+                getEntityManager().getTransaction().commit();
+            }
+
+            return toJsonString(Response.Status.OK, "Accion realizada exitosamente");
+        } catch (BadRequestException | IllegalArgumentException ex) {
+            return toJsonString(Response.Status.BAD_REQUEST, ex.getMessage());
+        } catch (Exception ex) {
+            return toJsonString(Response.Status.INTERNAL_SERVER_ERROR, ex.getMessage() + ex.getStackTrace()[0].toString());
+        }
+    }
+
     @RolesAllowed("2")
     @Secured
     @GET
@@ -251,15 +309,52 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
         return toJsonString(Response.Status.OK, prepareTransacciones());
     }
 
+    @RolesAllowed("2")
+    @Secured
+    @POST
+    @Path("COMBINACIONES-CON")
+    public Response getOperacionesCon(String listaInsumo) {
+        List<InsumoAlmacen> aux = findAll().get(0).getInsumoAlmacenList(), ret = new ArrayList<>();
+        List<Insumo> admitidos = new ArrayList<>();
+        try {
+            ObjectMapper om = new ObjectMapper();
+            List<InsumoAlmacen> lista = new ObjectMapper().readValue(listaInsumo, om.getTypeFactory().constructCollectionType(List.class,
+                    InsumoAlmacen.class
+            ));
+
+            for (InsumoAlmacen i : lista) {
+                for (InsumoElaborado ie : getEntityManager().find(Insumo.class,
+                        i.getInsumo().getCodInsumo()).getProductosDerivados()) {
+                    admitidos.add(ie.getInsumo());
+                }
+            }
+            for (Insumo a : admitidos) {
+                for (InsumoAlmacen i : aux) {
+                    if (i.getInsumo().getCodInsumo().equals(a.getCodInsumo())) {
+                        i.setCantidad((float) 0);
+                        ret.add(i);
+                    }
+                }
+            }
+            return toJsonString(Response.Status.OK, ret);
+
+        } catch (Exception ex) {
+            Logger.getLogger(AlmacenFacadeREST.class
+                    .getName()).log(Level.SEVERE, null, ex);
+            return toJsonString(Response.Status.BAD_REQUEST, "La peticion se proceso incorrectamente " + ex.getMessage());
+        }
+    }
+
     public List<Transaccion> prepareTransacciones() {
-        List<Transaccion> ret = super.findAll(Transaccion.class);
+        List<Transaccion> ret = super.findAll(Transaccion.class
+        );
         Collections.sort(ret, (Transaccion o1, Transaccion o2) -> {
-            int comp = o1.getFecha().compareTo(o2.getFecha()) *-1;
-            return comp == 0 ? o1.getHora().compareTo(o2.getHora())*-1 : comp;
+            int comp = o1.getFecha().compareTo(o2.getFecha()) * -1;
+            return comp == 0 ? o1.getHora().compareTo(o2.getHora()) * -1 : comp;
         });
         for (Transaccion t : ret) {
             if (t.getTransaccionEntrada() != null) {
-                t.setDescripcion("ENTRADA T: " + t.getTransaccionEntrada().getValorTotal() + R.COIN_SUFFIX);
+                t.setDescripcion("ENTRADA: " + t.getTransaccionEntrada().getValorTotal() + R.COIN_SUFFIX);
             }
             if (t.getTransaccionMerma() != null) {
                 t.setDescripcion(t.getTransaccionMerma().getRazon().toUpperCase());
@@ -277,6 +372,16 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
             }
         }
         return ret;
+    }
+
+    public TransaccionTransformacion transformInsumoAlmacen(InsumoAlmacen selected, float cantidadUsada) {
+        AlmacenController controller = new AlmacenController(findAll().get(0));
+        TransaccionTransformacion nueva = new TransaccionTransformacion();
+        nueva.setCantidadCreada(selected.getCantidad());
+        nueva.setCantidadUsada(cantidadUsada);
+        nueva.setDireccionInversa(false);
+        nueva.setInsumo(controller.findInsumo(findAll().get(0).getCodAlmacen(), selected.getInsumo().getCodInsumo()).getInsumo());
+        return nueva;
     }
 
     @Override

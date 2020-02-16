@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.jobits.pos.persistence;
 
 import java.io.Serializable;
@@ -21,8 +20,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
 @Entity
 @Table(name = "insumo_elaborado")
@@ -48,10 +48,10 @@ public class InsumoElaborado implements Serializable {
     private float costo;
     @JoinColumn(name = "insumocod_nombre", referencedColumnName = "cod_insumo", insertable = false, updatable = false)
     @ManyToOne(optional = false)
-    private Insumo insumo;
+    private Insumo derivante;
     @JoinColumn(name = "insumocod_insumo", referencedColumnName = "cod_insumo", insertable = false, updatable = false)
     @ManyToOne(optional = false)
-    private Insumo insumo1;
+    private Insumo insumo;
 
     public InsumoElaborado() {
     }
@@ -94,20 +94,20 @@ public class InsumoElaborado implements Serializable {
         this.costo = costo;
     }
 
+    public Insumo getDerivante() {
+        return derivante;
+    }
+
+    public void setDerivante(Insumo derivante) {
+        this.derivante = derivante;
+    }
+
     public Insumo getInsumo() {
         return insumo;
     }
 
     public void setInsumo(Insumo insumo) {
         this.insumo = insumo;
-    }
-
-    public Insumo getInsumo1() {
-        return insumo1;
-    }
-
-    public void setInsumo1(Insumo insumo1) {
-        this.insumo1 = insumo1;
     }
 
     @Override
@@ -120,14 +120,11 @@ public class InsumoElaborado implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof InsumoElaborado)) {
+        if (!(object instanceof Insumo)) {
             return false;
         }
-        InsumoElaborado other = (InsumoElaborado) object;
-        if ((this.insumoElaboradoPK == null && other.insumoElaboradoPK != null) || (this.insumoElaboradoPK != null && !this.insumoElaboradoPK.equals(other.insumoElaboradoPK))) {
-            return false;
-        }
-        return true;
+        Insumo other = (Insumo) object;
+        return getInsumo().equals(other);
     }
 
     @Override
