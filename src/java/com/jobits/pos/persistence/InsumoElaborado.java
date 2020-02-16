@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.jobits.pos.persistence;
 
 import java.io.Serializable;
@@ -21,8 +20,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
 @Entity
 @Table(name = "insumo_elaborado")
@@ -120,14 +120,11 @@ public class InsumoElaborado implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof InsumoElaborado)) {
+        if (!(object instanceof Insumo)) {
             return false;
         }
-        InsumoElaborado other = (InsumoElaborado) object;
-        if ((this.insumoElaboradoPK == null && other.insumoElaboradoPK != null) || (this.insumoElaboradoPK != null && !this.insumoElaboradoPK.equals(other.insumoElaboradoPK))) {
-            return false;
-        }
-        return true;
+        Insumo other = (Insumo) object;
+        return getInsumo().equals(other);
     }
 
     @Override
