@@ -5,7 +5,6 @@
  */
 package com.jobits.pos.service;
 
-import com.jobits.pos.authentication.Secured;
 import com.jobits.pos.persistence.Carta;
 import com.jobits.pos.persistence.Negocio;
 import javax.persistence.EntityManager;
@@ -13,7 +12,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import com.jobits.utils.R;
 import java.util.HashMap;
-import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.Response;
 
 /**
