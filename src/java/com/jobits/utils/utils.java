@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import com.jobits.utils.utils;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import javax.ws.rs.InternalServerErrorException;
 
 /**
  *
@@ -211,6 +215,7 @@ public class utils {
     /**
      *
      * reduce los decimales de un float a 2 y ademas agrega la moneda d sufijo
+     *
      * @param valorARedondear
      * @return
      */
@@ -232,11 +237,20 @@ public class utils {
     }
 
     public static float redondeoPorExcesoFloat(Float valorARedondear) {
-        int valorConvertidoEntero = (int) Math.ceil((int)(valorARedondear * 100));
+        int valorConvertidoEntero = (int) Math.ceil((int) (valorARedondear * 100));
         int ref = valorConvertidoEntero % 5;
         if (ref != 0) {
             valorConvertidoEntero += 5 - ref;
         }
-        return ((float) valorConvertidoEntero / 100) ;
+        return ((float) valorConvertidoEntero / 100);
+    }
+
+    public static String getSHA256(String stringToConvert) throws InternalServerErrorException {
+        try {
+            byte[] bytes = MessageDigest.getInstance("SHA-256").digest(stringToConvert.getBytes());
+            return String.format("%064x", new BigInteger(1, bytes));
+        } catch (NoSuchAlgorithmException ex) {
+            throw new InternalServerErrorException("Error con algoritmo Hash");
+        }
     }
 }
