@@ -18,6 +18,7 @@ import com.jobits.pos.persistence.Insumo;
 import com.jobits.pos.persistence.InsumoAlmacen;
 import com.jobits.pos.persistence.Ipv;
 import com.jobits.pos.controllers.TransaccionController;
+import com.jobits.pos.persistence.InsumoAlmacenPK;
 import com.jobits.pos.persistence.InsumoElaborado;
 import com.jobits.pos.persistence.IpvRegistro;
 import com.jobits.pos.persistence.Transaccion;
@@ -236,13 +237,13 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
                 throw new BadRequestException("La lista de salidas debe ser 1");
             }
 
-            InsumoAlmacen salida = model.getSalidas().get(0);
-
+            InsumoAlmacen salida = em1.find(InsumoAlmacen.class, model.getSalidas().get(0).getInsumoAlmacenPK());
+            em1.refresh(salida);
             boolean derivanteValido = false;
-            for (InsumoAlmacen e : model.getEntradas()) {
+            for (InsumoAlmacen ia : model.getEntradas()) {
                 derivanteValido = false;
-                for (InsumoElaborado derivante : e.getInsumo().getProductosDerivantes()) {
-                    if (derivante.getInsumo().equals(salida.getInsumo())) {
+                for (InsumoElaborado derivante : em1.find(Insumo.class, ia.getInsumo().getCodInsumo()).getProductosDerivantes()) {
+                    if (derivante.getDerivante().equals(salida.getInsumo())) {
                         derivanteValido = true;
                     }
                 }
@@ -254,15 +255,18 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
             for (InsumoAlmacen entrada : model.getEntradas()) {
                 aux.add(transformInsumoAlmacen(entrada, 0));
             }
-            //return new AlmacenController(em1, findAll().get(0)).crearTransformacion(salida, salida.getCantidad(), aux, findAll().get(0));
+            getEntityManager().getTransaction().begin();
+            new AlmacenController(getEntityManager(), findAll().get(0)).crearTransformacion(salida, model.getSalidas().get(0).getCantidad(), aux, findAll().get(0));
+            if (getEntityManager().getTransaction().isActive()) {
+                getEntityManager().getTransaction().commit();
+            }
 
-        } catch (BadRequestException ex) {
-            toJsonString(Response.Status.BAD_REQUEST, ex.getMessage());
+            return toJsonString(Response.Status.OK, "Accion realizada exitosamente");
+        } catch (BadRequestException | IllegalArgumentException ex) {
+            return toJsonString(Response.Status.BAD_REQUEST, ex.getMessage());
         } catch (Exception ex) {
-            toJsonString(Response.Status.INTERNAL_SERVER_ERROR, ex.getMessage());
+            return toJsonString(Response.Status.INTERNAL_SERVER_ERROR, ex.getMessage() + ex.getStackTrace()[0].toString());
         }
-
-        return toJsonString(Response.Status.CREATED, "desarrollo");
     }
 
     @RolesAllowed("2")
@@ -371,11 +375,12 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
     }
 
     public TransaccionTransformacion transformInsumoAlmacen(InsumoAlmacen selected, float cantidadUsada) {
+        AlmacenController controller = new AlmacenController(findAll().get(0));
         TransaccionTransformacion nueva = new TransaccionTransformacion();
         nueva.setCantidadCreada(selected.getCantidad());
         nueva.setCantidadUsada(cantidadUsada);
         nueva.setDireccionInversa(false);
-        nueva.setInsumo(selected.getInsumo());
+        nueva.setInsumo(controller.findInsumo(findAll().get(0).getCodAlmacen(), selected.getInsumo().getCodInsumo()).getInsumo());
         return nueva;
     }
 

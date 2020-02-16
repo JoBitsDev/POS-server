@@ -78,10 +78,10 @@ public class TransaccionController {
             i.setTransaccion(t);
             i.setTransaccionTransformacionPK(pk);
             i.setCostoUnitario(precioMedioNuevo);
+            t.setTransaccionTransformacionList(items);
+            createNewTransaccionTransformacion(t, destino, selected.getAlmacen());
         }
-        t.setTransaccionTransformacionList(items);
-        createNewTransaccionTransformacion(t, destino, selected.getAlmacen());
-    }
+        }
 
     //
     //Private methods
@@ -113,7 +113,7 @@ public class TransaccionController {
     }
 
     private void createNewTransaccionTransformacion(Transaccion t, Almacen a, Almacen origen) {
-        AlmacenController almacenController = new AlmacenController(origen);
+        AlmacenController almacenController = new AlmacenController(em1,origen);
         almacenController.darTransformacionAInsumo(t, a);
     }
 

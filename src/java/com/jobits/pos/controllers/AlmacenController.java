@@ -97,8 +97,8 @@ public class AlmacenController {
         }
     }
 
-    public void crearTransformacion(InsumoAlmacen selected, float cantidad, List<TransaccionTransformacion> items, Almacen destino) throws  IllegalArgumentException{
-
+    public void crearTransformacion(InsumoAlmacen selected, float cantidad, List<TransaccionTransformacion> items, Almacen destino) throws IllegalArgumentException {
+        
         // Validaciones
         if (selected.getCantidad() < cantidad || cantidad <= 0) {
             throw new IllegalArgumentException("La cantidad a transformar no puede ser mayor que la cantidad existente en almacen"
@@ -113,7 +113,7 @@ public class AlmacenController {
             sumaTransformacion += i.getCantidadUsada();
             if (!selected.getInsumo().getProductosDerivados().contains(i.getInsumo())) {
                 throw new IllegalArgumentException("El insumo " + i.getInsumo() + " no es un insumo derivado de " + selected.getInsumo()
-                        + "\n y no es posible transformarlo");
+                        + " y no es posible transformarlo");
             }
             if (findInsumo(destino.getCodAlmacen(), i.getInsumo().getCodInsumo()) == null) {
                 throw new IllegalArgumentException("El insumo " + i.getInsumo() + " no se encuentra en el almacen destino (" + destino + ")");
@@ -127,7 +127,7 @@ public class AlmacenController {
         }
 
         float merma = utils.setDosLugaresDecimalesFloat(sumaTransformacion - cantidad);
-       
+
         TransaccionController controller = new TransaccionController(em1);
         controller.addTransaccionTransformacion(selected, new Date(), new Date(), items, cantidad, merma, destino);
     }
@@ -212,6 +212,7 @@ public class AlmacenController {
         insumoaRebajar.setCantidad(insumoaRebajar.getCantidad() - cantidad);
         insumoaRebajar.setValorMonetario(insumoaRebajar.getValorMonetario() - cantidad * precioMedio);
         em1.merge(insumoaRebajar);
+        //em1.flush();
         //updateValorTotalAlmacen(instance);
 
     }
@@ -241,7 +242,7 @@ public class AlmacenController {
             a.setValorMonetario(a.getValorMonetario() + total);
             em1.merge(a);
 
-            em1.getTransaction().commit();
+            // em1.getTransaction().commit();
         }
     }
 
@@ -254,7 +255,7 @@ public class AlmacenController {
         }
     }
 
-    private InsumoAlmacen findInsumo(String a, String i) {
+    public InsumoAlmacen findInsumo(String a, String i) {
         try {
             return (InsumoAlmacen) em1.createNamedQuery("InsumoAlmacen.findByAlmacenInsumo")
                     .setParameter("almacencodAlmacen", a)
