@@ -92,9 +92,9 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
     @RolesAllowed("0")
     @Secured
-    @POST
+    @GET
     @Path("VALIDATE")
-    public Response isValid(String codOrden) {
+    public Response isValid(@QueryParam("codOrden") String codOrden) {
         Orden o = super.find(codOrden);
 
         if (o != null) {
