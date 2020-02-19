@@ -7,9 +7,7 @@ package com.jobits.pos.service;
 
 import com.jobits.pos.controllers.InsumoController;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.jobits.pos.authentication.Secured;
 import com.jobits.pos.controllers.AlmacenController;
 import com.jobits.pos.persistence.Almacen;
@@ -18,7 +16,6 @@ import com.jobits.pos.persistence.Insumo;
 import com.jobits.pos.persistence.InsumoAlmacen;
 import com.jobits.pos.persistence.Ipv;
 import com.jobits.pos.controllers.TransaccionController;
-import com.jobits.pos.persistence.InsumoAlmacenPK;
 import com.jobits.pos.persistence.InsumoElaborado;
 import com.jobits.pos.persistence.IpvRegistro;
 import com.jobits.pos.persistence.IpvRegistroPK;
@@ -30,7 +27,6 @@ import com.jobits.pos.persistence.TransaccionTransformacion;
 import com.jobits.pos.persistence.models.TransformacionModel;
 import com.jobits.pos.printservice.Impresion;
 import com.jobits.utils.R;
-import java.util.AbstractList;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -297,11 +293,12 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
                         .setParameter("ptoElab", puntoElaboracion)
                         .setParameter("fecha", findVenta().getFecha())
                         .getResultList());
-        
+
         ArrayList<IpvRegistro> ret = new ArrayList<>();
         for (IpvVentaRegistro x : aux) {
             ret.add(transform(x));
         }
+        Collections.sort(ret);
         return toJsonString(Response.Status.OK, ret);
     }
 
@@ -318,6 +315,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
         for (IpvRegistro x : ret) {
             x.getIpvRegistroPK().setIpvinsumocodInsumo(x.getIpv().getInsumo().toString());
         }
+        Collections.sort(ret);
         return toJsonString(Response.Status.OK, ret);
     }
 
@@ -397,8 +395,8 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
     public IpvRegistro transform(IpvVentaRegistro registro) {
         IpvRegistroPK pk = new IpvRegistroPK(
                 registro.getProductoVenta().getNombre(),
-                 registro.getProductoVenta().getCocinacodCocina().getCodCocina(),
-                 registro.getIpvVentaRegistroPK().getVentafecha());
+                registro.getProductoVenta().getCocinacodCocina().getCodCocina(),
+                registro.getIpvVentaRegistroPK().getVentafecha());
         IpvRegistro ret = new IpvRegistro(pk);
         ret.setConsumo(registro.getVenta());
         ret.setDisponible(registro.getDisponible());
