@@ -20,10 +20,10 @@ import javax.ws.rs.core.Response;
  * @author Jorge
  *
  */
-@Path("carta/")
-public class CartaFacadeREST extends AbstractFacade<Carta> {
+@Path("general/")
+public class GeneralFacadeREST extends AbstractFacade<Carta> {
 
-    public CartaFacadeREST() {
+    public GeneralFacadeREST() {
         super(Carta.class);
     }
 
@@ -37,6 +37,8 @@ public class CartaFacadeREST extends AbstractFacade<Carta> {
         String secundaria = n.getMonedaPrincipal().equals("CUC") ? " MN" : " CUC";
         ret.put("monedaSecundaria", secundaria);
         ret.put("cambio", R.COINCHANGE);
+        ret.put("majorVersion", R.MAJOR_VERSION);
+        ret.put("minorVersion", R.MINOR_VERSION);
         return toJsonString(Response.Status.OK, ret);
     }
 
