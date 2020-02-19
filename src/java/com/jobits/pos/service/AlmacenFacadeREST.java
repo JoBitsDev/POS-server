@@ -21,6 +21,8 @@ import com.jobits.pos.controllers.TransaccionController;
 import com.jobits.pos.persistence.InsumoAlmacenPK;
 import com.jobits.pos.persistence.InsumoElaborado;
 import com.jobits.pos.persistence.IpvRegistro;
+import com.jobits.pos.persistence.IpvRegistroPK;
+import com.jobits.pos.persistence.IpvVentaRegistro;
 import com.jobits.pos.persistence.Transaccion;
 import com.jobits.pos.persistence.TransaccionEntrada;
 import com.jobits.pos.persistence.TransaccionSalida;
@@ -290,6 +292,24 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
     @GET
     @Path("REGISTRO-IPVS")
     public Response getRegistroIpvs(@QueryParam(PTO_ELAB) String puntoElaboracion) {
+        ArrayList<IpvVentaRegistro> aux = new ArrayList<>(
+                em1.createNamedQuery("IpvVentaRegistro.findByPtoElab")
+                        .setParameter("ptoElab", puntoElaboracion)
+                        .setParameter("fecha", findVenta().getFecha())
+                        .getResultList());
+        
+        ArrayList<IpvRegistro> ret = new ArrayList<>();
+        for (IpvVentaRegistro x : aux) {
+            ret.add(transform(x));
+        }
+        return toJsonString(Response.Status.OK, ret);
+    }
+
+    @RolesAllowed("2")
+    @Secured
+    @GET
+    @Path("REGISTRO-EXISTENCIAS")
+    public Response getRegistroExistencias(@QueryParam(PTO_ELAB) String puntoElaboracion) {
         ArrayList<IpvRegistro> ret = new ArrayList<>(
                 em1.createNamedQuery("IpvRegistro.findByIpvcocinacodCocinaAndFecha")
                         .setParameter("ipvcocinacodCocina", puntoElaboracion)
@@ -371,6 +391,20 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
                 }
             }
         }
+        return ret;
+    }
+
+    public IpvRegistro transform(IpvVentaRegistro registro) {
+        IpvRegistroPK pk = new IpvRegistroPK(
+                registro.getProductoVenta().getNombre(),
+                 registro.getProductoVenta().getCocinacodCocina().getCodCocina(),
+                 registro.getIpvVentaRegistroPK().getVentafecha());
+        IpvRegistro ret = new IpvRegistro(pk);
+        ret.setConsumo(registro.getVenta());
+        ret.setDisponible(registro.getDisponible());
+        ret.setEntrada(registro.getEntrada());
+        ret.setFinal1(registro.getFinal1());
+        ret.setInicio(registro.getInicio());
         return ret;
     }
 
