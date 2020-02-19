@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.jobits.pos.persistence;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,8 +21,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
 @Entity
 @Table(name = "ipv_registro")
@@ -45,7 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "IpvRegistro.findByConsumoReal", query = "SELECT i FROM IpvRegistro i WHERE i.consumoReal = :consumoReal")
     , @NamedQuery(name = "IpvRegistro.findByFinal1", query = "SELECT i FROM IpvRegistro i WHERE i.final1 = :final1")
     , @NamedQuery(name = "IpvRegistro.findByFinalReal", query = "SELECT i FROM IpvRegistro i WHERE i.finalReal = :finalReal")})
-public class IpvRegistro implements Serializable {
+public class IpvRegistro implements Serializable, Comparable<IpvRegistro> {
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
@@ -178,6 +178,11 @@ public class IpvRegistro implements Serializable {
     @Override
     public String toString() {
         return "com.restmanager.IpvRegistro[ ipvRegistroPK=" + ipvRegistroPK + " ]";
+    }
+
+    @Override
+    public int compareTo(IpvRegistro o) {
+        return getIpvRegistroPK().getIpvinsumocodInsumo().compareToIgnoreCase(o.getIpvRegistroPK().getIpvinsumocodInsumo());
     }
 
 }
