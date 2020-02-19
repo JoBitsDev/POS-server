@@ -247,7 +247,7 @@ public class Insumo implements Serializable {
 
     @Override
     public String toString() {
-        return "("+codInsumo +")" +"("+um +")" + nombre;
+        return nombre +" ("+um +")";
     }
 
 }
