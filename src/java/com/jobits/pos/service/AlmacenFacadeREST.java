@@ -210,7 +210,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     @RolesAllowed("4")
     @DELETE
-    @Path("MERMAR_{almac-enCod}_{insumoCod}_{cant}_{razon}")
+    @Path("MERMAR_{almacenCod}_{insumoCod}_{cant}_{razon}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public String rebaja(@PathParam("almacenCod") String almacenCod,
             @PathParam("insumoCod") String insumoCod,
@@ -221,8 +221,8 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     }
 
-    //@RolesAllowed("2")
-    //@Secured
+    @RolesAllowed("2")
+    @Secured
     @POST
     @Path("TRANSFORMAR")
     public Response transformacion(String listas) {
@@ -283,11 +283,33 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
         return toJsonString(Response.Status.OK, cocinas);
     }
 
-    @RolesAllowed("2")
+    @RolesAllowed("0")
     @Secured
     @GET
     @Path("REGISTRO-IPVS")
     public Response getRegistroIpvs(@QueryParam(PTO_ELAB) String puntoElaboracion) {
+        ArrayList<IpvRegistro> aux = new ArrayList<>(
+                em1.createNamedQuery("IpvRegistro.findByIpvcocinacodCocinaAndFecha")
+                        .setParameter("ipvcocinacodCocina", puntoElaboracion)
+                        .setParameter("fecha", findVenta().getFecha())
+                        .getResultList());
+        ArrayList<IpvRegistro> ret = new ArrayList<>();
+        for (IpvRegistro x : aux) {
+            if (x.getDisponible() != 0) {
+                x.getIpvRegistroPK().setIpvinsumocodInsumo(x.getIpv().getInsumo().toString());
+                ret.add(x);
+            }
+        }
+
+        Collections.sort(ret);
+        return toJsonString(Response.Status.OK, ret);
+    }
+
+    @RolesAllowed("0")
+    @Secured
+    @GET
+    @Path("REGISTRO-EXISTENCIAS")
+    public Response getRegistroExistencias(@QueryParam(PTO_ELAB) String puntoElaboracion) {
         ArrayList<IpvVentaRegistro> aux = new ArrayList<>(
                 em1.createNamedQuery("IpvVentaRegistro.findByPtoElab")
                         .setParameter("ptoElab", puntoElaboracion)
@@ -296,24 +318,9 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
         ArrayList<IpvRegistro> ret = new ArrayList<>();
         for (IpvVentaRegistro x : aux) {
-            ret.add(transform(x));
-        }
-        Collections.sort(ret);
-        return toJsonString(Response.Status.OK, ret);
-    }
-
-    @RolesAllowed("2")
-    @Secured
-    @GET
-    @Path("REGISTRO-EXISTENCIAS")
-    public Response getRegistroExistencias(@QueryParam(PTO_ELAB) String puntoElaboracion) {
-        ArrayList<IpvRegistro> ret = new ArrayList<>(
-                em1.createNamedQuery("IpvRegistro.findByIpvcocinacodCocinaAndFecha")
-                        .setParameter("ipvcocinacodCocina", puntoElaboracion)
-                        .setParameter("fecha", findVenta().getFecha())
-                        .getResultList());
-        for (IpvRegistro x : ret) {
-            x.getIpvRegistroPK().setIpvinsumocodInsumo(x.getIpv().getInsumo().toString());
+            if (x.getDisponible() != 0) {
+                ret.add(transform(x));
+            }
         }
         Collections.sort(ret);
         return toJsonString(Response.Status.OK, ret);

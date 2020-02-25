@@ -38,7 +38,7 @@ public class CocinaFacadeREST extends AbstractFacade<Cocina> {
         super(Cocina.class);
     }
 
-    @RolesAllowed("2")
+    @RolesAllowed("0")
     @GET
     @Path("NAMES")
     public Response getCocinasNombres() {
