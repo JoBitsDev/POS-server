@@ -78,7 +78,7 @@ public class AreaFacadeREST extends AbstractFacade<Area> {
         return toJsonString(Response.Status.OK, new ArrayList<>(super.findAll(Mesa.class)));
     }
 
-    @RolesAllowed("1")
+    @RolesAllowed("0")
     @Secured
     @GET
     public Response getAreas() {

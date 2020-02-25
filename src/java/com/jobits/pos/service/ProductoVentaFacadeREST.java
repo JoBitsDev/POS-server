@@ -6,27 +6,20 @@
 package com.jobits.pos.service;
 
 import com.jobits.pos.authentication.Secured;
+import com.jobits.pos.controllers.IPVController;
 import com.jobits.pos.persistence.Carta;
 import com.jobits.pos.persistence.Mesa;
 import com.jobits.pos.persistence.ProductoVenta;
 import com.jobits.pos.persistence.Seccion;
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
@@ -65,9 +58,17 @@ public class ProductoVentaFacadeREST extends AbstractFacade<ProductoVenta> {
         return toJsonString(Response.Status.OK, ret);
     }
 
+    @RolesAllowed("0")
+    @Secured
+    @GET
+    @Path("RESTANTES")
+    public Response getRestantesDeProducto(@QueryParam("codProducto") String codProducto) {
+        return toJsonString(Response.Status.OK, new IPVController(getEntityManager()).getRestantes(codProducto,findVenta().getFecha()));
+    }
+
     @Override
     protected EntityManager getEntityManager() {
-        return em;
+        return em1;
     }
 
 }

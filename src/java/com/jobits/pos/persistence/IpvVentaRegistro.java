@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.jobits.pos.persistence;
 
 import java.io.Serializable;
@@ -20,8 +19,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
 @Entity
 @Table(name = "ipv_venta_registro")
@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "IpvVentaRegistro.findAll", query = "SELECT i FROM IpvVentaRegistro i")
     , @NamedQuery(name = "IpvVentaRegistro.findByVentafecha", query = "SELECT i FROM IpvVentaRegistro i WHERE i.ipvVentaRegistroPK.ventafecha = :ventafecha")
     , @NamedQuery(name = "IpvVentaRegistro.findByProductoVentapCod", query = "SELECT i FROM IpvVentaRegistro i WHERE i.ipvVentaRegistroPK.productoVentapCod = :productoVentapCod")
+    , @NamedQuery(name = "IpvVentaRegistro.findByPtoElab", query = "SELECT i FROM IpvVentaRegistro i WHERE i.productoVenta.cocinacodCocina.codCocina = :ptoElab AND i.venta1.fecha = :fecha")
     , @NamedQuery(name = "IpvVentaRegistro.findByInicio", query = "SELECT i FROM IpvVentaRegistro i WHERE i.inicio = :inicio")
     , @NamedQuery(name = "IpvVentaRegistro.findByEntrada", query = "SELECT i FROM IpvVentaRegistro i WHERE i.entrada = :entrada")
     , @NamedQuery(name = "IpvVentaRegistro.findByDisponible", query = "SELECT i FROM IpvVentaRegistro i WHERE i.disponible = :disponible")
