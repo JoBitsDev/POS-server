@@ -59,7 +59,7 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
         super(Personal.class);
     }
 
-    @RolesAllowed("1")
+    @RolesAllowed("0")
     @GET
     @Secured
     @Path("MOSTRAR-PERSONAL-TRABAJANDO")
