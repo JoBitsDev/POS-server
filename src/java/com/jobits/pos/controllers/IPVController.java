@@ -61,7 +61,7 @@ public class IPVController extends AbstractController {
         IpvVentaRegistroPK pk = new IpvVentaRegistroPK(productoVenta.getOrden().getVentafecha().getFecha(), productoVenta.getProductoVenta().getPCod());
         IpvVentaRegistro ipvVenta = getEntityManager().find(IpvVentaRegistro.class, pk);
         if (ipvVenta != null) {
-            ipvVenta.setVendidos(ipvVenta.getVendidos()+ cantidad);
+            ipvVenta.setVenta(ipvVenta.getVenta() + cantidad);
             updateInstance(ipvVenta);
         }
     }
@@ -72,7 +72,7 @@ public class IPVController extends AbstractController {
             IpvVentaRegistroPK pk = new IpvVentaRegistroPK(x.getOrden().getVentafecha().getFecha(), x.getProductoVenta().getPCod());
             IpvVentaRegistro ipvVenta = getEntityManager().find(IpvVentaRegistro.class, pk);
             if (ipvVenta != null) {
-                ipvVenta.setVendidos(ipvVenta.getVendidos()- x.getCantidad());
+                ipvVenta.setVenta(ipvVenta.getVenta() - x.getCantidad());
                 ipvVenta.setAutorizos(ipvVenta.getAutorizos() + x.getCantidad());
                 updateInstance(ipvVenta);
             }
@@ -87,7 +87,7 @@ public class IPVController extends AbstractController {
             IpvVentaRegistro ipvVenta = getEntityManager().find(IpvVentaRegistro.class, pk);
             if (ipvVenta != null) {
                 ipvVenta.setAutorizos(ipvVenta.getAutorizos() - x.getCantidad());
-                ipvVenta.setVendidos(ipvVenta.getVendidos()+ x.getCantidad());
+                ipvVenta.setVenta(ipvVenta.getVenta() + x.getCantidad());
                 updateInstance(ipvVenta);
             }
         }
@@ -112,7 +112,7 @@ public class IPVController extends AbstractController {
         IpvVentaRegistroPK pk = new IpvVentaRegistroPK(productoVenta.getOrden().getVentafecha().getFecha(), productoVenta.getProductoVenta().getPCod());
         IpvVentaRegistro ipvVenta = getEntityManager().find(IpvVentaRegistro.class, pk);
         if (ipvVenta != null) {
-            ipvVenta.setVendidos(ipvVenta.getVendidos()- diferencia);
+            ipvVenta.setVenta(ipvVenta.getVenta() - diferencia);
             updateInstance(ipvVenta);
         }
     }
@@ -130,20 +130,20 @@ public class IPVController extends AbstractController {
         if (instance.getConsumoReal() == null) {
             instance.setConsumoReal((float) 0);
         }
-        if (instance.getFinalCalculado() == null) {
-            instance.setFinalCalculado((float) 0);
+        if (instance.getFinal1() == null) {
+            instance.setFinal1((float) 0);
         }
-        if (instance.getFinalAjustado() == null) {
-            instance.setFinalAjustado((float) 0);
+        if (instance.getFinalReal() == null) {
+            instance.setFinalReal((float) 0);
         }
         if (instance.getDisponible() == null) {
             instance.setDisponible((float) 0);
         }
         instance.setDisponible(instance.getEntrada() + instance.getInicio());
-        instance.setFinalCalculado(utils.setDosLugaresDecimalesFloat(instance.getDisponible() - instance.getConsumo()));
+        instance.setFinal1(utils.setDosLugaresDecimalesFloat(instance.getDisponible() - instance.getConsumo()));
         if (instance.getConsumoReal() != null) {
             if (instance.getConsumoReal() > 0) {
-                instance.setFinalCalculado(utils.setDosLugaresDecimalesFloat(instance.getDisponible() - instance.getConsumoReal()));
+                instance.setFinal1(utils.setDosLugaresDecimalesFloat(instance.getDisponible() - instance.getConsumoReal()));
             }
         }
         getEntityManager().getTransaction().begin();
@@ -158,8 +158,8 @@ public class IPVController extends AbstractController {
         if (instance.getInicio() == null) {
             instance.setInicio((float) 0);
         }
-        if (instance.getVendidos() == null) {
-            instance.setVendidos((float) 0);
+        if (instance.getVenta() == null) {
+            instance.setVenta((float) 0);
         }
         if (instance.getFinal1() == null) {
             instance.setFinal1((float) 0);
@@ -171,7 +171,7 @@ public class IPVController extends AbstractController {
             instance.setAutorizos((float) 0);
         }
         instance.setDisponible(instance.getEntrada() + instance.getInicio());
-        instance.setFinal1(utils.setDosLugaresDecimalesFloat(instance.getDisponible() - instance.getVendidos() - instance.getAutorizos()));
+        instance.setFinal1(utils.setDosLugaresDecimalesFloat(instance.getDisponible() - instance.getVenta() - instance.getAutorizos()));
         getEntityManager().getTransaction().begin();
         getEntityManager().merge(instance);
         getEntityManager().getTransaction().commit();
@@ -200,4 +200,29 @@ public class IPVController extends AbstractController {
                 .getSingleResult();
 
     }
+
+    public boolean hayDisponibilidad(ProductoVenta selected, Date fecha, float cantidad) {
+        for (ProductoInsumo insumo : selected.getProductoInsumoList()) {
+            try {
+                IpvRegistro ipv = getIpvRegistro(selected.getCocinacodCocina(), fecha, insumo.getInsumo());
+                float f = ipv.getConsumo() + insumo.getCantidad() * cantidad;
+                if (f > ipv.getDisponible()) {
+                    selected.setVisible(false);
+                    getEntityManager().getTransaction().begin();
+                    getEntityManager().merge(selected);
+                    getEntityManager().getTransaction().commit();
+                    return false;
+                }
+            } catch (NoResultException e) {
+                return true;
+            } catch (PersistenceException e) {
+                throw new IllegalArgumentException(e.getMessage());
+
+            }
+
+        }
+        return true;
+
+    }
+
 }
