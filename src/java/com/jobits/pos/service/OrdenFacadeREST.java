@@ -140,6 +140,11 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         ArrayList<ProductovOrden> po = new ArrayList<>(o.getProductovOrdenList());
         ProductovOrden founded = null;
         int contains = -1;
+        if (producto.getCocinacodCocina().getLimitarVentaInsumoAgotado()) {
+            if (!ipvController.hayDisponibilidad(producto, findVenta().getFecha(), cantidad)) {
+                return toJsonString(Response.Status.EXPECTATION_FAILED, "No hay suficiente " + producto + "para elaborar. el producto se marcara como no visible");
+            }
+        }
         if (!po.isEmpty()) {
             for (int i = 0; contains == -1 && i < po.size(); i++) {
                 if (po.get(i).getProductoVenta().getPCod().equals(codProducto)) {
@@ -265,7 +270,9 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         if (em1.getTransaction().isActive()) {
             em1.getTransaction().commit();
         }
-
+        if (o.getDeLaCasa()) {
+            ipvController.consumirPorLaCasa(o.getProductovOrdenList());
+        }
         super.edit(o);
 
         return toJsonString(Response.Status.OK, "Orden cerrada exitosamente");
@@ -278,7 +285,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     public Response enviarACocina(String codOrden, @Context HttpServletRequest inRequest) {
         Orden o = super.find(codOrden);
         Mesa m = getEntityManager().find(Mesa.class, o.getMesacodMesa().getCodMesa());
-
+        boolean notificacionEnviada = false;
         if (R.TABLETS_EN_COCINA) {
             for (ProductovOrden x : o.getProductovOrdenList()) {
                 if (x.getEnviadosacocina() < x.getCantidad()) {
@@ -305,7 +312,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                         super.em1.persist(not);
                     }
 
-                    enviarNotificacion(not);
+                    notificacionEnviada = enviarNotificacion(not);
                     //if (enviarNotificacion(not)) {
                     super.em1.getTransaction().commit();
                     //} else {
@@ -325,7 +332,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
         super.edit(o);
 
-        return toJsonString(Response.Status.OK, o);
+        return notificacionEnviada ? toJsonString(Response.Status.OK, o) : toJsonString(Response.Status.EXPECTATION_FAILED, "La notificacion no pudo ser enviada porque el destinatario no pudo ser contactado o tiene el servicio desactivado. Notifique manualmente");
     }//TODO: METODoS ARCAICOS
 
     @POST
