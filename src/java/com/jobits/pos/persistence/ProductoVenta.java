@@ -7,6 +7,7 @@ package com.jobits.pos.persistence;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.jobits.utils.utils;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -36,15 +37,15 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "producto_venta")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "ProductoVenta.findAll", query = "SELECT p FROM ProductoVenta p")
-    , @NamedQuery(name = "ProductoVenta.findByPCod", query = "SELECT p FROM ProductoVenta p WHERE p.pCod = :pCod")
-    , @NamedQuery(name = "ProductoVenta.findByNombre", query = "SELECT p FROM ProductoVenta p WHERE p.nombre = :nombre")
-    , @NamedQuery(name = "ProductoVenta.findByPrecioVenta", query = "SELECT p FROM ProductoVenta p WHERE p.precioVenta = :precioVenta")
-    , @NamedQuery(name = "ProductoVenta.findByGanancia", query = "SELECT p FROM ProductoVenta p WHERE p.ganancia = :ganancia")
-    , @NamedQuery(name = "ProductoVenta.findByGasto", query = "SELECT p FROM ProductoVenta p WHERE p.gasto = :gasto")
-    , @NamedQuery(name = "ProductoVenta.findByDescripcion", query = "SELECT p FROM ProductoVenta p WHERE p.descripcion = :descripcion")
-    , @NamedQuery(name = "ProductoVenta.findByVisible", query = "SELECT p FROM ProductoVenta p WHERE p.visible = :visible")
-    , @NamedQuery(name = "ProductoVenta.findByPagoPorVenta", query = "SELECT p FROM ProductoVenta p WHERE p.pagoPorVenta = :pagoPorVenta")})
+    @NamedQuery(name = "ProductoVenta.findAll", query = "SELECT p FROM ProductoVenta p"),
+    @NamedQuery(name = "ProductoVenta.findByPCod", query = "SELECT p FROM ProductoVenta p WHERE p.pCod = :pCod"),
+    @NamedQuery(name = "ProductoVenta.findByNombre", query = "SELECT p FROM ProductoVenta p WHERE p.nombre = :nombre"),
+    @NamedQuery(name = "ProductoVenta.findByPrecioVenta", query = "SELECT p FROM ProductoVenta p WHERE p.precioVenta = :precioVenta"),
+    @NamedQuery(name = "ProductoVenta.findByGanancia", query = "SELECT p FROM ProductoVenta p WHERE p.ganancia = :ganancia"),
+    @NamedQuery(name = "ProductoVenta.findByGasto", query = "SELECT p FROM ProductoVenta p WHERE p.gasto = :gasto"),
+    @NamedQuery(name = "ProductoVenta.findByDescripcion", query = "SELECT p FROM ProductoVenta p WHERE p.descripcion = :descripcion"),
+    @NamedQuery(name = "ProductoVenta.findByVisible", query = "SELECT p FROM ProductoVenta p WHERE p.visible = :visible"),
+    @NamedQuery(name = "ProductoVenta.findByPagoPorVenta", query = "SELECT p FROM ProductoVenta p WHERE p.pagoPorVenta = :pagoPorVenta")})
 public class ProductoVenta implements Serializable, Comparable<ProductoVenta> {
 
     private static final long serialVersionUID = 1L;
@@ -229,7 +230,7 @@ public class ProductoVenta implements Serializable, Comparable<ProductoVenta> {
 
     @Override
     public String toString() {
-        return "com.restmanager.ProductoVenta[ pCod=" + pCod + " ]";
+        return nombre + " (" + utils.setDosLugaresDecimales(precioVenta) + ")";
     }
 
     @XmlTransient
