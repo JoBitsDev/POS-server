@@ -21,6 +21,9 @@ public abstract class AbstractController {
     public AbstractController(EntityManager em1) {
         this.em1 = em1;
     }
-    
 
+    public EntityManager getEntityManager() {
+        return em1;
+    }
+    
 }
