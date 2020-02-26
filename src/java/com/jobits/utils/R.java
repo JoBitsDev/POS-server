@@ -55,12 +55,14 @@ public class R {
 
     public static DecimalFormat formatoMoneda = new DecimalFormat("0.00");
 
-    public static int MAJOR_VERSION = 4;
-   
-    public static int MINOR_VERSION = 1;
-    
-    public static String RELEASE_VERSION = "Version 4.1.0";
-    
+    public static final int MAJOR_VERSION = 4;
+
+    public static final int MINOR_VERSION = 1;
+
+    public static final int PATCH_VERSION = 1;
+
+    public static String RELEASE_VERSION = "Version " + MAJOR_VERSION + "." + MINOR_VERSION + "." + PATCH_VERSION;
+
     public static int BUILD_VERSION = 17;
 
     public static enum SettingID {
