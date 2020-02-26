@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobits.pos.authentication.AuthenticationFilter;
 import com.jobits.pos.authentication.Secured;
+import com.jobits.pos.controllers.IPVController;
 import com.jobits.pos.persistence.*;
 import com.jobits.pos.notificationdelivery.Notificable;
 import com.jobits.pos.notificationdelivery.Notificador;
@@ -37,6 +38,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
     SimpleDateFormat FormatDate = new SimpleDateFormat("MM'/'dd'/'yy");
     SimpleDateFormat FormatTime = new SimpleDateFormat(" hh ':' mm ' ' a ");
+    IPVController ipvController = new IPVController(getEntityManager());
     private Date today = new Date();
 
     public static final String ESTADO_MESA_VACIA = "vacia",
@@ -136,6 +138,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         Orden o = super.find(codOrden);
         ProductoVenta producto = getEntityManager().find(ProductoVenta.class, codProducto);
         ArrayList<ProductovOrden> po = new ArrayList<>(o.getProductovOrdenList());
+        ProductovOrden founded = null;
         int contains = -1;
         if (!po.isEmpty()) {
             for (int i = 0; contains == -1 && i < po.size(); i++) {
@@ -146,25 +149,25 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         }
 
         if (contains != -1) {
-            ProductovOrden p = po.get(contains);
-            float cant = p.getCantidad();
-            p.setCantidad(cant + cantidad);
+            founded = po.get(contains);
+            float cant = founded.getCantidad();
+            founded.setCantidad(cant + cantidad);
 
         } else {
-            ProductovOrden aux = new ProductovOrden(codProducto, codOrden);
-            aux.setOrden(o);
-            aux.setProductoVenta(producto);
-            aux.setCantidad(cantidad);
-            aux.setEnviadosacocina((float) 0);
-            aux.setNumeroComensal(0);
+            founded = new ProductovOrden(codProducto, codOrden);
+            founded.setOrden(o);
+            founded.setProductoVenta(producto);
+            founded.setCantidad(cantidad);
+            founded.setEnviadosacocina((float) 0);
+            founded.setNumeroComensal(0);
 
             //em.persist(aux);
-            po.add(aux);
+            po.add(founded);
 
         }
         o.setProductovOrdenList(po);
         o.setOrdenvalorMonetario(calcularValorTotal(o));
-
+        ipvController.consumir(founded, cantidad);
         super.edit(o);
         return toJsonString(Response.Status.OK, o);
     }//TODO: Respuesta del servidor incorrecta
@@ -216,6 +219,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
             }
             o.setProductovOrdenList(po);
             o.setOrdenvalorMonetario(calcularValorTotal(o));
+            ipvController.devolver(p, cantidad);
             super.edit(o);
         }//TODO: aqui hay que disminuir tambien los contadores para enviado a cocina junto con los contadores de cantidad
 
