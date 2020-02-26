@@ -26,7 +26,7 @@ public class Notificador extends Thread {
     private Socket client; // socket to communicate with server
     private final String host;
     private final Notificable notificacion;
-    public  boolean NOTIFICACION_ENVIADA = false;
+    public boolean NOTIFICACION_ENVIADA = false;
 
     // initialize chatServer and set up GUI
     public Notificador(String host, Notificable notificacion) {
@@ -103,8 +103,8 @@ public class Notificador extends Thread {
             output.close();
             input.close();
             client.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            return;
         }
     }
 
