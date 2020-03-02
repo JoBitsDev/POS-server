@@ -47,6 +47,7 @@ public class ApplicationConfig extends Application {
         resources.add(com.jobits.pos.service.ConfiguracionFacadeREST.class);
 
         resources.add(com.jobits.pos.authentication.AuthenticationFilter.class);
+        resources.add(com.jobits.pos.exceptionshandlers.ExceptionHandler.class);
     }
 
 }

@@ -6,3 +6,7 @@ dist/
 src/java/com/jobits/pos/.DS_Store
 
 src/java/com/jobits/.DS_Store
+
+*.zip
+
+.DS_Store
