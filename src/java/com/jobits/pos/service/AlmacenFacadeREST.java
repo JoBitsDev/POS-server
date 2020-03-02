@@ -405,7 +405,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
                 registro.getProductoVenta().getCocinacodCocina().getCodCocina(),
                 registro.getIpvVentaRegistroPK().getVentafecha());
         IpvRegistro ret = new IpvRegistro(pk);
-        ret.setConsumo(registro.getVenta());
+        ret.setConsumo(registro.getVenta() + registro.getAutorizos());
         ret.setDisponible(registro.getDisponible());
         ret.setEntrada(registro.getEntrada());
         ret.setFinal1(registro.getFinal1());

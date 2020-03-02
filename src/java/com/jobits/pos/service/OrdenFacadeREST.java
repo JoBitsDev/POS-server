@@ -172,7 +172,11 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         }
         o.setProductovOrdenList(po);
         o.setOrdenvalorMonetario(calcularValorTotal(o));
-        ipvController.consumir(founded, cantidad);
+        if (o.getDeLaCasa()) {
+            ipvController.consumirPorLaCasa(founded, cantidad);
+        } else {
+            ipvController.consumir(founded, cantidad);
+        }
         super.edit(o);
         return toJsonString(Response.Status.OK, o);
     }//TODO: Respuesta del servidor incorrecta
@@ -224,7 +228,11 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
             }
             o.setProductovOrdenList(po);
             o.setOrdenvalorMonetario(calcularValorTotal(o));
-            ipvController.devolver(p, cantidad);
+            if (o.getDeLaCasa()) {
+                ipvController.devolverPorLaCasa(p, cantidad);
+            } else {
+                ipvController.devolver(p, cantidad);
+            }
             super.edit(o);
         }//TODO: aqui hay que disminuir tambien los contadores para enviado a cocina junto con los contadores de cantidad
 
@@ -270,9 +278,6 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         if (em1.getTransaction().isActive()) {
             em1.getTransaction().commit();
         }
-        if (o.getDeLaCasa()) {
-            ipvController.consumirPorLaCasa(o.getProductovOrdenList());
-        }
         super.edit(o);
 
         return toJsonString(Response.Status.OK, "Orden cerrada exitosamente");
@@ -285,8 +290,9 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     public Response enviarACocina(String codOrden, @Context HttpServletRequest inRequest) {
         Orden o = super.find(codOrden);
         Mesa m = getEntityManager().find(Mesa.class, o.getMesacodMesa().getCodMesa());
-        boolean notificacionEnviada = false;
+        boolean notificacionEnviada = true;
         if (R.TABLETS_EN_COCINA) {
+            notificacionEnviada = false;
             for (ProductovOrden x : o.getProductovOrdenList()) {
                 if (x.getEnviadosacocina() < x.getCantidad()) {
                     NotificacionEnvioCocinaPK notPK = new NotificacionEnvioCocinaPK();
@@ -473,6 +479,11 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         Orden o = super.find(codOrden);
         o.setDeLaCasa(deLaCasa);
         super.edit(o);
+        if (deLaCasa) {
+            ipvController.consumirPorLaCasa(o.getProductovOrdenList());
+        } else {
+            ipvController.devolverPorLaCasa(o.getProductovOrdenList());
+        }
         return toJsonString(Response.Status.OK, o);
     }//TODO: METODoS ARCAICOS
 
