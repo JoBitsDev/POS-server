@@ -66,6 +66,15 @@ public class IPVController extends AbstractController {
         }
     }
 
+    public void consumirPorLaCasa(ProductovOrden productoVenta, float cantidad) {
+        IpvVentaRegistroPK pk = new IpvVentaRegistroPK(productoVenta.getOrden().getVentafecha().getFecha(), productoVenta.getProductoVenta().getPCod());
+        IpvVentaRegistro ipvVenta = getEntityManager().find(IpvVentaRegistro.class, pk);
+        if (ipvVenta != null) {
+            ipvVenta.setAutorizos(ipvVenta.getAutorizos() + cantidad);
+            updateInstance(ipvVenta);
+        }
+    }
+
     //esto solo pincha cuando ponen el de la casa al final
     public void consumirPorLaCasa(List<ProductovOrden> listaProductos) {
         for (ProductovOrden x : listaProductos) {
@@ -90,6 +99,15 @@ public class IPVController extends AbstractController {
                 ipvVenta.setVenta(ipvVenta.getVenta() + x.getCantidad());
                 updateInstance(ipvVenta);
             }
+        }
+    }
+
+    public void devolverPorLaCasa(ProductovOrden productoVenta, float diferencia) {
+        IpvVentaRegistroPK pk = new IpvVentaRegistroPK(productoVenta.getOrden().getVentafecha().getFecha(), productoVenta.getProductoVenta().getPCod());
+        IpvVentaRegistro ipvVenta = getEntityManager().find(IpvVentaRegistro.class, pk);
+        if (ipvVenta != null) {
+            ipvVenta.setAutorizos(ipvVenta.getAutorizos() - diferencia);
+            updateInstance(ipvVenta);
         }
     }
 
