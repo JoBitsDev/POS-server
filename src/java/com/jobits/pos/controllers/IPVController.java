@@ -42,7 +42,7 @@ public class IPVController extends AbstractController {
         return cantidadMinima == Integer.MAX_VALUE ? 0 : cantidadMinima;
     }
 
-    public void consumir(ProductovOrden productoVenta, float cantidad) {
+    public void consumir(ProductovOrden productoVenta, float cantidad) throws PersistenceException{
         List<IpvRegistro> updateList = new ArrayList<>();
         for (ProductoInsumo productoInsumo : productoVenta.getProductoVenta().getProductoInsumoList()) {
             IpvRegistro registro
@@ -157,13 +157,6 @@ public class IPVController extends AbstractController {
         if (instance.getDisponible() == null) {
             instance.setDisponible((float) 0);
         }
-        instance.setDisponible(instance.getEntrada() + instance.getInicio());
-        instance.setFinal1(utils.setDosLugaresDecimalesFloat(instance.getDisponible() - instance.getConsumo()));
-        if (instance.getConsumoReal() != null) {
-            if (instance.getConsumoReal() > 0) {
-                instance.setFinal1(utils.setDosLugaresDecimalesFloat(instance.getDisponible() - instance.getConsumoReal()));
-            }
-        }
         getEntityManager().getTransaction().begin();
         getEntityManager().merge(instance);
         getEntityManager().getTransaction().commit();
@@ -188,8 +181,6 @@ public class IPVController extends AbstractController {
         if (instance.getAutorizos() == null) {
             instance.setAutorizos((float) 0);
         }
-        instance.setDisponible(instance.getEntrada() + instance.getInicio());
-        instance.setFinal1(utils.setDosLugaresDecimalesFloat(instance.getDisponible() - instance.getVenta() - instance.getAutorizos()));
         getEntityManager().getTransaction().begin();
         getEntityManager().merge(instance);
         getEntityManager().getTransaction().commit();
